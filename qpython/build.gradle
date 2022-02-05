@@ -4,7 +4,7 @@ apply plugin: 'realm-android'
 
 //获取系统时间
 def releaseTime() {
-    return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
+    return new Date().format("yyyyMMdd-HHmmss")
 }
 
 android {
@@ -14,8 +14,8 @@ android {
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 304
-        versionName "3.0.0"
+        versionCode 355
+        versionName "3.5.5"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
 
@@ -34,12 +34,12 @@ android {
 
     signingConfigs {
         release {
-            keyAlias 'zuowuxuxi'
-            keyPassword 'myxiake1q'
+            keyAlias 'key0'
+            keyPassword 'lolita'
             storeFile file('qpython.key')
-            storePassword 'myxiake1q'
-            v1SigningEnabled true
-            v2SigningEnabled false
+            storePassword 'lolita'
+            v1SigningEnabled false
+            v2SigningEnabled true
         }
 
         debug {
@@ -60,7 +60,7 @@ android {
                 variant.outputs.each { output ->
                     def outputFile = output.outputFile
                     if (outputFile != null && outputFile.name.endsWith('.apk')) {
-                        def fileName = "qpython_os_${releaseTime()}_${variant.productFlavors[0].name}.apk"
+                        def fileName = "qpython_${variant.productFlavors[0].name}_${releaseTime()}.apk"
                         output.outputFileName = fileName
                     }
                 }
@@ -96,25 +96,9 @@ android {
     //设置渠道
     productFlavors {
 
-        ol {
+        oc {
 //            resValue "string", "app_name", "Qpython"
-            applicationId "org.qpython.qpy"
-        }
-        os {
-//            resValue "string", "app_name", "Qpython"
-            applicationId "org.qpython.qpy"
-        }
-        od {
-//            resValue "string", "app_name", "Qpython"
-            applicationId "org.qpython.qpy"
-        }
-        op {
-//            resValue "string", "app_name", "QpythonL"
-            applicationId "com.hipipal.qpyplus"
-        }
-        oh {
-//            resValue "string", "app_name", "QpythonL"
-            applicationId "com.hipipal.qpyplus"
+            applicationId "indi.czc.qpython"
         }
 
     }
@@ -176,41 +160,11 @@ dependencies {
     api rootProject.ext.libSupportCardView
     api rootProject.ext.libSupportPreference
 
-    osApi rootProject.ext.firebaseCore
-    osApi rootProject.ext.firebaseMsg
-    osApi rootProject.ext.firebaseAuth
-    osApi rootProject.ext.firebaseDatabase
-    osApi rootProject.ext.googlePlayServiceAuth
-
-    olApi rootProject.ext.firebaseCore
-    olApi rootProject.ext.firebaseMsg
-    olApi rootProject.ext.firebaseAuth
-    olApi rootProject.ext.firebaseDatabase
-    olApi rootProject.ext.googlePlayServiceAuth
-
     api rootProject.ext.retrofit
     api rootProject.ext.retrofitCoverterGson
     api rootProject.ext.retrofitAdapterRxjava
 
     api 'com.android.support.constraint:constraint-layout:1.0.2'
-
-    //    微信
-    opApi('com.tencent.mm.opensdk:wechat-sdk-android-with-mta:1.4.0') {
-        exclude group: 'com.android.support:support-v4'
-    }
-    //    友盟统计
-    opApi('com.umeng.analytics:analytics:6.1.2') {
-        exclude group: 'com.android.support:support-v4'
-    }
-
-    ohApi('com.tencent.mm.opensdk:wechat-sdk-android-with-mta:1.4.0') {
-        exclude group: 'com.android.support:support-v4'
-    }
-    //    友盟统计
-    ohApi('com.umeng.analytics:analytics:6.1.2') {
-        exclude group: 'com.android.support:support-v4'
-    }
-
 
     api 'com.youth.banner:banner:1.4.10'
 }

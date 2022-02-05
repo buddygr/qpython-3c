@@ -11,7 +11,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -23,7 +22,6 @@ import com.quseit.base.QBaseApp;
 import org.qpython.qpy.console.ScriptExec;
 
 import com.quseit.util.FileHelper;
-import com.quseit.util.NAction;
 import com.quseit.util.NUtil;
 
 import org.qpython.qpy.main.activity.BaseActivity;
@@ -131,10 +129,11 @@ public class MPyApi extends BaseActivity {
                         param = bundle.getString("param");
                         if (param != null && param.equals("fileapi")) {
                             runMode = 2;
-                            ScriptExec.getInstance().playScript(this,pyfile, null, false);
+                            String arg = bundle.getString("pyarg");
+                            ScriptExec.getInstance().playScript(this,pyfile, arg, false);
                         } else {
                             // Compatibility Mode
-                            if (pycode.contains("#qpy:console\n") || NAction.isQPy3(getApplicationContext())) {
+                            if (pycode.contains("#qpy:console\n") /*|| NAction.isQPy3(getApplicationContext())*/) {
                                 runMode = 3;
                             } else {
                                 runMode = 1;
@@ -156,7 +155,7 @@ public class MPyApi extends BaseActivity {
         if (myURI != null) {
             String script = getApplicationContext().getFilesDir() + "/bin/share.py";
             String param = myURI.toString();
-            ScriptExec.getInstance().playQScript(this,script, param, false);
+            ScriptExec.getInstance().playQScript(this,script, param);
         }
     }
 
@@ -168,7 +167,7 @@ public class MPyApi extends BaseActivity {
             String script = getApplicationContext().getFilesDir() + "/bin/share.py";
             String param = sharedText;
             //new QPyTask().execute(script, param);
-            ScriptExec.getInstance().playQScript(this,script, param, false);
+            ScriptExec.getInstance().playQScript(this,script, param);
 
             // Update UI to reflect text being shared
         }
@@ -178,7 +177,7 @@ public class MPyApi extends BaseActivity {
         Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (imageUri != null) {
             //onMenu();
-            ScriptExec.getInstance().playQScript(this, getApplicationContext().getFilesDir() + "/bin/share.py", imageUri.toString(), false);
+            ScriptExec.getInstance().playQScript(this, getApplicationContext().getFilesDir() + "/bin/share.py", imageUri.toString());
 
             // Update UI to reflect image being shared
         }

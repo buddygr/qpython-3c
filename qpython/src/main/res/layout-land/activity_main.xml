@@ -5,7 +5,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/img_home_bg_land"
+        android:background="@drawable/star_mountain"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -15,12 +15,40 @@
             android:gravity="center"
             android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/icon"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="50dp"
-                android:src="@drawable/img_home_logo"/>
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="#7F2A2A2A" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/layout_padding"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#00ffff"
+                    android:text="QPython"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/layout_padding"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#00ff00"
+                    android:text="2022"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/icon_margin_top"
+                android:text="@string/proj_scri"
+                android:background="#7F2A2A2A"
+                android:textColor="#FFF"/>
 
             <ImageView
                 android:id="@+id/ll_qpy_app"
@@ -28,25 +56,14 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_home_qpyapp"/>
 
-            <TextView
-                android:id="@+id/login"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/login"
-                android:textColor="#FFF"/>
-            <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="@string/read_from_QR"-->
-            <!--android:textColor="#9B9B9B"/>-->
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_margin="25dp"
+            android:layout_margin="10dp"
             android:layout_weight="1.2"
-            android:background="#4A4A4A"
+            android:background="#7F2A2A2A"
             android:elevation="2dp"
             android:orientation="vertical">
 
@@ -72,6 +89,12 @@
                         android:layout_marginTop="@dimen/icon_margin_top"
                         android:text="@string/terminal"
                         android:textColor="#FFF"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/can_long_press"
+                        android:textColor="#FF7F7F" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -199,20 +222,20 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/ll_course"
+                    android:id="@+id/ll_record"
                     style="@style/row_ll">
 
-                    <!--ImageView
+                    <!-- ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ic_home_course"/>
+                        android:src="@drawable/ic_home_record" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/icon_margin_top"
-                        android:text="@string/course"
-                        android:textColor="#FFF"/-->
+                        android:text="@string/screen_record"
+                        android:textColor="#FFF" / -->
                 </LinearLayout>
 
                 <LinearLayout
@@ -231,8 +254,6 @@
                         android:text="@string/community"
                         android:textColor="#FFF"/-->
                 </LinearLayout>
-
-
 
 
             </LinearLayout>

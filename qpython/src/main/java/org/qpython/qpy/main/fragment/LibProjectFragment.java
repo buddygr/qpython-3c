@@ -1,5 +1,6 @@
 package org.qpython.qpy.main.fragment;
 
+import android.annotation.SuppressLint;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
@@ -12,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -77,8 +79,8 @@ public class LibProjectFragment extends RefreshFragment {
         super.onViewCreated(view, savedInstanceState);
         binding = DataBindingUtil.bind(view);
 
-        SCRIPT_DIR = QPyConstants.ABSOLUTE_PATH + "/" + (NAction.isQPy3(getActivity())?QPyConstants.DFROM_QPY3:QPyConstants.DFROM_QPY2) +"/";
-        PROJECT_DIR = QPyConstants.ABSOLUTE_PATH + "/" + (NAction.isQPy3(getActivity())?QPyConstants.DFROM_PRJ3:QPyConstants.DFROM_PRJ2) +"/";
+        SCRIPT_DIR = QPyConstants.ABSOLUTE_PATH + "/" + /*(NAction.isQPy3(getActivity())?*/QPyConstants.DFROM_QPY3/*:QPyConstants.DFROM_QPY2)*/ +"/";
+        PROJECT_DIR = QPyConstants.ABSOLUTE_PATH + "/" + /*(NAction.isQPy3(getActivity())?*/QPyConstants.DFROM_PRJ3/*:QPyConstants.DFROM_PRJ2)*/ +"/";
 
         initDataList();
         initView();
@@ -114,12 +116,26 @@ public class LibProjectFragment extends RefreshFragment {
                 }
             }
 
+            @SuppressLint("SetTextI18n")
             @Override
             public void onError(Throwable e) {
                 binding.swipeList.setVisibility(View.GONE);
                 binding.progressBar.setVisibility(View.GONE);
                 binding.netError.setVisibility(View.VISIBLE);
+
+                if (NetStateUtil.isConnected(getContext())) {
+                    Button np = binding.netErrPypi;
+                    np.setText(
+                            getString(R.string.click_force_open)+" "+
+                            getString(R.string.install_with_python_s_pypi)+"\n"+
+                            getString(R.string.py_pi));
+                    np.setOnClickListener(v -> {
+                        openPip();
+                    });
+                    np.setVisibility(View.VISIBLE);
+                }
             }
+
 
             @Override
             public void onNext(List<LibModel> libModels) {
@@ -205,9 +221,9 @@ public class LibProjectFragment extends RefreshFragment {
     private void installTool(LibModel item) {
         String downloadDir = null;
         if (item.getCat().equals("script")) {
-            downloadDir = "qpython/"+(NAction.isQPy3(getActivity())?QPyConstants.DFROM_QPY3:QPyConstants.DFROM_QPY2);
+            downloadDir = "qpython/"+/*(NAction.isQPy3(getActivity())?*/QPyConstants.DFROM_QPY3;//:QPyConstants.DFROM_QPY2);
         } else if (item.getCat().equals("user")) {
-            downloadDir = "qpython/"+(NAction.isQPy3(getActivity())?QPyConstants.DFROM_QPY3:QPyConstants.DFROM_QPY2);
+            downloadDir = "qpython/"+/*(NAction.isQPy3(getActivity())?*/QPyConstants.DFROM_QPY3;//:QPyConstants.DFROM_QPY2);
         }
 
         // Download
@@ -243,7 +259,7 @@ public class LibProjectFragment extends RefreshFragment {
                         if (item.getSrc().equals("")) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                             AlertDialog alertDialog = builder.setTitle(R.string.location)
-                                    .setMessage(CONF.qpypiPath() + "/" + item.getTitle())
+                                    .setMessage(CONF.qpypiPath + "/" + item.getTitle())
                                     .setPositiveButton(R.string.confirm, null)
                                     .create();
                             alertDialog.show();
@@ -275,7 +291,7 @@ public class LibProjectFragment extends RefreshFragment {
                         if (item.getSrc().equals("")) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                             AlertDialog alertDialog = builder.setTitle(R.string.location)
-                                    .setMessage(CONF.qpypiPath() + "/" + item.getTitle())
+                                    .setMessage(CONF.qpypiPath + "/" + item.getTitle())
                                     .setPositiveButton(R.string.confirm, null)
                                     .create();
                             alertDialog.show();

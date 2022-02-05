@@ -174,7 +174,7 @@ public class GistDetailActivity extends BaseActivity implements DetailView {
     @Subscribe
     public void onEvent(GistEvent event) {
         switch (event.name) {
-            case FORK:
+            /*case FORK:
                 ifLogin(this::fork);
                 break;
             case COMMENT_EVENT: {
@@ -189,7 +189,7 @@ public class GistDetailActivity extends BaseActivity implements DetailView {
             case FAVORITE_REQUEST: {
                 ifLogin(() -> mDetailControler.favoriteGist(id));
                 break;
-            }
+            }*/
 
             case RUN_SCRIPT: {
                 String[] titleCode = event.content.split(DIVIDER);
@@ -197,17 +197,17 @@ public class GistDetailActivity extends BaseActivity implements DetailView {
                 break;
             }
 
-            case RUN_NOTEBOOK: {
+            /*case RUN_NOTEBOOK: {
                 // TODO: 2018/3/12 打开notebook
                 break;
-            }
+            }*/
 
             case CODE_REVIEW_EVENT: {
                 mCodeReviewDialog.show();
                 break;
             }
 
-            case REPLY_EVENT: {
+            /*case REPLY_EVENT: {
                 ifLogin(() -> {
                     toId = event.content.split(",")[0];
                     commentUserName = event.content.split(",")[1];
@@ -216,7 +216,7 @@ public class GistDetailActivity extends BaseActivity implements DetailView {
                     showSoftInput(true);
                 });
                 break;
-            }
+            }*/
 
         }
 
@@ -254,11 +254,11 @@ public class GistDetailActivity extends BaseActivity implements DetailView {
 
 //        if (!getIntent().getBooleanExtra(IS_EDITABLE, false)) {
         MenuItem item = menu.findItem(R.id.news_edit);
-        if (App.getUser() != null && App.getUser().getUserName().equals(gistUserName)) {
-            item.setVisible(true);
-        } else {
+        //if (App.getUser() != null && App.getUser().getUserName().equals(gistUserName)) {
+            //item.setVisible(true);
+       // } else {
             item.setVisible(false);
-        }
+       // }
         return true;
     }
 

@@ -6,24 +6,66 @@
         android:id="@+id/rootView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/mohu"
+        android:background="@drawable/star_mountain"
         android:orientation="vertical"
         android:padding="@dimen/default_margin">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#7F2A2A2A"
+        android:layout_gravity="center">
+
+        <TextView
+            android:id="@+id/tv_ar_back"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:gravity="start"
+            android:text="←"
+            android:textColor="#FF0"
+            android:textSize="25sp"
+            android:textStyle="bold|italic"
+            android:clickable="true"
+            android:layout_weight="3"/>
+
         <TextView
             android:id="@+id/tv_folder_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/qpy_app"
+            android:textColor="#FFF"
+            android:layout_weight="1"
+            android:textSize="25sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_weight="3"
+            android:gravity="end"
+            android:text=""
+            android:textSize="25sp" />
+
+    </LinearLayout>
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/qpy_app"
-            android:textColor="#FFF"
-            android:textSize="28sp"/>
+            android:text="@string/click_ball"
+            android:textColor="#ff7f7f"
+            android:background="#7F2A2A2A"
+            android:textSize="15sp"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_app"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="40dp"
-            android:background="@null"/>
+            android:layout_marginTop="10dp"
+            android:background="#7F2A2A2A"/>
     </LinearLayout>
 </layout>

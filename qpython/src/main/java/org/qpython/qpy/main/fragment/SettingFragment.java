@@ -16,7 +16,6 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -38,44 +37,38 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.qpython.qpy.R;
 import org.qpython.qpy.main.activity.AboutActivity;
-import org.qpython.qpy.main.activity.CourseActivity;
 import org.qpython.qpy.main.activity.HomeMainActivity;
 import org.qpython.qpy.main.app.App;
+import org.qpython.qpy.main.auxActivity.ProtectActivity;
+import org.qpython.qpy.main.auxActivity.ScreenRecordActivity;
 import org.qpython.qpy.main.service.FTPServerService;
 import org.qpython.qpy.main.widget.LoadingDialog;
 import org.qpython.qpy.texteditor.ui.view.EnterDialog;
-import org.qpython.qpy.utils.NotebookUtil;
 import org.qpython.qpysdk.QPyConstants;
 import org.qpython.qpysdk.QPySDK;
 import org.qpython.qpysdk.utils.Utils;
 import org.qpython.qsl4a.QPyScriptService;
-import org.swiftp.Util;
 
 import java.io.File;
 import java.net.InetAddress;
-import java.text.MessageFormat;
-
-import rx.Observable;
-import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-
 
 public class SettingFragment extends PreferenceFragment {
     private static final String TAG = "SettingFragment";
-
-    private static final String URL_COMMUNITY = "https://www.qpython.org/community.html";
 
     private LoadingDialog mLoadingDialog;
 
     private SharedPreferences settings;
     private Resources         resources;
     private Preference        mPassWordPref, username_pref, portnum_pref, chroot_pref, lastlog;
-    private CheckBoxPreference sl4a, running_state, root, display_pwd, notebook_run;
+    private CheckBoxPreference sl4a, running_state, root, display_pwd, qpy_protect;//, notebook_run;
 
-    private PreferenceScreen py_inter,notebook_page;
-    private Preference py3,py2; //notebook_res, py2compatible
+    //private PreferenceScreen py_inter,notebook_page;
+    //private Preference py3,py2; //notebook_res, py2compatible
     //private Preference update_qpy3,update_qpy2compatible;
+
+    private void viewWebSite(int resId) {
+        startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(getString(resId))));
+    }
 
     private SwitchPreference log, app;
     private BroadcastReceiver ftpServerReceiver = new BroadcastReceiver() {
@@ -92,9 +85,13 @@ public class SettingFragment extends PreferenceFragment {
             } else if (intent.getAction().equals(FTPServerService.ACTION_FAILEDTOSTART)) {
                 running_state.setChecked(false);
                 running_state.setSummary(org.swiftp.R.string.running_summary_failed);
+                Toast.makeText(getActivity(),R.string.ip_address_need_wifi_or_ap,Toast.LENGTH_LONG).show();
             }
         }
     };
+
+    public SettingFragment() {
+    }
 
     static private String transformPassword(String password) {
         StringBuilder sb = new StringBuilder(password.length());
@@ -135,7 +132,7 @@ public class SettingFragment extends PreferenceFragment {
         Preference ipaddress = findPreference("ipaddress");
         InetAddress ip;
         try {
-            ip = FTPServerService.getWifiIp();
+            ip = FTPServerService.getWifiAndApIp();
         } catch (NullPointerException e) {
             ip = null;
 
@@ -143,11 +140,11 @@ public class SettingFragment extends PreferenceFragment {
         if (ip!=null) {
             ipaddress.setSummary(ip.getHostAddress());
         } else {
-            ipaddress.setSummary(R.string.ip_address_need_wifi);
+            ipaddress.setSummary(R.string.ip_address_need_wifi_or_ap);
         }
         lastlog = (Preference) findPreference("lastlog");
-        py_inter = (PreferenceScreen) findPreference(getString(R.string.key_py_inter));
-        notebook_page = (PreferenceScreen) findPreference(getString(R.string.key_notebook_page));
+        //py_inter = (PreferenceScreen) findPreference(getString(R.string.key_py_inter));
+        /*notebook_page = (PreferenceScreen) findPreference(getString(R.string.key_notebook_page));
         notebook_page.setTitle(MessageFormat.format(getString(R.string.notebook_for_py), NAction.getPyVer(getActivity())));
         if (NAction.isQPy3(getActivity())) {
             notebook_page.setSummary(NotebookUtil.isNotebookLibInstall(getActivity()) ? R.string.notebook_installed : R.string.notebook_not_started);
@@ -155,24 +152,24 @@ public class SettingFragment extends PreferenceFragment {
         } else {
             notebook_page.setSummary( R.string.notebook_py3_support);
 
-        }
+        }*/
 
         //notebook_res = (Preference) findPreference(getString(R.string.key_notebook));
         //notebook_res.setSummary((NotebookUtil.isNotebookLibInstall(getActivity())||NotebookUtil.isNotebookInstall(getActivity()))?R.string.choose_notebook_inter:R.string.install_notebook_first);
-        notebook_run = (CheckBoxPreference) findPreference(getString(R.string.key_notebook_run));
+        //notebook_run = (CheckBoxPreference) findPreference(getString(R.string.key_notebook_run));
 
         //update_qpy3 = (Preference)findPreference(getString(R.string.key_update_qpy3));
         //update_qpy2compatible = (Preference)findPreference(getString(R.string.key_update_qpy2compatible));
-        py2 = (Preference) findPreference(getString(R.string.key_py2));
+        //py2 = (Preference) findPreference(getString(R.string.key_py2));
         //py2compatible = (Preference) findPreference(getString(R.string.key_py2compatible));
-        py3 = (Preference) findPreference(getString(R.string.key_py3));
+        //py3 = (Preference) findPreference(getString(R.string.key_py3));
 
 
         root = (CheckBoxPreference) findPreference(resources.getString(R.string.key_root));
         sl4a = (CheckBoxPreference) findPreference(resources.getString(R.string.key_sl4a));
+        qpy_protect = (CheckBoxPreference) findPreference("qpython_protect");
         app = (SwitchPreference) findPreference(getString(R.string.key_hide_push));
         log = (SwitchPreference) findPreference(resources.getString(R.string.key_hide_noti));
-        //qpypi = findPreference(resources.getString(R.string.key_qpypi));
         username_pref = findPreference(resources.getString(R.string.key_username));
         running_state = (CheckBoxPreference) findPreference(resources.getString(R.string.key_ftp_state));
         display_pwd = (CheckBoxPreference) findPreference(resources.getString(R.string.key_show_pwd));
@@ -180,7 +177,7 @@ public class SettingFragment extends PreferenceFragment {
         portnum_pref = findPreference(resources.getString(R.string.key_port_num));
         chroot_pref = findPreference(resources.getString(R.string.key_root_dir));
 
-        boolean isRoot, isRunning, isSaverOn;
+        boolean isRoot, isRunning;
         isRoot = settings.getBoolean(getString(R.string.key_root), false);
         root.setChecked(isRoot);
         root.setSummary(isRoot ? R.string.enable_root : R.string.disable_root);
@@ -188,6 +185,8 @@ public class SettingFragment extends PreferenceFragment {
         isRunning = isMyServiceRunning(QPyScriptService.class);
         sl4a.setChecked(isRunning);
         sl4a.setSummary(isRunning ? R.string.sl4a_running : R.string.sl4a_un_running);
+
+        qpy_protect.setChecked(settings.getBoolean("qpython_protect",false));
 
         app.setChecked(settings.getBoolean(getString(R.string.key_hide_push), true));
         log.setChecked(settings.getBoolean(getString(R.string.key_hide_noti), true));
@@ -206,7 +205,7 @@ public class SettingFragment extends PreferenceFragment {
         chroot_pref.setSummary(settings.getString(resources.getString(R.string.key_root_dir),
                 Environment.getExternalStorageDirectory().getPath()));
 
-        py_inter.setSummary(NAction.isQPy3(getActivity()) ? R.string.py3_now : R.string.py2_now);
+        //py_inter.setSummary(NAction.isQPy3(getActivity()) ? R.string.py3_now : R.string.py2_now);
         //setNotebookCheckbox();
 
         SharedPreferences.Editor editor = settings.edit();
@@ -222,10 +221,11 @@ public class SettingFragment extends PreferenceFragment {
     }
 
     private void setFtpAddress() {
-        InetAddress address = FTPServerService.getWifiIp();
+        InetAddress address = FTPServerService.getWifiAndApIp();
         if (address == null) {
             Log.v(TAG, "Unable to retreive wifi ip address");
             running_state.setSummary(org.swiftp.R.string.cant_get_url);
+            Toast.makeText(getActivity(),R.string.ip_address_need_wifi_or_ap,Toast.LENGTH_LONG).show();
         } else {
             String iptext = "ftp://" + address.getHostAddress() + ":"
                     + FTPServerService.getPort() + "/";
@@ -245,16 +245,26 @@ public class SettingFragment extends PreferenceFragment {
         return false;
     }
 
-
     private void initListener() {
 
         lastlog.setOnPreferenceClickListener(preference -> {
-            Utils.checkRunTimeLog(getActivity(), getString(R.string.last_log), QPyConstants.ABSOLUTE_LOG);
-
+            File logFolder = new File(Environment.getExternalStorageDirectory(),"qpython/log");
+            String[] logFiles = logFolder.list();
+            if (logFiles == null || logFiles.length==0){return false;}
+            android.app.AlertDialog.Builder alert;
+            alert = new android.app.AlertDialog.Builder(getActivity(),R.style.MyDialog);
+            alert.setTitle(R.string.choose_file);
+            alert.setItems(logFiles, (dialogInterface, i) -> {
+                Utils.checkRunTimeLog(getActivity(), getString(R.string.last_log),
+                        logFolder.toString()+"/"+logFiles[i]);
+                    });
+            alert.setNegativeButton(getString(R.string.close),
+                    (dialogInterface, i) -> dialogInterface.dismiss());
+            alert.create().show();
             return false;
         });
 
-        if (!NAction.isQPy3(getActivity())) {
+        /*if (!NAction.isQPy3(getActivity())) {
             notebook_run.setSummary(getString(R.string.notebook_py3_support));
             notebook_run.setEnabled(false);
 
@@ -272,22 +282,22 @@ public class SettingFragment extends PreferenceFragment {
 
                 return true;
             });
-        }
+        }*/
 
-        py2.setOnPreferenceClickListener(preference -> {
+        /*py2.setOnPreferenceClickListener(preference -> {
             Log.d(TAG, "py2.setOnPreferenceClickListener");
             NotebookUtil.killNBSrv(getActivity());
 
-            releasePython2Standard(preference);
+            releasePython2Standard();
             return false;
         });
 
         py3.setOnPreferenceClickListener(preference -> {
             NotebookUtil.killNBSrv(getActivity());
-            releasePython3(preference);
+            releasePython3();
 
             return false;
-        });
+        });*/
 
         root.setOnPreferenceChangeListener((preference, newValue) ->
         {
@@ -346,19 +356,54 @@ public class SettingFragment extends PreferenceFragment {
                 return true;
             });
 
-        findPreference("course").
+        findPreference("course_official").
             setOnPreferenceClickListener(preference ->
             {
-                CourseActivity.start(getActivity());
+                viewWebSite(R.string.qpython_edu);
                 return true;
             });
 
         findPreference("community").
             setOnPreferenceClickListener(preference ->
             {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(URL_COMMUNITY+"?from="+NAction.getCode(this.getActivity()))));
+                viewWebSite(R.string.community_website);
                 return true;
             });
+
+        findPreference("video_account").
+                setOnPreferenceClickListener(preference ->
+                {
+                    viewWebSite(R.string.bilibili_video_website);
+                    return true;
+                });
+
+        findPreference("open_source_library").
+            setOnPreferenceClickListener(preference ->
+            {
+                viewWebSite(R.string.bilibili_website);
+                return true;
+            });
+
+        findPreference("screen_record").
+                setOnPreferenceClickListener(preference ->
+                {
+                    startActivity(new Intent(getActivity(), ScreenRecordActivity.class));
+                    return true;
+                });
+
+        qpy_protect.setOnPreferenceChangeListener((preference,newValue) -> {
+            Context context = getActivity();
+            boolean result = (boolean) newValue;
+            settings.edit().putBoolean("qpython_protect",result).apply();
+            if (result) {
+                ProtectActivity.DoProtect(context);
+                } else {
+                Toast.makeText(context,getString(R.string.restart_valid),Toast.LENGTH_SHORT).show();
+                ProtectActivity.UndoProtect();
+            }
+            return true;
+        });
+
         /*  ====================FTP====================   */
         running_state.setOnPreferenceChangeListener((preference, newValue) ->
         {
@@ -475,7 +520,7 @@ public class SettingFragment extends PreferenceFragment {
         });
     }
 
-    private void releaseNotebook(Preference preference) {
+    /*private void releaseNotebook(Preference preference) {
         Observable.create((Observable.OnSubscribe<Boolean>) subscriber -> {
             try {
                 String nbfile = NStorage.getSP(App.getContext(), NotebookUtil.getNbResFk(getActivity()));
@@ -546,7 +591,7 @@ public class SettingFragment extends PreferenceFragment {
                 qpySDK.extractRes(resf, new File(extarget), false);
             }
         }
-    }
+    }*/
 
 
     private void releaseQPycRes(String path) {
@@ -562,14 +607,19 @@ public class SettingFragment extends PreferenceFragment {
         }
     }
 
-    private void releasePython2Standard(Preference preference) {
+    /*private void releasePython2Standard() {
         Observable.create((Observable.OnSubscribe<Boolean>) subscriber -> {
             try {
+                File filesDir = getActivity().getFilesDir();
                 //removeQPyc2Core();
                 QPySDK qpysdk = new QPySDK(getActivity(), getActivity());
-                qpysdk.extractRes("private1", getActivity().getFilesDir(), true);
-                qpysdk.extractRes("private2", getActivity().getFilesDir(), true);
-                qpysdk.extractRes("private3", getActivity().getFilesDir(),true);
+                qpysdk.extractRes("private1", filesDir, true);
+                qpysdk.extractRes("private2", filesDir, true);
+                qpysdk.extractRes("private~", new File(filesDir,"lib/python2.7/site-packages"), true);
+                qpysdk.extractRes("private3", filesDir,true);
+
+                File externalStorage = new File(Environment.getExternalStorageDirectory(), "qpython");
+                qpysdk.extractRes("public", new File(externalStorage + "/lib"),true);
 
                 subscriber.onNext(true);
                 subscriber.onCompleted();
@@ -602,9 +652,9 @@ public class SettingFragment extends PreferenceFragment {
                 getActivity().recreate();
             }
         });
-    }
+    }*/
 
-    private void releasePython2Compatable(Preference preference) {
+    /*private void releasePython2Compatable(Preference preference) {
         Observable.create((Observable.OnSubscribe<Boolean>) subscriber -> {
             try {
 
@@ -643,24 +693,25 @@ public class SettingFragment extends PreferenceFragment {
                 getActivity().recreate();
             }
         });
-    }
+    }*/
 
 
-    private void releasePython3(Preference preference) {
+    /*private void releasePython3() {
         QPySDK qpysdk = new QPySDK(this.getActivity(), this.getActivity());
         Observable.create((Observable.OnSubscribe<Boolean>) subscriber -> {
             try {
+                File filesDir = getActivity().getFilesDir();
                 releaseQPycRes(NStorage.getSP(App.getContext(),QPyConstants.KEY_PY3_RES));
                 //extractQPyCore(false);
 
-                qpysdk.extractRes("private31", getActivity().getFilesDir(), true);
-                qpysdk.extractRes("private32", getActivity().getFilesDir(), true);
-                qpysdk.extractRes("private33", getActivity().getFilesDir(),true);
-                qpysdk.extractRes("notebook3", getActivity().getFilesDir(), true);
+                qpysdk.extractRes("private31", filesDir, true);
+                qpysdk.extractRes("private32", filesDir, true);
+                qpysdk.extractRes("private~", new File(filesDir,"lib/python"+QPyConstants.py3Ver+"/site-packages"), true);
+                qpysdk.extractRes("private33", filesDir,true);
+                //qpysdk.extractRes("notebook3", filesDir, true);
 
                 File externalStorage = new File(Environment.getExternalStorageDirectory(), "qpython");
-
-                qpysdk.extractRes("publi3c", new File(externalStorage + "/lib"));
+                qpysdk.extractRes("public3", new File(externalStorage + "/lib"));
 
                 subscriber.onNext(true);
                 subscriber.onCompleted();
@@ -694,7 +745,7 @@ public class SettingFragment extends PreferenceFragment {
             }
         });
 
-    }
+    }*/
 
     private void updatePreference(Preference preference) {
         SharedPreferences.Editor editor = settings.edit();
@@ -751,7 +802,7 @@ public class SettingFragment extends PreferenceFragment {
 
     /*
     TODO: Make it configuration
-     */
+
     private void getNotebook() {
 
         mLoadingDialog.show();
@@ -850,7 +901,7 @@ public class SettingFragment extends PreferenceFragment {
             }
         });
 
-    }
+    }*/
     private void getQPYC(boolean ispy2compatible) {
         mLoadingDialog.show();
 
@@ -954,21 +1005,21 @@ public class SettingFragment extends PreferenceFragment {
 
     private boolean isQPycRelease(boolean ispy2compatible) {
         boolean isRelease = true;
-        String[] py3Mp3File = getActivity().getResources().getStringArray(ispy2compatible?R.array.qpy2compatible_zip:R.array.qpy3_zip);
+        String[] py3Mp3File = getActivity().getResources().getStringArray(R.array.qpy3_zip);
         for (String s : py3Mp3File) {
             isRelease = isRelease && new File(QPyConstants.PY_CACHE_PATH + "/" + s).exists();
         }
         return isRelease;
     }
 
-    private void removeQPyc2Core() {
+    /*private void removeQPyc2Core() {
         Log.d(TAG, "removeQPyc2Core");
         String files = getActivity().getFilesDir().getAbsolutePath();
         String[] files2del = {files+"/lib/notebook.zip", files+"/lib/python27.zip", files+"/lib/python2.7"};
         for (int i=0;i<files2del.length;i++) {
             QPySDK.recursiveDelete(files2del[i]);
         }
-    }
+    }*/
 
     /**
      * 应该在工作线程处理文件的解压释放
@@ -976,7 +1027,7 @@ public class SettingFragment extends PreferenceFragment {
     private void extractQPyCore(Boolean ispy2Compatible) {
         QPySDK qpySDK = new QPySDK(getActivity(), getActivity());
         File libFolder = new File(QPyConstants.ABSOLUTE_PATH, QPyConstants.PY_CACHE);
-        String[] pyMp3File = getActivity().getResources().getStringArray(ispy2Compatible?R.array.qpy2compatible_zip:R.array.qpy3_zip);
+        String[] pyMp3File = getActivity().getResources().getStringArray(R.array.qpy3_zip);
 
         for (String s : pyMp3File) {
 
@@ -992,4 +1043,5 @@ public class SettingFragment extends PreferenceFragment {
 
         }
     }
+
 }

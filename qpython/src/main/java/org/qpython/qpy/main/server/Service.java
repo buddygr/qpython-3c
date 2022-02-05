@@ -17,14 +17,10 @@ import org.qpython.qpy.BuildConfig;
 import org.qpython.qpy.main.activity.LibActivity;
 import org.qpython.qpy.main.app.App;
 import org.qpython.qpy.main.server.model.BaseLibModel;
-import org.qpython.qpy.main.server.model.CourseAdModel;
-import org.qpython.qpy.main.server.model.CourseModel;
 import org.qpython.qpy.main.server.model.LibModel;
-import org.qpython.qpy.main.server.model.MyCourse;
 import org.qpython.qpy.main.server.model.PayStatusModel;
 import org.qpython.qpy.main.server.model.QpypiModel;
 import org.qpython.qpy.main.server.model.UpdateModel;
-import org.qpython.qpy.main.utils.Utils;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -91,7 +87,7 @@ public class Service extends CacheKey {
         toSubscribe(request.checkUpdate(), subscriber);
     }
 
-    public Observable<List<CourseModel>> getCourse() {
+ /*   public Observable<List<CourseModel>> getCourse() {
 //        List<CourseModel> courseModels = new ArrayList<>();
 //        List<CourseModel> latest = getObject(new TypeToken<ArrayList<CourseModel>>() {
 //        }.getType(), COURSE_LATEST);
@@ -114,7 +110,7 @@ public class Service extends CacheKey {
 //        }
     }
 
-    public void getMyCourse(String email, Subscriber<MyCourse> subscriber) {
+    /*public void getMyCourse(String email, Subscriber<MyCourse> subscriber) {
         toSubscribe(apuQuseit
                         .getMyCourse(App.getContext().getPackageName(), email),
                 subscriber);
@@ -122,7 +118,7 @@ public class Service extends CacheKey {
 
     public Observable<CourseAdModel> getCourseAd() {
         return apuQuseit.getCourseAd(BuildConfig.VERSION_CODE);
-    }
+    }*/
 
     public void getArticleSupportNum(String articleId, Subscriber<Object> callback) {
         toSubscribe(apuQuseit.getSupportNum(articleId), callback);

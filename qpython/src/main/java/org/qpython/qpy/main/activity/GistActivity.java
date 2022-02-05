@@ -22,7 +22,6 @@ import org.qpython.qpy.main.server.gist.TokenManager;
 import org.qpython.qpy.main.server.gist.indexScreen.GistHomeControler;
 import org.qpython.qpy.main.server.gist.indexScreen.GistHomeView;
 import org.qpython.qpy.main.server.gist.response.GistBean;
-import org.qpython.qpy.main.server.model.CourseAdModel.QpyBean.ExtAdBean.FeaturedBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +39,7 @@ import java.util.List;
 public class GistActivity extends BaseActivity implements GistHomeView {
 
     private ActivityCommunityBinding binding;
-    private List<FeaturedBean>       mADBeans;
+    //private List<FeaturedBean>       mADBeans;
     private GistHomeControler        mGistHomeControler;
     private GistFragment             latestFragment, featureFragment;
     private int scrollHeight;// 记录滚动超出多少后显示顶部的Tab
@@ -56,7 +55,7 @@ public class GistActivity extends BaseActivity implements GistHomeView {
         initFragment();
         initListener();
         getData();
-        getAD();
+        //getAD();
     }
 
     @Override
@@ -123,8 +122,8 @@ public class GistActivity extends BaseActivity implements GistHomeView {
 
     private void initListener() {
         binding.adSlide.setOnUrlBackCall(i -> {
-            FeaturedBean bean = mADBeans.get(i);
-            QWebViewActivity.start(this, bean.getAd_man(), bean.getAd_link());
+            //FeaturedBean bean = mADBeans.get(i);
+            //QWebViewActivity.start(this, bean.getAd_man(), bean.getAd_link());
         });
         binding.getRoot().getViewTreeObserver().addOnGlobalLayoutListener(() -> scrollHeight = binding
                 .adSlide.getHeight());
@@ -163,19 +162,19 @@ public class GistActivity extends BaseActivity implements GistHomeView {
         mGistHomeControler.refresh();
     }
 
-    public void getAD() {
+    /*public void getAD() {
         mGistHomeControler.getAD();
-    }
+    }*/
 
     @Override
     public void showError(String msg) {
     }
 
-    @Override
+    /*@Override
     public void hideError() {
-    }
+    }*/
 
-    @Override
+    /*@Override
     public void setAD(List<FeaturedBean> list) {
         mADBeans = list;
         List<String> urls = new ArrayList<>();
@@ -187,7 +186,7 @@ public class GistActivity extends BaseActivity implements GistHomeView {
 
     @Override
     public void hideAd() {
-    }
+    }*/
 
     @Override
     protected void onDestroy() {

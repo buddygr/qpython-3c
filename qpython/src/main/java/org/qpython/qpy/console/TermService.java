@@ -57,7 +57,7 @@ import jackpal.androidterm.libtermexec.v1.ITerminal;
 public class TermService extends Service implements TermSession.FinishCallback {
     /* Parallels the value of START_STICKY on API Level >= 5 */
     public static final  int NOTIFICATION_ID      = 40530;
-    private static final int RUNNING_NOTIFICATION = 1;
+   // private static final int RUNNING_NOTIFICATION = 1;
     private ServiceForegroundCompat compat;
 
     private SessionList mTermSessions;
@@ -71,9 +71,9 @@ public class TermService extends Service implements TermSession.FinishCallback {
 
     private final IBinder mTSBinder = new TSBinder();
 
-    @Override
-    public void onStart(Intent intent, int flags) {
-    }
+    //@Override
+   // public void onStart(Intent intent, int flags) {
+    //}
 
     /* This should be @Override if building with API Level >=5 */
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -93,11 +93,11 @@ public class TermService extends Service implements TermSession.FinishCallback {
                 .setContentText(getString(R.string.console_running))
                 .setSmallIcon(R.drawable.terminal_mini_icon);
         Notification notification;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+        //if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
             notification = builder.build();
-        } else {
+        /*} else {
             notification = builder.getNotification();
-        }
+        }*/
         startForeground(NOTIFICATION_ID, notification);
         return START_STICKY;
     }

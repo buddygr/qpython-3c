@@ -13,13 +13,13 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+
+import com.quseit.util.FileHelper;
 
 import org.qpython.qpy.R;
+import org.qpython.qpy.console.ScriptExec;
 import org.qpython.qpy.databinding.ActivityAboutBinding;
-import org.qpython.qpy.main.app.App;
-import org.qpython.qpy.main.server.MySubscriber;
-import org.qpython.qpy.main.server.model.UpdateModel;
+import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.texteditor.androidlib.common.MiscUtils;
 
 
@@ -31,6 +31,7 @@ import org.qpython.qpy.texteditor.androidlib.common.MiscUtils;
 public class AboutActivity extends BaseActivity {
     ActivityAboutBinding binding;
     ProgressDialog       progressDialog;
+    String               QPY_DESCRIPTION;
 
     public static void start(Context context) {
         Intent starter = new Intent(context, AboutActivity.class);
@@ -40,6 +41,8 @@ public class AboutActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        QPY_DESCRIPTION = getString(R.string.qpy_description).replace(
+                "PyVer", CONF.pyVerComplete);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_about);
         try {
             PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -55,33 +58,61 @@ public class AboutActivity extends BaseActivity {
         setTitle(R.string.about);
         myToolbar.setNavigationIcon(R.drawable.ic_back);
         myToolbar.setNavigationOnClickListener(view -> finish());
+        binding.tvAppId.setText(getPackageName());
 
         initListener();
-        checkUpdate(true);
+        //checkUpdate(true);
+    }
+
+    private void viewWebSite(int resId) {
+        startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(getString(resId))));
     }
 
     private void initListener() {
-        binding.tvStar.setOnClickListener(v -> {
-            Intent viewIntent = new Intent("android.intent.action.VIEW",
-                    Uri.parse("market://details?id=" + getPackageName()));
-            startActivity(viewIntent);
-        });
 
         binding.tvPrivacy.setOnClickListener(v -> {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.privacy_html)));
-            startActivity(browserIntent);
+            viewWebSite(R.string.privacy_html);
         });
 
-        binding.tvFeedback.setOnClickListener(v -> onFeedback(""));
+        //binding.tvPackageName.setOnClickListener(v -> onFeedback(""));
+
+        binding.tvQpyDescription.setText(QPY_DESCRIPTION);
 
         binding.tvUpdate.setOnClickListener(v -> {
-            checkUpdate(false);
-            progressDialog.show();
+            //  checkUpdate(false);
+            //progressDialog.show();
+            ScriptExec.getInstance().playScript(this,
+                    getFilesDir().getAbsolutePath()+"/bin/updateQPython.py",
+                    null, false);
         });
 
-        binding.tvThanks.setOnClickListener(v ->
-            startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(getString(R.string.thanks_link))))
+        binding.tvBackupDownload.setOnClickListener(v ->
+            viewWebSite(R.string.backup_down_addr)
         );
+
+        binding.ForkFrom.setOnClickListener(v ->
+            viewWebSite(R.string.qpython_github)
+        );
+
+        binding.ForkTo.setOnClickListener(v ->
+                viewWebSite(R.string.qpython_3c_github)
+        );
+
+        binding.tvThanks.setOnClickListener(v ->
+            viewWebSite(R.string.thanks_link)
+        );
+
+        binding.openSourceProtocol.setOnClickListener(v ->{
+            String content = FileHelper.getFileContents(getFilesDir()+"/text/"+getString(R.string.lang_flag)+"/security_tip");
+            new AlertDialog.Builder(this, R.style.MyDialog)
+                    .setTitle(R.string.notice)
+                    .setMessage(content)
+                    .setPositiveButton(R.string.ok, (dialog1, which) -> {
+                        viewWebSite(R.string.apache2);
+                    })
+                    .create()
+                    .show();
+                });
     }
 
     @Override
@@ -95,15 +126,18 @@ public class AboutActivity extends BaseActivity {
         switch (item.getItemId()) {
             case R.id.menu_mail:
 //                MiscUtils.sendEMailTo(getString(R.string.ui_mail), getPackageManager().getApplicationLabel(getApplicationInfo()).toString());
-                onFeedback("");
+                //onFeedback("");
                 break;
             case R.id.menu_share:
-                MiscUtils.share(this, getString(R.string.share_text));
+                MiscUtils.share(this,
+                        QPY_DESCRIPTION+
+                                getString(R.string.bili_web_tip)+
+                        getString(R.string.bilibili_website));
                 break;
         }
         return true;
     }
-
+/*
     private void checkUpdate(boolean open) {
         App.getService().checkUpdate(new MySubscriber<UpdateModel>() {
             @Override
@@ -158,5 +192,5 @@ public class AboutActivity extends BaseActivity {
                 }
             }
         });
-    }
+    }*/
 }

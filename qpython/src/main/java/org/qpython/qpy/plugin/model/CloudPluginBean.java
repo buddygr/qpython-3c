@@ -1,7 +1,7 @@
 package org.qpython.qpy.plugin.model;
 
 import com.quseit.common.updater.updatepkg.UpdatePackage;
-import org.qpython.qpy.plugin.CloudPluginManager;
+import org.qpython.qpy.plugin.manager.CloudPluginManager;
 
 import java.io.File;
 

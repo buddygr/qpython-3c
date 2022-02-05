@@ -26,6 +26,7 @@ import com.quseit.util.FileUtils;
 
 import org.qpython.qpy.console.compont.FileCompat;
 import org.qpython.qpy.console.util.TermSettings;
+import org.qpython.qpy.main.app.CONF;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -111,7 +112,7 @@ public class ShellTermSession extends GenericTermSession {
 
         String[] env = ScriptExec.getInstance().getPyEnv(context, path, settings.getTermType(), pyPath);
 
-        File enf = new File(context.getFilesDir()+"/bin/init.sh");
+        File enf = new File(CONF.binDir +"init.sh");
         //if (! enf.exists()) {
         String content = "#!/system/bin/sh";
         for (int i=0;i<env.length;i++) {

@@ -1,6 +1,6 @@
 package org.qpython.qpy.main.adapter;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,7 +11,7 @@ import android.databinding.DataBindingUtil;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
@@ -22,20 +22,21 @@ import android.widget.Toast;
 import org.qpython.qpy.R;
 import org.qpython.qpy.console.ScriptExec;
 import org.qpython.qpy.databinding.ItemAppListBinding;
-import org.qpython.qpy.main.activity.AppListActivity;
+import org.qpython.qpy.main.activity.HomeMainActivity;
 import org.qpython.qpy.main.model.AppModel;
 import org.qpython.qpy.main.model.LocalAppModel;
 import org.qpython.qpy.main.model.QPyScriptModel;
 import org.qpython.qpy.texteditor.EditorActivity;
+import org.qpython.qpy.texteditor.TedLocalActivity;
 import org.qpython.qpy.texteditor.ui.view.EnterDialog;
-import android.support.v7.app.AlertDialog;
 
-
+import java.io.File;
 import java.util.List;
 
 /**
  * App list adapter
  * Created by Hmei on 2017-05-25.
+ * 乘着船 修改 2021
  */
 
 public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppListBinding>> {
@@ -116,7 +117,7 @@ public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppLis
                                     dialog.dismiss();
 
                             }
-                        }).setNegativeButton("CLOSE", new DialogInterface.OnClickListener() {
+                        }).setNegativeButton(context.getString(R.string.close), new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -149,6 +150,7 @@ public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppLis
         void exit();
     }
 
+    @SuppressLint("StringFormatInvalid")
     private boolean createShortCut(int position) {
         //最后一个为添加script，不用创建快键图标
         if (position == dataList.size()) {
@@ -157,7 +159,7 @@ public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppLis
         // Create shortcut
         QPyScriptModel qPyScriptModel = (QPyScriptModel) dataList.get(position);
         Intent intent = new Intent();
-        intent.setClass(context, AppListActivity.class);
+        intent.setClass(context, HomeMainActivity.class);
         intent.setAction(Intent.ACTION_VIEW);
         intent.putExtra("type", "script");
         intent.putExtra("path", qPyScriptModel.getPath());
@@ -179,6 +181,7 @@ public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppLis
                         pinnedShortcutCallbackIntent, 0);
                 mShortcutManager.requestPinShortcut(pinShortcutInfo,
                         successCallback.getIntentSender());
+            Toast.makeText(context, context.getString(R.string.shortcut_create_unsuc, dataList.get(position).getLabel()), Toast.LENGTH_LONG).show();
             }
         } else {
             //Adding shortcut for MainActivity
@@ -199,13 +202,13 @@ public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppLis
     private void openToEdit(int position) {
         QPyScriptModel model = (QPyScriptModel) dataList.get(position);
         if (model.isProj()) {
-
-            EditorActivity.start(model.getPath(), context);
-
+            TedLocalActivity.start(context,model.getPath());
+            //EditorActivity.start(context, Uri.parse("file://"+model.getPath()+"/main.py"));
+            //EditorActivity.start(model.getPath(), context);
         } else {
             //Intent intent = new Intent();
             //model.getPath()
-            EditorActivity.start(context, Uri.parse("file://"+model.getPath()));
+            EditorActivity.start(context, Uri.fromFile(new File(model.getPath())));
         }
     }
 

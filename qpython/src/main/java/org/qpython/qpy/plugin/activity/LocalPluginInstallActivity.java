@@ -16,7 +16,7 @@ import android.widget.Toast;
 import org.qpython.qpy.R;
 
 import org.qpython.qpy.main.activity.BaseActivity;
-import org.qpython.qpy.plugin.LocalPluginManager;
+import org.qpython.qpy.plugin.manager.LocalPluginManager;
 import org.qpython.qpy.plugin.view.FileSelectView;
 
 import java.util.HashMap;
@@ -76,7 +76,7 @@ public class LocalPluginInstallActivity extends BaseActivity {
         }
     }
 
-    private void checkPermission() {
+    public void checkPermission() {
         if (Build.VERSION.SDK_INT >= 23) {
             int checkPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
             if (checkPermission != PackageManager.PERMISSION_GRANTED) {

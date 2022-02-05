@@ -9,7 +9,7 @@
 
         <include
             android:id="@+id/lt"
-            layout="@layout/layout_toolbar"/>
+            layout="@layout/layout_toolbar" />
 
         <ProgressBar
             android:id="@+id/WebViewProgress"

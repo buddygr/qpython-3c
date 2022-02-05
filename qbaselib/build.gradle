@@ -1,0 +1,51 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+
+        }
+    }
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+    }
+
+    useLibrary 'org.apache.http.legacy'
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+}
+
+dependencies {
+    api 'org.apache.httpcomponents:httpcore:4.4.2'
+    api 'org.greenrobot:eventbus:3.0.0'
+    //compile 'com.loopj.android:android-async-http:1.4.8'
+
+    api project(':qftplib')
+    api files('libs/android-async-http-1.4.8.aar')
+    //api 'com.loopj.android:android-async-http:1.4.8'
+
+    debugApi rootProject.ext.leakcanaryDebug
+    releaseApi rootProject.ext.leakcanaryRelease
+    api rootProject.ext.libSupportCardView
+    api rootProject.ext.libSupportV4
+    api rootProject.ext.libSupportV4Design
+}

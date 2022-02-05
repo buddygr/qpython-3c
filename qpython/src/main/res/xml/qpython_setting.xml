@@ -2,6 +2,26 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:key="setting_page"
     >
+
+    <PreferenceCategory
+        android:key="@string/course"
+        android:title="@string/course"/>
+
+    <Preference
+        android:key="course_official"
+        android:title="@string/course_official"
+        android:summary="@string/edu_qpy_org"/>
+
+    <Preference
+        android:key="video_account"
+        android:title="@string/video_account_bili"
+        android:summary="@string/bili_com"/>
+
+    <Preference
+        android:key="open_source_library"
+        android:title="@string/open_source_library_bili"
+        android:summary="@string/bili_com"/>
+
     <PreferenceCategory
         android:key="other"
         android:title="@string/about"/>
@@ -10,19 +30,14 @@
         <!--android:title="@string/install_py3"/>-->
 
     <Preference
-        android:key="course"
-        android:title="@string/course"
-        android:summary="@string/learn_course"/>
-
-
-    <Preference
         android:key="community"
         android:title="@string/get_help"
         android:summary="@string/get_support_from_community"/>
+
     <Preference
         android:key="@string/key_about"
         android:title="@string/about"
-        android:summary="About / Feedback / Contributors"/>
+        android:summary="@string/abou_feed_cont"/>
 
 
     <Preference
@@ -40,11 +55,11 @@
         android:title="@string/last_log"
         android:summary="@string/get_last_log"/>
 
-    <PreferenceScreen
+    <!--<PreferenceScreen
         android:key="@string/key_py_inter"
         android:title="@string/py_inter">
 
-        <!--PreferenceCategory
+        <!-PreferenceCategory
             android:key="py_inter_update"
             android:title="@string/py_resources">
 
@@ -59,7 +74,7 @@
 
         </PreferenceCategory-->
 
-        <PreferenceCategory
+        <!--PreferenceCategory
             android:key="py_inter_update"
             android:title="@string/py_inter">
 
@@ -72,31 +87,31 @@
                 android:title="@string/switch_py2"/>
 
 
-            <!--Preference
+            <!-Preference
                 android:key="@string/key_py2compatible"
                 android:summary="@string/switch_py2_libs"
-                android:title="@string/switch_py2compatible"/-->
+                android:title="@string/switch_py2compatible"/->
 
         </PreferenceCategory>
-    </PreferenceScreen>
+    </PreferenceScreen>-->
 
 
     <!--CheckBoxPreference
         android:key="@string/key_aipy"
         android:summary="@string/aipy_install"
         android:title="@string/install_aipy"/-->
-    <PreferenceScreen
-        android:summary="@string/notebook_not_started"
-        android:key="@string/key_notebook_page"
-        android:title="@string/notebook">
-        <!--PreferenceCategory
-            android:key="notebook_update"
-            android:title="@string/notebook_res">
-            <Preference
-                android:key="@string/key_notebook"
-                android:title="@string/install_notebook"/>
+    <!--<PreferenceScreen
+       android:summary="@string/notebook_not_started"
+       android:key="@string/key_notebook_page"
+       android:title="@string/notebook">
+       <!-PreferenceCategory
+           android:key="notebook_update"
+           android:title="@string/notebook_res">
+           <Preference
+               android:key="@string/key_notebook"
+               android:title="@string/install_notebook"/>
 
-        </PreferenceCategory-->
+       </PreferenceCategory->
 
         <PreferenceCategory
             android:key="notebook_update"
@@ -107,7 +122,7 @@
                 android:summary="@string/notebook_explorer_bg_start"
                 android:title="@string/notebook_explorer"/>
         </PreferenceCategory>
-    </PreferenceScreen>
+    </PreferenceScreen>-->
 
     <CheckBoxPreference
         android:key="@string/key_root"
@@ -120,10 +135,6 @@
         android:summaryOn="@string/sl4a_running"
         android:summaryOff="@string/sl4a_un_running"
         android:title="@string/sl4a_server"/>
-    <!--Preference
-        android:key="@string/key_qpypi"
-        android:summary="@string/http_qpypi_qpython_org"
-        android:title="@string/extra_pypi"/-->
     <Preference
         android:key="@string/key_reset"
         android:title="@string/internal_space"/>
@@ -185,9 +196,20 @@
 
         </PreferenceCategory>
     </PreferenceScreen>
+
+    <CheckBoxPreference
+        android:key="qpython_protect"
+        android:summary="@string/qpython_avoid_close"
+        android:defaultValue="false"
+        android:title="@string/qpython_protect"/>
+
+    <Preference
+        android:key="screen_record"
+        android:title="@string/screen_record"/>
+
     <PreferenceCategory
         android:key="notify"
-        android:title="Notifications">
+        android:title="@string/noti">
         <SwitchPreference
             android:defaultValue="true"
             android:key="@string/key_hide_noti"

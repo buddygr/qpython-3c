@@ -12,7 +12,6 @@ import com.quseit.util.NAction;
 import com.quseit.util.NUtil;
 
 import org.qpython.qpy.console.ScriptExec;
-import org.qpython.qpy.main.app.App;
 import org.qpython.qpysdk.QPyConstants;
 
 public class MPyService extends Service {
@@ -109,7 +108,7 @@ public class MPyService extends Service {
     void handleSendImage(Intent intent) {
         Uri imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (imageUri != null) {
-            ScriptExec.getInstance().playQScript(MPyService.this, getApplicationContext().getFilesDir() + "/bin/share.py", imageUri.toString(), false);
+            ScriptExec.getInstance().playQScript(MPyService.this, getApplicationContext().getFilesDir() + "/bin/share.py", imageUri.toString());
         }
     }
 

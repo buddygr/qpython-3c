@@ -31,7 +31,6 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -69,15 +68,15 @@ import com.quseit.util.NAction;
 
 import org.qpython.qpy.R;
 import org.qpython.qpy.console.compont.ActivityCompat;
-import org.qpython.qpysdk.utils.AndroidCompat;
 import org.qpython.qpy.console.compont.FileCompat;
 import org.qpython.qpy.console.compont.MenuItemCompat;
 import org.qpython.qpy.console.util.SessionList;
 import org.qpython.qpy.console.util.TermSettings;
-import org.qpython.qpy.main.activity.NotebookActivity;
-import org.qpython.qpy.main.app.App;
+import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.texteditor.ui.adapter.bean.PopupItemBean;
 import org.qpython.qpy.texteditor.ui.view.EditorPopUp;
+import org.qpython.qpysdk.utils.AndroidCompat;
+import org.qpython.qsl4a.QPyScriptService;
 import org.qpython.qsl4a.qsl4a.StringUtils;
 
 import java.io.File;
@@ -85,7 +84,6 @@ import java.io.IOException;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -100,6 +98,7 @@ import jackpal.androidterm.emulatorview.compat.KeycodeConstants;
 
 /**
  * A terminal emulator activity.
+ * Edit by 乘着船 2021 - 2022
  */
 
 public class TermActivity extends AppCompatActivity implements UpdateCallback, SharedPreferences.OnSharedPreferenceChangeListener {
@@ -108,6 +107,7 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
     public static final  int    REQUEST_CHOOSE_WINDOW             = 1;
     public static final  String EXTRA_WINDOW_ID                   = "jackpal.androidterm.window_id";
     public static final  String ARGS                              = "PYTHONARGS";
+    public static final  String TYPE                              = "shell_type";
     /**
      * The name of the ViewFlipper in the resources.
      */
@@ -258,9 +258,9 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
         context.startActivity(intent);
     }
 
-    public static void startShell(Context context) {
+    public static void startShell(Context context,String shell_type) {
         Intent intent = new Intent(context, TermActivity.class);
-        intent.putExtra("shell_type","shell");
+        intent.putExtra(TYPE,shell_type);
         context.startActivity(intent);
     }
 
@@ -285,10 +285,10 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
         final SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mPrefs.registerOnSharedPreferenceChangeListener(this);
         mSettings = new TermSettings(getResources(), mPrefs);
-        if (Build.VERSION.SDK_INT < 16 && mSettings.showStatusBar()) {
+        /*if (Build.VERSION.SDK_INT < 16 && mSettings.showStatusBar()) {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                     WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        }
+        }*/
         setContentView(R.layout.term_activity);
         initView();
         mPrivateAlias = new ComponentName(this, RemoteInterface.PRIVACT_ACTIVITY_ALIAS);
@@ -310,6 +310,11 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
 
         TSIntent = new Intent(this, TermService.class);
         startService(TSIntent);
+        try {
+            startService(new Intent(this, QPyScriptService.class));
+        } catch (Exception E) {
+            Toast.makeText(this,E.toString(),Toast.LENGTH_LONG);
+        }
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, TermDebug.LOG_TAG);
@@ -360,17 +365,19 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
         TermShortcutLayout shortcutLayout = (TermShortcutLayout) findViewById(R.id.term_shortcut);
         shortcutLayout.setCallback(this::setTextToEmulator);
 
-        findViewById(R.id.notebook).setOnClickListener(v -> {
-            NotebookActivity.start(this, null, false);
-        });
+        /*findViewById(R.id.notebook).setOnClickListener(v -> {
+            ScriptExec.getInstance().playScript(this,
+                    getFilesDir().getAbsolutePath()+"/bin/browserConsole.py",
+                    null, false);
+        });*/
 
         //findViewById(R.id.history).setOnClickListener(v -> showHistory());
-        findViewById(R.id.switch_notebook_img).setOnClickListener(v -> openNotebook());
+        //findViewById(R.id.switch_notebook_img).setOnClickListener(v -> openNotebook());
     }
 
-    private void openNotebook() {
+    /*private void openNotebook() {
         startActivity(new Intent(this, NotebookActivity.class));
-    }
+    }*/
 
     @Override
     public void onPause() {
@@ -480,17 +487,13 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
         Log.d("TermActivity", "populateViewFlipper");
         if (mTermService != null) {
             mTermSessions = mTermService.getSessions();
-            String[] mArgs = this.getIntent().getStringArrayExtra(ARGS);
-            if (mArgs != null) {
+            Intent intent = this.getIntent();
+            String[] mArgs = intent.getStringArrayExtra(ARGS);
+            String shell_type = intent.getStringExtra(TYPE);
+            if (mArgs != null || shell_type != null) {
                 mTermSessions.add(createPyTermSession(mArgs));
-            } else {
-                mArgs = this.getIntent().getStringArrayExtra("ARGS");
-                if (mArgs != null) {
-                    mTermSessions.add(createPyTermSession(mArgs));
-
-                } else if (mTermSessions.size() == 0) {
+            } else if (mTermSessions.size() == 0) {
                     mTermSessions.add(createPyTermSession(null));
-                }
             }
             //存在内存泄漏
             mTermSessions.addCallback(this);
@@ -567,11 +570,7 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
                 ((GenericTermSession) session).updatePrefs(mSettings);
             }
         }
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
-            setStatusBarVisible(mSettings.showStatusBar());
-        } else {
-            Toast.makeText(App.getContext(), R.string.under_16_status_bar_hint, Toast.LENGTH_SHORT).show();
-        }
+        setStatusBarVisible(mSettings.showStatusBar());
         mActionBarMode = mSettings.actionBarMode();
         switch (mActionBarMode) {
             case TermSettings.ACTION_BAR_MODE_ALWAYS_VISIBLE:
@@ -929,7 +928,6 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
 //                        //在关闭当前窗口时mTermSessions可能还未初始化完成
                         if (mTermSessions != null) {
                             for (int i = mTermSessions.size(); i > 0; i--) {
-
                                 mTermSessions.get(i - 1).finish();
 
                             }
@@ -1160,34 +1158,38 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
     private TermSession createPyTermSession(String[] mArgs) throws IOException {
         Log.d("TermActivity", "createPyTermSession:" + mArgs);
         TermSettings settings = mSettings;
-        TermSession session;
+        TermSession session = null;
         Intent intent = this.getIntent();
-        String shell_type = intent.getStringExtra("shell_type");
-        if (shell_type!=null && shell_type.equals("shell")) {
-
-            session = createTermSession(this, settings, "cd $HOME && cat SHELL", this.getFilesDir().getAbsolutePath());
-
-        } else {
-
-            if (mArgs == null) {
-                String scmd = getScmd() + " && exit";
-                session = createTermSession(this, settings, scmd, "");
+        String shell_type = intent.getStringExtra(TYPE);
+        if (shell_type==null) {
+            if (mArgs!=null) shell_type = "";
+            else shell_type = "1";
+        }
+        if (shell_type.equals("1"))
+            mArgs = new String[]{CONF.qpyccs, CONF.qpyccs};
+        else if (shell_type.endsWith(".py")) {
+            shell_type = CONF.binDir + shell_type;
+            mArgs = new String[]{shell_type, shell_type};
+        } else
+            session = createTermSession(this, settings, CONF.binDir + shell_type + " && exit", CONF.filesDir);
+        if (mArgs != null) {
+            //String content = FileHelper.getFileContents(mArgs[0]);
+            //String cmd = settings.getInitialCommand().equals("")?scmd:settings.getInitialCommand();
+            String scmd = getScmd();
+            if (mArgs.length < 3) {
+                session = createTermSession(this, settings, scmd + " \"" + StringUtils.addSlashes(mArgs[0]) + "\" && exit", mArgs[1]);
             } else {
-                //String content = FileHelper.getFileContents(mArgs[0]);
-                //String cmd = settings.getInitialCommand().equals("")?scmd:settings.getInitialCommand();
-                String scmd = getScmd();
-                if (mArgs.length < 3) {
-                    session = createTermSession(this, settings, scmd + " \"" + StringUtils.addSlashes(mArgs[0]) + "\" && exit", mArgs[1]);
-                } else {
-                    StringBuilder cm = new StringBuilder();
-                    for (int i = 0; i < mArgs.length; i++) {
-                        if (i == 1 && mArgs[0].contains(mArgs[i])) continue;
-                        cm.append(" ").append(mArgs[i]).append(" ");
-                    }
-                    session = createTermSession(this, settings, scmd + " " + cm + " && exit", mArgs[1]);
+                StringBuilder cm = new StringBuilder();
+                String f = mArgs[0];
+                mArgs[0] = "\"" + f + "\"";
+                for (int i = 0; i < mArgs.length; i++) {
+                    if (i == 1 && f.contains(mArgs[1])) continue;
+                    cm.append(" ").append(mArgs[i]).append(" ");
                 }
+                session = createTermSession(this, settings, scmd + " " + cm + " && exit", mArgs[1]);
             }
         }
+
         // TODO: INIT.SH
         //initPyInit();
 
@@ -1198,20 +1200,11 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
     private String getScmd() {
         boolean isRootEnable = NAction.isRootEnable(this);
         String scmd;
-        if (Build.VERSION.SDK_INT >= 20) {
             if (isRootEnable) {
-                scmd = getApplicationContext().getFilesDir() + "/bin/qpython" + (NAction.isQPy3(this) ? "3" : "") + "-android5-root.sh";
+                scmd = CONF.qpyshr;
             } else {
-                scmd = getApplicationContext().getFilesDir() + "/bin/qpython" + (NAction.isQPy3(this) ? "3" : "") + "-android5.sh";
+                scmd = CONF.qpysh;
             }
-        } else {
-            if (isRootEnable) {
-                scmd = getApplicationContext().getFilesDir() + "/bin/qpython" + (NAction.isQPy3(this) ? "3" : "") + "-root.sh";
-            } else {
-                scmd = getApplicationContext().getFilesDir() + "/bin/qpython" + (NAction.isQPy3(this) ? "3" : "") + ".sh";
-
-            }
-        }
         return scmd;
     }
 

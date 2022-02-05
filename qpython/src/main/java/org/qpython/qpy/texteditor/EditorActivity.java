@@ -118,6 +118,7 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
 
     public static void start(Context context) {
         Intent starter = new Intent(context, EditorActivity.class);
+        starter.setFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
         starter.setAction(DEFAULT_ACTION);
         context.startActivity(starter);
     }
@@ -140,6 +141,7 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
     public static void start(Context context, Uri path) {
         Intent starter = new Intent(context, EditorActivity.class);
         starter.setAction(FILE_ACTION);
+        starter.setFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
         starter.setData(path);
         context.startActivity(starter);
     }
@@ -373,20 +375,20 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
         //if (checkExpired("public", new File(externalStorage + "/lib").getAbsolutePath(), "programs"+NAction.getPyVer(this))) {
 
             //String code = NAction.getCode(this);
-        boolean isQpy3 = NAction.isQPy3(getApplication());
+      //  boolean isQpy3 = NAction.isQPy3(getApplication());
         String baseDir = QPyConstants.ABSOLUTE_PATH;
         File root = new File(baseDir);
         if (!(root.exists() && root.isDirectory())) {
             root.mkdir();
         }
-        String path = baseDir + (isQpy3 ? "/snippets3" : "/snippets");
+        String path = baseDir + /*(isQpy3 ? */"/snippets3"/* : "/snippets")*/;
         File folder = new File(path);
         if (!(folder.exists() && folder.isDirectory())) {
             folder.mkdir();
         }
 
         // init snipples
-        String[] filesList = {"Apache_License", "The_MIT_License", "QPy_WebApp", "QPy_ConsoleApp", "QPy_SL4AApp", "QPy_PygameApp"};
+        String[] filesList = {"Apache_License", "The_MIT_License", "QPy_WebApp", "QPy_ConsoleApp", "QPy_SL4AApp", "GPL_v3_Licence"};
         for (int i=0;i<filesList.length;i++) {
             String fn = filesList[i];
             File f = new File(path + "/" + fn);
@@ -408,11 +410,7 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
             File f2 = new File(lastFile);
             if (f2.exists()) {
                 mCurrentFileName = f2.getName();
-                if (mCurrentFileName.equals("main.py")) {
-                    projPath = f2.getParent();
-
-                }
-
+                if (mCurrentFileName.equals("main.py")) projPath = f2.getParent();
                 return doOpenFile(f2, false);
             }
         }
@@ -507,13 +505,13 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
                         }
                     }));
 
-                    itemBeanList.add(new PopupItemBean(getString(R.string.pygame_app_project), v -> {
+                    /*itemBeanList.add(new PopupItemBean(getString(R.string.pygame_app_project), v -> {
                         if (mDirty) {
                             promptSaveDirty(((dialog, which) -> newProject(QPyConstants.PYGAME_PROJECT)));
                         } else {
                             newProject(QPyConstants.PYGAME_PROJECT);
                         }
-                    }));
+                    }));*/
 
 //                    itemBeanList.add(new PopupItemBean(getString(R.string.kivy_app_project), v -> {
 //                        if (mDirty) {
@@ -577,7 +575,8 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
                     binding.leftDrawer.setAdapter(fileTreeAdapter);
                     binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 
-                    doOpenFile(FileHelper.findFile(new File(projPath), "main.py"), false);
+                    //doOpenFile(FileHelper.findFile(new File(projPath), "main.py"), false);
+                    TedLocalActivity.start(this,projPath);
                 } else {
                     binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                     doOpenFile(new File(extras.getString("path")), false);
@@ -889,7 +888,7 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
                 .setTitle(getString(R.string.new_script))
                 .setExt(".py")
                 .setConfirmListener(name -> {
-                    File file = new File(QPyConstants.ABSOLUTE_PATH + "/" + (isQpy3? QPyConstants.DFROM_QPY3:QPyConstants.DFROM_QPY2) + "/" + name);
+                    File file = new File(QPyConstants.ABSOLUTE_PATH + "/" + /*(isQpy3? */QPyConstants.DFROM_QPY3/*:QPyConstants.DFROM_QPY2)*/ + "/" + name);
                     if (file.exists()) {
                         Crouton.showText(this, R.string.file_exists, Style.ALERT);
 
@@ -922,10 +921,10 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
             .setHint(getString(R.string.project_name))
             .setConfirmListener(name -> {
                 Stack<String> curArtistDir = new Stack<>();
-                final boolean isQpy3 = NAction.isQPy3(getApplicationContext());
+                //final boolean isQpy3 = NAction.isQPy3(getApplicationContext());
 
                 curArtistDir.push(QPyConstants.ABSOLUTE_PATH
-                        + "/" + (isQpy3 ? QPyConstants.DFROM_PRJ3 : QPyConstants.DFROM_PRJ2) + "/" + name);
+                        + "/" + /*(isQpy3 ? */QPyConstants.DFROM_PRJ3/* : QPyConstants.DFROM_PRJ2)*/ + "/" + name);
 
                 File fileN = new File(curArtistDir.peek());
                 if (fileN.exists()) {

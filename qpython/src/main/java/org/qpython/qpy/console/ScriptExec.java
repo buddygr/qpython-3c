@@ -1,14 +1,10 @@
 package org.qpython.qpy.console;
 
 import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Message;
@@ -20,22 +16,18 @@ import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.qpython.qpysdk.Exec;
-import com.quseit.util.FileUtils;
 import com.quseit.util.NAction;
 
-import org.greenrobot.eventbus.EventBus;
 import org.qpython.qpy.R;
-import org.qpython.qpysdk.QPyConstants;
-import org.qpython.qpysdk.utils.AndroidCompat;
 import org.qpython.qpy.console.util.TermSettings;
-import org.qpython.qpy.main.activity.LogActivity;
+import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.main.utils.Utils;
+import org.qpython.qpysdk.Exec;
+import org.qpython.qpysdk.QPyConstants;
 import org.qpython.qpysdk.utils.FileHelper;
 import org.qpython.qpysdk.utils.StreamGobbler;
 import org.qpython.qsl4a.QPyScriptService;
 import org.qpython.qsl4a.qsl4a.util.SPFUtils;
-import org.renpy.android.PythonSDLActivity;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -59,6 +51,7 @@ public class ScriptExec {
     private static final int    LOG_NOTIFICATION_ID = (int) System.currentTimeMillis();
     private InputStream  mIn;
     private OutputStream mOut;
+    private String logFile = QPyConstants.ABSOLUTE_LOG;
 
     private ScriptExec() { }
 
@@ -74,21 +67,21 @@ public class ScriptExec {
         String header_512 = FileHelper.getFileContents(script,512);
         boolean isWeb   = header_512.contains("#qpy:webapp");
         boolean isQApp  = header_512.contains("#qpy:quiet");
-        boolean isKivy  = header_512.contains("#qpy:kivy");
-        boolean isGame  = header_512.contains("#qpy:pygame");
+        //boolean isKivy  = header_512.contains("#qpy:kivy");
+        //boolean isGame  = header_512.contains("#qpy:pygame");
         boolean isDaemon = header_512.contains("#qpy:daemon");
 
-        Log.d(TAG, "playScript:" + script+"|isWeb:"+isWeb+"|isQapp:"+isQApp+"|isKivy:"+isKivy+"|isGame:"+isGame+"|isDaemon:"+isDaemon);
+        //Log.d(TAG, "playScript:" + script+"|isWeb:"+isWeb+"|isQapp:"+isQApp+"|isKivy:"+isKivy+"|isGame:"+isGame+"|isDaemon:"+isDaemon);
 
         if (isWeb) {
             playWebApp(context,  script, arg);
-        } else if (isKivy) {
+        } /*else if (isKivy) {
             playKScript(context, script, arg, notify);
-        } else if (isQApp) {
-            playQScript(context, script, arg, notify);
-        } else if (isGame) {
+        } */else if (isQApp) {
+            playQScript(context, script, arg);
+        } /*else if (isGame) {
             playGScript(context, script, arg, notify);
-        } else if (isDaemon) {
+        } */else if (isDaemon) {
             playDScript(context, script, arg, notify);
         } else {
             playCScript(context, script, arg);
@@ -126,34 +119,20 @@ public class ScriptExec {
         }
     }
 
-
-
-    public String getLastLog() {
-        File logFile = new File(QPyConstants.ABSOLUTE_LOG);
-
-        if (!logFile.getAbsoluteFile().getParentFile().exists()) {
-            logFile.getAbsoluteFile().getParentFile().mkdirs();
-        }
-        if (logFile.exists()) {    // clear log
-            logFile.delete();
-        }
-
-        return logFile.getAbsolutePath();
-    }
-
-
     public String[] getPyEnv(Context context, String path, String term, String pyPath) {
-        boolean isQPy3 =  NAction.isQPy3(context);
+        //boolean isQPy3 =  NAction.isQPy3(context);
 
+        String pyVer = CONF.pyVer;//QPyConstants.py3Ver;
         File filesDir = context.getFilesDir();
         File externalStorage = new File(QPyConstants.ABSOLUTE_PATH);
+        String commDir = filesDir+"/lib/"+pyVer+"/";
 
         String[] env = new String[24];
 
         env[0] = "TERM=" + term;
-        env[1] = "PATH=" + context.getFilesDir()+"/bin"+":"+path;
+        env[1] = "PATH=" + CONF.filesDir+"/bin"+":"+path;
 
-        if (!isQPy3) {
+        /*if (!isQPy3) {
             File py27so = new File(filesDir+"/lib/libpython2.7.so.1.0");
             File py27soorg = new File(filesDir.getParentFile()+"/lib/libpython2.7.so");
 
@@ -168,8 +147,8 @@ public class ScriptExec {
 
                 }
             }
-        }
-        env[2] = "LD_LIBRARY_PATH=.:" + filesDir + "/lib/" + ":" + filesDir + "/:" + filesDir.getParentFile() + "/lib/";
+        }*/
+        env[2] = "LD_LIBRARY_PATH=.:" + filesDir + "/lib/" + ":" + filesDir + "/";// + filesDir.getParentFile() + "/lib/";
 
         env[3] = "PYTHONHOME="+filesDir;
         env[4] = "ANDROID_PRIVATE="+filesDir;
@@ -181,38 +160,34 @@ public class ScriptExec {
             externalStorage.mkdir();
         }
 
-        if (isQPy3) {
-            String pyVer = new File(context.getFilesDir()+"/lib/python37.zip").exists()?"3.7":"3.6";
+        //if (isQPy3) {
+
             env[5] = "PYTHONPATH="
-                    +filesDir+"/lib/python"+pyVer+"/site-packages/:"
-                    +filesDir+"/lib/python"+pyVer+"/:"
-                    +filesDir+"/lib/python"+pyVer.replace(".","")+".zip:"
-                    +filesDir+"/lib/notebook.zip:"
-                    +filesDir+"/lib/python"+pyVer+"/qpyutil.zip:"
-                    +filesDir+"/lib/python"+pyVer+"/lib-dynload/:"
-                    +externalStorage+"/lib/python"+pyVer+"/site-packages/:"
-                    +pyPath;
+                    +commDir+":"
+                    +commDir+"lib-dynload/:"
+                    +commDir+"site-packages/:"
+                    //+filesDir+"/lib/python"+pyVer+"/qpyutil.zip:"
+                    +externalStorage+"/lib/"+pyVer+"/site-packages/";
+                    //+filesDir+"/lib/notebook.zip:";
 
-            env[14] = "PYTHONSTARTUP="+filesDir+"/lib/python"+pyVer+"/site-packages/qpy.py";
+            env[14] = "PYTHONSTARTUP="+commDir+"site-packages/qpy.py";
 
 
-        } else {
+        /*} else {
 
             env[5] = "PYTHONPATH="
                     +filesDir+"/lib/python2.7/site-packages/:"
                     +filesDir+"/lib/python2.7/:"
                     +filesDir+"/lib/python27.zip:"
-                    +filesDir+"/lib/notebook.zip:"
                     +filesDir+"/lib/python2.7/qpyutil.zip:"
                     +filesDir+"/lib/python2.7/lib-dynload/:"
-                    +externalStorage+"/lib/python2.7/site-packages/:"
-                    +pyPath;
+                    +externalStorage+"/lib/python2.7/site-packages/:";
 
             //env[14] = "IS_QPY2=1";
             env[14] = "PYTHONSTARTUP="+filesDir+"/lib/python2.7/site-packages/qpy.py";
-        }
+        }*/
 
-        env[6] = "PYTHONOPTIMIZE=2";
+        env[6] = "PYTHONOPTIMIZE=1";
 
         File td = new File(externalStorage+"/cache");
         if (!td.exists()) {
@@ -227,15 +202,15 @@ public class ScriptExec {
 
         env[11] = "ANDROID_PUBLIC="+externalStorage;
         env[12] = "ANDROID_PRIVATE="+context.getFilesDir().getAbsolutePath();
-        env[13] = "ANDROID_ARGUMENT="+pyPath;
+        env[13] = "ANDROID_ARGUMENT=\""+pyPath+"\"";
 
         env[15] = "QPY_USERNO="+ NAction.getUserNoId(context);
         env[16] = "QPY_ARGUMENT="+NAction.getExtConf(context);
         env[17] = "PYTHONDONTWRITEBYTECODE=1";
         env[18] = "TMP="+externalStorage+"/cache";
         env[19] = "ANDROID_APP_PATH="+externalStorage+"";
-        env[20] = "LANG=en_US.UTF-8";
-        env[21] = "HOME="+context.getFilesDir();
+        env[20] = "LANG="+context.getString(R.string.lang_env)+".UTF-8";
+        env[21] = "HOME="+filesDir;
         env[22] = "ANDROID_DATA="+System.getenv("ANDROID_DATA");
         env[23] = "ANDROID_ROOT="+System.getenv("ANDROID_ROOT");
         return env;
@@ -243,29 +218,17 @@ public class ScriptExec {
 
     public String getPyBin(Context context, boolean bin) {
         String scmd = "";
-        String v = NAction.isQPy3(context) ? "3" : "";
+        //String v = NAction.isQPy3(context) ? "3" : "";
         boolean isRootEnable = NAction.isRootEnable(context);
-        if (Build.VERSION.SDK_INT >= 20) {
             if (bin) {
-                scmd = context.getFilesDir() + "/bin/python" + v + "-android5";
+                scmd = CONF.pytho;
             } else {
                 if (isRootEnable) {
-                    scmd = context.getFilesDir() + "/bin/qpython" + v + "-android5-root.sh";
+                    scmd = CONF.qpyshr;
                 } else {
-                    scmd = context.getFilesDir() + "/bin/qpython" + v + "-android5.sh";
+                    scmd = CONF.qpysh;
                 }
             }
-        } else {
-            if (bin) {
-                scmd = context.getFilesDir() + "/bin/python" + v;
-            } else {
-                if (isRootEnable) {
-                    scmd = context.getFilesDir() + "/bin/qpython" + v + "-root.sh";
-                } else {
-                    scmd = context.getFilesDir() + "/bin/qpython" + v + ".sh";
-                }
-            }
-        }
         return scmd;
     }
 
@@ -315,10 +278,11 @@ public class ScriptExec {
         Pattern srvPattern = Pattern.compile("#qpy://(.+)[\\s]+", Pattern.CASE_INSENSITIVE);
         Matcher matcher1 = srvPattern.matcher(header_512);
 
-        if (matcher1.find()) {
-            srv = "http://" + matcher1.group(1);
-        }
+        if (matcher1.find()) srv = "http://" + matcher1.group(1);
+        logFile = Utils.getWebLog(srv,script);
+        Utils.backTaskNotify(context);
 
+        Utils.logFile[0] = logFile;
         playDScript(context, script, argv, false);
         Utils.startWebActivityWithUrl(context, title, srv, script, isNoHead, isDrawer);
 //        QWebViewActivity.start(context, "main", title, srv, script);
@@ -327,7 +291,7 @@ public class ScriptExec {
 
     /*
         Run KIVY Script
-     */
+     * /
     public void playKScript(Context context, final String script, String argv, boolean notify) {
         if (Utils.isOpenGL2supported(context)) {
             File scriptParent = new File(script).getParentFile();
@@ -355,14 +319,14 @@ public class ScriptExec {
                     .show();
 
         }
-    }
+    }*/
 
     /*
         Run Game Script
-     */
+     * /
     public void playGScript(Context context, final String script, String argv, boolean notify) {
         playKScript(context,script,argv,notify);
-    }
+    }*/
 
 
     /*
@@ -375,9 +339,7 @@ public class ScriptExec {
         } else {
             args = new String[]{scriptPath, scriptPath, arg};
         }
-
         execPyInConsole((Activity)context, args);
-
     }
 
     /*
@@ -385,7 +347,7 @@ public class ScriptExec {
      */
 
     public void playDScript(Context context, final String scriptPath, String argv1, boolean notify) {
-        String logFile = getLastLog();
+        //String logFile = getLastLog();
 
         String[] mArgs = {scriptPath, " " + (argv1 != null ? argv1 : ""), logFile};
 
@@ -397,7 +359,7 @@ public class ScriptExec {
         Run Quiet Script
      */
     FileDescriptor mFd;
-    public int playQScript(Context context, final String script, String argv, boolean notify) {
+    public int playQScript(Context context, final String script, String argv) {
         ArrayList<String> mArguments = new ArrayList<>();
 
         String binaryPath = getPyBin(context, true);
@@ -413,7 +375,10 @@ public class ScriptExec {
 
         String[] argumentsArray = mArguments.toArray(new String[mArguments.size()]);
 
-        final File mLog = new File(QPyConstants.ABSOLUTE_LOG);
+        logFile = Utils.getQuietLog(script);
+        Utils.backTaskNotify(context);
+
+        final File mLog = new File(logFile);
 
         mFd = Exec.createSubprocess(binaryPath, argumentsArray, getPyEnv(context, System.getenv("PATH"), System.getenv("TERM"),f.getParentFile() + ""), Environment.getExternalStorageDirectory() + "/", pid);
         final AtomicInteger mPid = new AtomicInteger(PID_INIT_VALUE);
@@ -423,33 +388,31 @@ public class ScriptExec {
         mIn = new StreamGobbler(new FileInputStream(mFd), mLog, DEFAULT_BUFFER_SIZE);
         long mStartTime = System.currentTimeMillis();
 
-        new Thread(new Runnable() {
-            public void run() {
-                int returnValue = Exec.waitFor(mPid.get());
+        new Thread(() -> {
+            int returnValue = Exec.waitFor(mPid.get());
 
-                //long mEndTime = System.currentTimeMillis();
-                int pid = mPid.getAndSet(PID_INIT_VALUE);
-                Log.d("", "out:" + mFd.out.toString());
+            //long mEndTime = System.currentTimeMillis();
+            int pid1 = mPid.getAndSet(PID_INIT_VALUE);
+            Log.d("", "out:" + mFd.out.toString());
 
-                Message msg = new Message();
-                msg.what = returnValue;
-                msg.obj = mArguments.get(0);
+            Message msg = new Message();
+            msg.what = returnValue;
+            msg.obj = mArguments.get(0);
 
-                Log.d(TAG, "Process " + pid + " exited with result code " + returnValue + ".");
+            Log.d(TAG, "Process " + pid1 + " exited with result code " + returnValue + ".");
 
-                try {
-                    mIn.close();
-                } catch (IOException e) {
-                    Log.e(TAG, e.getMessage());
-                }
-
-                try {
-                    mOut.close();
-                } catch (IOException e) {
-                    Log.e(TAG, e.getMessage());
-                }
-                //context.updateNotify(msg);
+            try {
+                mIn.close();
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage());
             }
+
+            try {
+                mOut.close();
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage());
+            }
+            //context.updateNotify(msg);
         }).start();
 
         return mPid.getAndSet(PID_INIT_VALUE);

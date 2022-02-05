@@ -1,18 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">127.0.0.1</domain>
-        <domain includeSubdomains="true">localhost</domain>
-        <domain includeSubdomains="true">apu2.quseit.com</domain>
-        <domain includeSubdomains="true">qpy.io</domain>
-        <domain includeSubdomains="true">dl.qpy.io</domain>
-        <domain includeSubdomains="true">gist.qpy.io</domain>
-        <domain includeSubdomains="true">qpython.org</domain>
-        <domain includeSubdomains="true">gist.qpython.org</domain>
-        <domain includeSubdomains="true">edu.qpython.org</domain>
-        <domain includeSubdomains="true">www.qpython.org</domain>
-        <domain includeSubdomains="true">qpypi.qpython.org</domain>
-        <domain includeSubdomains="true">qpypi3.qpython.org</domain>
-
-    </domain-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
 </network-security-config>

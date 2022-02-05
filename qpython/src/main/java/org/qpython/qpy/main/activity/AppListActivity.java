@@ -1,6 +1,5 @@
 package org.qpython.qpy.main.activity;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.Context;
@@ -8,7 +7,6 @@ import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,7 +14,6 @@ import android.widget.TextView;
 
 import com.quseit.util.FileHelper;
 import com.quseit.util.FolderUtils;
-import com.quseit.util.NAction;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -24,10 +21,12 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.qpython.qpy.R;
 import org.qpython.qpy.console.ScriptExec;
 import org.qpython.qpy.main.adapter.AppListAdapter;
+import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.main.event.AppsLoader;
 import org.qpython.qpy.main.model.AppModel;
 import org.qpython.qpy.main.model.QPyScriptModel;
 import org.qpython.qpysdk.QPyConstants;
+import org.qpython.qpysdk.QPySDK;
 import org.qpython.qpysdk.utils.Utils;
 
 import java.io.File;
@@ -39,6 +38,7 @@ import java.util.List;
 /**
  * Local App list
  * Created by Hmei on 2017-05-22.
+ * Edit by 乘着船 2021-2022
  */
 
 public class AppListActivity extends BaseActivity implements LoaderManager.LoaderCallbacks<ArrayList<AppModel>> {
@@ -56,7 +56,6 @@ public class AppListActivity extends BaseActivity implements LoaderManager.Loade
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        runShortcut();
         setContentView(R.layout.activity_local_app);
         initView();
         EventBus.getDefault().register(this);
@@ -75,19 +74,6 @@ public class AppListActivity extends BaseActivity implements LoaderManager.Loade
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
-    }
-
-    private void runShortcut() {
-        if (Intent.ACTION_VIEW.equals(getIntent().getAction())) {
-            String path = getIntent().getStringExtra("path");
-            boolean isProj = getIntent().getBooleanExtra("isProj", false);
-            if (isProj) {
-                ScriptExec.getInstance().playProject(this, path, false);
-            } else {
-                ScriptExec.getInstance().playScript(this, path, null, false);
-            }
-            finish();
-        }
     }
 
     private void initView() {
@@ -116,24 +102,47 @@ public class AppListActivity extends BaseActivity implements LoaderManager.Loade
         appsView.setAdapter(adapter);
 
         ((TextView) findViewById(R.id.tv_folder_name)).setText(R.string.qpy_app);
+        ((TextView) findViewById(R.id.tv_ar_back)).setOnClickListener(view -> finish());
         getScriptList();
     }
 
+    private void getProjectList(File projectFile) {
+        File[] projectFiles = projectFile.listFiles();
+        if (projectFiles != null) {
+            Arrays.sort(projectFiles, FolderUtils.sortByName);
+            for (File file : projectFiles) {
+                if (file.isDirectory()) {
+                    if ((new File(file, "main.py")).exists())
+                        dataList.add(new QPyScriptModel(file));
+                    else {
+                        getProjectList(file);
+                    }
+                }
+            }
+        }
+    }
 
     private void getScriptList() {
         try {
-            String projectPath = NAction.isQPy3(this.getApplicationContext())? QPyConstants.DFROM_PRJ3:QPyConstants.DFROM_PRJ2;
+            /*String projectPath = NAction.isQPy3(this.getApplicationContext())?QPyConstants.DFROM_PRJ3:QPyConstants.DFROM_PRJ2;
             File[] projectFiles = FileHelper.getABSPath(QPyConstants.ABSOLUTE_PATH + "/" + projectPath).listFiles();
             if (projectFiles != null) {
                 Arrays.sort(projectFiles, FolderUtils.sortByName);
                 dataList.clear();
                 for (File file : projectFiles) {
                     if (file.isDirectory()) {
-                        dataList.add(new QPyScriptModel(file));
+                        if (new File(file,"main.py").exists())
+                            dataList.add(new QPyScriptModel(file));
+                        else {
+                            projectFiles.
+                        }
                     }
                 }
-            }
-            String scriptPath = NAction.isQPy3(this.getApplicationContext())?QPyConstants.DFROM_QPY3:QPyConstants.DFROM_QPY2;
+            }*/
+            File projectFile = new File(QPyConstants.ABSOLUTE_PATH,QPyConstants.DFROM_PRJ3);
+            getProjectList(projectFile);
+
+            String scriptPath = /*NAction.isQPy3(this.getApplicationContext())?*/QPyConstants.DFROM_QPY3;//:QPyConstants.DFROM_QPY2;
 
             File[] files = FileHelper.getFilesByType(FileHelper.getABSPath(QPyConstants.ABSOLUTE_PATH + "/" + scriptPath));
             if (files!=null && files.length > 0) {

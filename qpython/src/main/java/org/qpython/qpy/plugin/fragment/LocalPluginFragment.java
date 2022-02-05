@@ -13,7 +13,7 @@ import android.widget.LinearLayout;
 
 import org.qpython.qpy.R;
 
-import org.qpython.qpy.plugin.LocalPluginManager;
+import org.qpython.qpy.plugin.manager.LocalPluginManager;
 import org.qpython.qpy.plugin.activity.LocalPluginInstallActivity;
 import org.qpython.qpy.plugin.adapter.LocalPluginAdapter;
 import org.qpython.qpy.plugin.model.LocalPluginBean;

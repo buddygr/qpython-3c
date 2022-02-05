@@ -1,20 +1,15 @@
 package org.qpython.qpy.main.server;
 
 import org.qpython.qpy.main.server.model.BaseLibModel;
-import org.qpython.qpy.main.server.model.CourseAdModel;
-import org.qpython.qpy.main.server.model.CourseModel;
 import org.qpython.qpy.main.server.model.LibModel;
-import org.qpython.qpy.main.server.model.MyCourse;
 import org.qpython.qpy.main.server.model.PayStatusModel;
 import org.qpython.qpy.main.server.model.QpypiModel;
 import org.qpython.qpy.main.server.model.UpdateModel;
 
 import java.util.List;
 
-import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
-import retrofit2.http.Url;
 import rx.Observable;
 
 /**
@@ -48,8 +43,8 @@ interface ServiceRequest {
     @GET("/update.json")
     Observable<UpdateModel> checkUpdate();
 
-    @GET("/courses-2x.json ")
-    Observable<List<CourseModel>> getCourse();
+    //@GET("/courses-2x.json ")
+    //Observable<List<CourseModel>> getCourse();
 
 
 }
@@ -59,24 +54,24 @@ interface ApuQuseit {
      * Domain: http://apu.quseit.com/
      */
 
-    @GET("/conf/update/org.qpython.qpy/{verCode}")
-    Observable<CourseAdModel> getCourseAd(@Path("verCode") int verCode);
+    //@GET("/conf/update/org.qpython.qpy/{verCode}")
+    //Observable<CourseAdModel> getCourseAd(@Path("verCode") int verCode);
 
     @GET("conf/iaplognum/org.qpython.qpy/{articleId}")
     Observable<Object> getSupportNum(@Path("articleId") String articleId);
 
-    @GET("/iap/items/{packageId}/{email}")
-    Observable<MyCourse> getMyCourse(@Path("packageId") String packageId, @Path("email") String email);
+    /*@GET("/iap/items/{packageId}/{email}")
+    Observable<MyCourse> getMyCourse(@Path("packageId") String packageId, @Path("email") String email);*/
 
     @GET("/iap/hasitem/org.qpython.qpy/{email}/{smodule}/")
     Observable<PayStatusModel> getPayStatus(@Path("email") String email, @Path("smodule") String
             smodule);
 }
 
-interface EduRequest {
+/*interface EduRequest {
     /**
      * Domain : http://edu.qpython.org
-     */
+     *
 
     @GET("/index/default.json")
     Observable<List<CourseModel>> getCourse();
@@ -87,4 +82,4 @@ interface EduRequest {
 
     @GET("/index/zhv2.json")
     Observable<List<CourseModel>> getCourseZn();
-}
+}*/

@@ -35,7 +35,8 @@ public class CodePattern {
                     "for|while|" +
                     "if|elif|else|" +
                     "and|in|is|not|or|" +
-                    "import|from|as)\\b");
+                    "import|from|as|" +
+                    "match|case|nonlocal)\\b");
     public static final Pattern PATTERN_LUA_KEYWORD  = Pattern.compile(
             "\\b(and|break|do|" +
                     "else|elseif|end|" +

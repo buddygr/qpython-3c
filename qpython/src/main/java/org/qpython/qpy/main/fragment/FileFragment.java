@@ -43,8 +43,8 @@ public class FileFragment extends Fragment {
     public static final  String PROJECT3 = "projects3";
     public static final  String SCRIPT3  = "scripts3";
 
-    private static final String PROJECT_PATH = QPyConstants.ABSOLUTE_PATH + "/" + PROJECT;
-    private static final String SCRIPT_PATH  = QPyConstants.ABSOLUTE_PATH + "/" + SCRIPT;
+    //private static final String PROJECT_PATH = QPyConstants.ABSOLUTE_PATH + "/" + PROJECT;
+    //private static final String SCRIPT_PATH  = QPyConstants.ABSOLUTE_PATH + "/" + SCRIPT;
 
     private static final String PROJECT_PATH3 = QPyConstants.ABSOLUTE_PATH + "/" + PROJECT3;
     private static final String SCRIPT_PATH3  = QPyConstants.ABSOLUTE_PATH + "/" + SCRIPT3;
@@ -93,16 +93,16 @@ public class FileFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         binding = DataBindingUtil.bind(view);
-        boolean isQPy = NAction.isQPy3(getContext());
+        //boolean isQPy = NAction.isQPy3(getContext());
         initView();
         initListener();
         String type = getArguments().getString(TYPE);
         switch (type != null ? type : SCRIPT) {
             case SCRIPT:
-                curPath = isQPy?SCRIPT_PATH3:SCRIPT_PATH;
+                curPath = SCRIPT_PATH3;
                 break;
             case PROJECT:
-                curPath = isQPy?PROJECT_PATH3:PROJECT_PATH;
+                curPath = PROJECT_PATH3;
                 break;
         }
 

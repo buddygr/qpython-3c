@@ -38,29 +38,29 @@ public class QPyScriptModel extends AppModel {
             content = org.qpython.qpysdk.utils.FileHelper.getFileContents(getPath());
         }
         boolean isWeb = content.contains("#qpy:webapp");
-        boolean isQApp = content.contains("#qpy:quiet") || content.contains("#qpy:qpysrv");
-        boolean isKivy = content.contains("#qpy:kivy");
-        boolean isGame = content.contains("#qpy:pygame");
-        boolean isPy3 = content.contains("#qpy:3");
+        //boolean isQApp = content.contains("#qpy:quiet") || content.contains("#qpy:qpysrv");
+        //boolean isKivy = content.contains("#qpy:kivy");
+        //boolean isGame = content.contains("#qpy:pygame");
+        //boolean isPy3 = content.contains("#qpy:3");
 
         if (isWeb) {
-            if (isPy3) {
+            //if (isPy3) {
                 res = (isProj ? R.drawable.ic_project_webapp3 : R.drawable.ic_pyfile_webapp3);
-            } else {
+            //} else {
                 res = (isProj ? R.drawable.ic_project_webapp : R.drawable.ic_pyfile_webapp);
-            }
-        } else if (isKivy || isGame) {
+            //}
+        } /*else if (isKivy || isGame) {
             if (isPy3) {
                 res = (isProj ? R.drawable.ic_project_kivy3 : R.drawable.ic_pyfile_kivy3);
             } else {
                 res = (isProj ? R.drawable.ic_project_kivy : R.drawable.ic_pyfile_kivy);
             }
-        } else {
-            if (isPy3) {
+        }*/ else {
+            //if (isPy3) {
                 res = (isProj ? R.drawable.ic_project_qapp3 : R.drawable.ic_pyfile_qapp3);
-            } else {
-                res = (isProj ? R.drawable.ic_project_qapp : R.drawable.ic_pyfile_qapp);
-            }
+            //} else {
+             //   res = (isProj ? R.drawable.ic_project_qapp : R.drawable.ic_pyfile_qapp);
+           // }
         }
         return res;
     }

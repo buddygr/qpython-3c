@@ -93,8 +93,7 @@ class TranscriptScreen implements Screen {
      * @param x         X coordinate (also known as column)
      * @param y         Y coordinate (also known as row)
      * @param codePoint Unicode codepoint to store
-     * @param foreColor the foreground color
-     * @param backColor the background color
+     * @param style     the style for the unicode char
      */
     public void set(int x, int y, int codePoint, int style) {
         mData.setChar(x, y, codePoint, style);
@@ -310,6 +309,7 @@ class TranscriptScreen implements Screen {
      * @return the count of active transcript rows.
      */
     public int getActiveTranscriptRows() {
+        if(mData==null) return 0;
         return mData.getActiveTranscriptRows();
     }
 

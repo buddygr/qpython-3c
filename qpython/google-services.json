@@ -62,6 +62,19 @@
           "current_key": "AIzaSyB7W6_FKMJO13hQ2HKhMopGQvemjjuDv4c"
         }
       ]
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:955258715976:android:4fd6edc2d9a8f5a8",
+        "android_client_info": {
+          "package_name": "indi.czc.qpython"
+        }
+      },
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7W6_FKMJO13hQ2HKhMopGQvemjjuDv4c"
+        }
+      ]
     }
   ],
   "configuration_version": "1"

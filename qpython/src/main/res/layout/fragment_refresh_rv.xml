@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorPrimaryDark"
@@ -24,8 +23,15 @@
             android:padding="@dimen/default_margin"
             android:text="@string/net_error"
             android:textColor="#FFF"
+            android:visibility="gone" />
+
+        <Button
+            android:textAllCaps="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/install_with_python_s_pypi"
             android:visibility="gone"
-            />
+            android:id="@+id/net_err_pypi" />
 
         <ProgressBar
             android:id="@+id/progress_bar"

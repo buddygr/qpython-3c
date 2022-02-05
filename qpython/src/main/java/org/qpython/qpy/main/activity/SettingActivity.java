@@ -13,7 +13,6 @@ import android.support.v7.widget.Toolbar;
 import org.qpython.qpy.R;
 import org.qpython.qpy.main.fragment.SettingFragment;
 import org.qpython.qpy.main.service.FTPServerService;
-import org.qpython.qpy.utils.NotebookUtil;
 import org.swiftp.Globals;
 
 
@@ -65,9 +64,9 @@ public class SettingActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (NotebookUtil.isNotebookEnable(this)){
+        /*if (NotebookUtil.isNotebookEnable(this)){
             setResult(RESULT_OK);
-        }
+        }*/
         super.onBackPressed();
     }
 

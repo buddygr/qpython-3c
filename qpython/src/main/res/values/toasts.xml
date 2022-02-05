@@ -10,8 +10,8 @@
     <string name="toast_open_error">Unable to open the file (maybe the file is too big, or corrupted)</string>
     <string name="toast_save_null">Unable to save, path is null</string>
     <string name="toast_save_temp">Unable to save to temp file</string>
-    <string name="toast_save_delete">Unable to save (error while copying temp file to save location)</string>
-    <string name="toast_save_rename">Unable to save (error while copying temp file to save location)</string>
+    <string name="toast_save_delete">Unable to save (error while delete old file from save location)</string>
+    <string name="toast_save_rename">Unable to save (error while move temp file to save location)</string>
     <string name="toast_save_success">File saved</string>
     <string name="toast_folder_cant_write">"Can't use this folder cause it isn't writeable"</string>
     <string name="toast_file_cant_read">"Can't use this file cause it isn't readable"</string>

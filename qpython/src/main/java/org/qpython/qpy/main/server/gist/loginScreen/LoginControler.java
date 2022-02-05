@@ -45,8 +45,8 @@ public class LoginControler extends Controler<LoginView> {
             public void onSuccess(ResponseBean<LoginResponse> loginResponseResponseBean) {
                 mView.hideLoading();
 
-                Log.d("login", "T:"+loginResponseResponseBean.getData().getToken());
-                if (loginResponseResponseBean.success()){
+                //Log.d("login", "T:"+loginResponseResponseBean.getData().getToken());
+                /*if (loginResponseResponseBean.success()){
                     App.setUser(user);
                     TokenManager.saveToken(loginResponseResponseBean.getData().getToken());
                     //LogUtil.d("login", "T:"+TokenManager.getToken());
@@ -56,7 +56,7 @@ public class LoginControler extends Controler<LoginView> {
                     mView.loginSuccess();
                 }else {
                     mView.showToast("login fail,please retry later");
-                }
+                }*/
             }
 
             @Override

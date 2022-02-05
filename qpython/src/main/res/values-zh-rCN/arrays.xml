@@ -164,13 +164,6 @@
         <item>2000</item>
     </string-array>
 
-    <string-array name="funding_price">
-        <item>36</item>
-        <item>48</item>
-        <item>60</item>
-        <item>96</item>
-    </string-array>
-
     <string-array name="funding_stage">
         <item>初级课程</item>
         <item>中级课程</item>

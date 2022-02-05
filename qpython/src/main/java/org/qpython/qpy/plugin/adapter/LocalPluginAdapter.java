@@ -13,8 +13,8 @@ import android.widget.TextView;
 
 import org.qpython.qpy.R;
 
-import org.qpython.qpy.plugin.LocalPluginManager;
-import org.qpython.qpy.plugin.PluginDetailDialogFragment;
+import org.qpython.qpy.plugin.manager.LocalPluginManager;
+import org.qpython.qpy.plugin.fragment.PluginDetailDialogFragment;
 import org.qpython.qpy.plugin.model.LocalPluginBean;
 
 import java.util.ArrayList;

@@ -42,7 +42,7 @@ public abstract class RefreshFragment extends Fragment {
     }
 
     public String getDownloadPath(String sModule) {
-        return CONF.qpypiPath() +
+        return CONF.qpypiPath +
                 sModule;
     }
 
@@ -152,7 +152,7 @@ public abstract class RefreshFragment extends Fragment {
         if (item.getSrc().equals("")) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
             AlertDialog alertDialog = builder.setTitle(R.string.location)
-                    .setMessage(CONF.qpypiPath() + "/" + item.getTitle())
+                    .setMessage(CONF.qpypiPath + "/" + item.getTitle())
                     .setPositiveButton(R.string.confirm, null)
                     .create();
             alertDialog.show();

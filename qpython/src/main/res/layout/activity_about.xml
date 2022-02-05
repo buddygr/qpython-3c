@@ -32,12 +32,13 @@
                 android:textColor="#FFF"/>
 
             <TextView
+                android:id="@+id/tv_qpy_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="30dp"
                 android:background="@drawable/white_rect_stroke"
                 android:padding="@dimen/default_margin"
-                android:text="@string/qpy_description"
+                android:text=""
                 android:textColor="#FFF"
                 android:textSize="18sp"/>
 
@@ -56,24 +57,44 @@
                 android:layout_height="1dp"
                 android:background="@color/toolbar"/>
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
                 <TextView
                     android:id="@+id/tv_update"
                     style="@style/setting_tv"
                     android:text="@string/check_update"/>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/toolbar"/>
+
+            <TextView
+                android:id="@+id/tv_backup_download"
+                style="@style/setting_tv"
+                android:text="@string/backup_download"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/toolbar"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tv_package_name"
+                style="@style/setting_tv"
+                android:text="@string/package_name_title"/>
+
                 <TextView
-                    android:id="@+id/tv_new_hint"
+                    android:id="@+id/tv_app_id"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="60dp"
                     android:gravity="center_vertical"
-                    android:text="@string/already_newest"
+                    android:text=""
                     android:textColor="@color/text_color_hint"/>
             </RelativeLayout>
 
@@ -82,30 +103,115 @@
                 android:layout_height="1dp"
                 android:background="@color/toolbar"/>
 
-            <TextView
-                android:id="@+id/tv_star"
-                style="@style/setting_tv"
-                android:text="@string/star_it"/>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/Fork_From"
+                    style="@style/setting_tv"
+                    android:text="@string/fork_from_title"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="60dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/qpython_android"
+                    android:textColor="@color/text_color_hint"/>
+            </RelativeLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@color/toolbar"/>
 
-            <TextView
-                android:id="@+id/tv_feedback"
-                style="@style/setting_tv"
-                android:text="@string/feedback"/>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/Fork_To"
+                    style="@style/setting_tv"
+                    android:text="@string/fork_to_title"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="60dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/qpython_3c_text"
+                    android:textColor="@color/text_color_hint"/>
+            </RelativeLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@color/toolbar"/>
 
-            <TextView
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
                 android:id="@+id/tv_thanks"
                 style="@style/setting_tv"
                 android:text="@string/thank"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="60dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="@string/origin_author"
+                    android:textColor="@color/text_color_hint"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="@string/modify_author"
+                    android:textColor="@color/text_color_hint"/>
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/toolbar"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    style="@style/setting_tv"
+                    android:text="@string/open_source_protocol"/>
+
+                <TextView
+                    android:id="@+id/open_source_protocol"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="60dp"
+                    android:gravity="center_vertical"
+                    android:text=""
+                    android:textColor="@color/text_color_hint"/>
+            </RelativeLayout>
+
         </LinearLayout>
     </ScrollView>
 </layout>

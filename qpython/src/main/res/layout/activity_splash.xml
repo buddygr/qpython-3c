@@ -4,13 +4,15 @@
     <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:background="#103606"
+        android:background="@drawable/sky_grass"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:layout_width="70dp"
-            android:layout_height="50dp"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:src="@drawable/img_home_logo"/>
+            android:text="QPython"
+            android:textSize="60sp"
+            android:textColor="#007f00"/>
     </RelativeLayout>
 </layout>       

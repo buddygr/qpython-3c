@@ -1,61 +1,45 @@
 package org.qpython.qpy.main.activity;
 
+//Edit by 乘着船 2022
+
 import android.Manifest;
+import android.app.ActivityManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityCompat;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
-import android.text.Html;
-import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
+import com.quseit.util.FileHelper;
 import com.quseit.util.NAction;
-import com.quseit.util.Utils;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.qpython.qpy.R;
+import org.qpython.qpy.console.ScriptExec;
 import org.qpython.qpy.console.TermActivity;
 import org.qpython.qpy.databinding.ActivityMainBinding;
-import org.qpython.qpy.main.app.App;
 import org.qpython.qpy.main.app.CONF;
-import org.qpython.qpy.main.server.MySubscriber;
-import org.qpython.qpy.main.server.model.CourseAdModel;
+import org.qpython.qpy.main.auxActivity.ProtectActivity;
+import org.qpython.qpy.main.auxActivity.ScreenRecordActivity;
 import org.qpython.qpy.main.utils.Bus;
 import org.qpython.qpy.texteditor.EditorActivity;
 import org.qpython.qpy.texteditor.TedLocalActivity;
-import org.qpython.qpy.utils.UpdateHelper;
-import org.qpython.qpysdk.QPyConstants;
 import org.qpython.qpysdk.QPySDK;
-import org.qpython.qpysdk.utils.FileHelper;
 import org.qpython.qsl4a.QPyScriptService;
 
 import java.io.File;
-import java.io.InputStream;
-
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-
-import static org.qpython.qpysdk.QPyConstants.PYTHON_2;
 
 public class HomeMainActivity extends BaseActivity {
-    private static final String URL_COMMUNITY = "https://www.qpython.org/community.html";
-    private static final String URL_COURSE    = "https://edu.qpython.org/?from=qpy2";
-    private static final String USER_NAME     = "username";
-    private static final String TAG = "HomeMainActivity";
 
-    private static final int LOGIN_REQUEST_CODE = 136;
+    private QPySDK qpysdk;
 
     private ActivityMainBinding binding;
 
@@ -64,11 +48,11 @@ public class HomeMainActivity extends BaseActivity {
         context.startActivity(starter);
     }
 
-    public static void start(Context context, String userName) {
+    /*public static void start(Context context, String userName) {
         Intent starter = new Intent(context, HomeMainActivity.class);
         starter.putExtra(USER_NAME, userName);
         context.startActivity(starter);
-    }
+    }*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,11 +60,13 @@ public class HomeMainActivity extends BaseActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         //App.setActivity(this);
         startMain();
-        handlePython3(getIntent());
+        //handlePython3(getIntent());
         handleNotification(savedInstanceState);
+        runShortcut(getIntent());
     }
 
-    private void initIcon() {
+    /*private void initIcon() {
+        binding.icon.setImageResource(R.drawable.img_home_logo_3);
         switch (NAction.getQPyInterpreter(this)) {
             case "3.x":
                 binding.icon.setImageResource(R.drawable.img_home_logo_3);
@@ -97,72 +83,130 @@ public class HomeMainActivity extends BaseActivity {
         } else {
             binding.login.setText(Html.fromHtml(getString(R.string.welcome_s, App.getUser().getNick())));
         }
-    }
+    }*/
 
     private void startMain() {
         initListener();
         startPyService();
         Bus.getDefault().register(this);
-        init();
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        openQpySDK();
+        setTaskDescription(new ActivityManager.TaskDescription(getString(R.string.aux_window)));
+        ProtectActivity.CheckProtect(this);
+        /*if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             UpdateHelper.checkConfUpdate(this, QPyConstants.BASE_PATH);
+        }*/
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void getPyVer(boolean once) {
+        if (CONF.pyVer.startsWith("py")) return;
+        if (qpysdk==null)
+            qpysdk = new QPySDK(HomeMainActivity.this, HomeMainActivity.this);
+        if(once && qpysdk.needUpdateRes())
+        {
+            initQPy();
+            qpysdk = null;
+            return;
         }
+        String[] pyVer;
+        try {
+            pyVer = qpysdk.getPyVer();
+            CONF.pyVerComplete = pyVer[1];
+            CONF.pyVer = pyVer[0];
+            //可以消除终端中文输入的某些bug，虽然不知道为什么
+            if (once) startShell("init.sh");
+            else runShortcut(getIntent());
+        }
+        catch (Exception e){
+            if (once) initQPy();
+        }
+        qpysdk = null;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        initUser();
-        initIcon();
+        //initUser();
+        //initIcon();
         handleNotification();
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        handlePython3(intent);
+        //handlePython3(intent);
+        runShortcut(intent);
+    }
+
+    private void startShell(String name){
+        TermActivity.startShell(this,name);
+    }
+
+    private void playPy(String name){
+        ScriptExec.getInstance().playScript(HomeMainActivity.this,
+                CONF.binDir+name+".py", null, false);
     }
 
     private void initListener() {
+
         binding.ivScan.setOnClickListener(v -> Bus.getDefault().post(new StartQrCodeActivityEvent()));
-        binding.login.setOnClickListener(v -> {
+        /*binding.login.setOnClickListener(v -> {
             if (App.getUser() == null) {
                 sendEvent(getString(R.string.event_login));
-                startActivityForResult(new Intent(this, SignInActivity.class), LOGIN_REQUEST_CODE);
+                //startActivityForResult(new Intent(this, SignInActivity.class), LOGIN_REQUEST_CODE);
             } else {
                 sendEvent(getString(R.string.event_me));
-                UserActivity.start(this);
+                //UserActivity.start(this);
             }
-        });
+        });*/
 
         binding.llTerminal.setOnClickListener(v -> {
+            //TermActivity.startActivity(HomeMainActivity.this);
+            //默认启动彩色Python解释器
             TermActivity.startActivity(HomeMainActivity.this);
             sendEvent(getString(R.string.event_term));
         });
 
         binding.llTerminal.setOnLongClickListener(v -> {
-            CharSequence[] chars = new CharSequence[]{ this.getString(R.string.python_interpreter), this.getString(R.string.action_notebook), this.getString(R.string.shell_terminal)};
+            startPyService();
+
+            CharSequence[] chars = new CharSequence[]{
+                    this.getString(R.string.color_python_interpreter),
+                    //this.getString(R.string.action_notebook),
+                    this.getString(R.string.ipython_interactive),
+                    this.getString(R.string.sl4a_gui_console),
+                    this.getString(R.string.browser_console),
+                    this.getString(R.string.shell_terminal),
+                    this.getString(R.string.python_interpreter),
+                    this.getString(R.string.python_shell_terminal),
+            };
             new AlertDialog.Builder(this, R.style.MyDialog)
                     .setTitle(R.string.choose_action)
                     .setItems(chars, (dialog, which) -> {
                         switch (which) {
-                            case 0: // Create Shortcut
-                                TermActivity.startActivity(HomeMainActivity.this);
+                            case 0:
+                                startShell("1");
                                 break;
                             case 1:
-                                NotebookActivity.start(HomeMainActivity.this, null, false);
+                                startShell("ipython.py");
                                 break;
                             case 2:
-                                TermActivity.startShell(HomeMainActivity.this);
+                                playPy("SL4A_GUI_Console");
+                                break;
+                            case 3:
+                                playPy("browserConsole");
+                                break;
+                            case 4:
+                                startShell("shell.sh");
+                                break;
+                            case 5:
+                                startShell("blackConsole.py");
+                                break;
+                            case 6:
+                                startShell("shell.py");
                                 break;
                         }
-                    }).setNegativeButton(getString(R.string.close), new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                }
-            })
+                    }).setNegativeButton(getString(R.string.close), (dialogInterface, i) -> dialogInterface.dismiss())
                     .show();
 
             return true;
@@ -190,19 +234,15 @@ public class HomeMainActivity extends BaseActivity {
             sendEvent(getString(R.string.event_file));
         });
         binding.llQpyApp.setOnClickListener(v -> {
-                AppListActivity.start(this, AppListActivity.TYPE_SCRIPT);
+            startPyService();
+            AppListActivity.start(this, AppListActivity.TYPE_SCRIPT);
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             sendEvent(getString(R.string.event_top));
         });
-
-        binding.llCourse.setOnClickListener(v -> {
-            CourseActivity.start(HomeMainActivity.this);
-            sendEvent(getString(R.string.event_course));
+        binding.llRecord.setOnClickListener(v -> {
+            startActivity(new Intent(this, ScreenRecordActivity.class));
         });
-/*        binding.llCourse.setOnClickListener(v ->
-                QWebViewActivity.start(HomeMainActivity.this, getString(R.string.course), URL_COURSE));
 
-        initCourseListener();*/
     }
 
 
@@ -212,7 +252,7 @@ public class HomeMainActivity extends BaseActivity {
         Bus.getDefault().unregister(this);
     }
 
-    private void handlePython3(Intent intent) {
+    /*private void handlePython3(Intent intent) {
         String action = intent.getAction();
         if (action != null && action.equals(getString(R.string.action_from_python_three))
                 && NAction.getQPyInterpreter(this).equals(PYTHON_2)) {
@@ -224,7 +264,7 @@ public class HomeMainActivity extends BaseActivity {
                     .create()
                     .show();
         }
-    }
+    }*/
 
     private void handleNotification(Bundle bundle) {
         if (bundle == null) return;
@@ -277,33 +317,7 @@ public class HomeMainActivity extends BaseActivity {
         }
     }
 
-//    private void initCourseListener() {
-//        App.getService().getCourseAd().subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new MySubscriber<CourseAdModel>() {
-//                    @Override
-//                    public void onNext(CourseAdModel o) {
-//                        super.onNext(o);
-//                        if ("0".equals(o.getQpy().getCourse_open())) {
-//                            // open web
-//                            binding.llCourse.setOnClickListener(v ->
-//                                    QWebViewActivity.start(HomeMainActivity.this, getString(R.string.course), URL_COURSE));
-//                        } else {
-//                            // open with native
-//                            binding.llCourse.setOnClickListener(v -> {
-//                                CourseActivity.start(HomeMainActivity.this);
-//                                sendEvent(getString(R.string.event_course));
-//                            });
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        binding.llCourse.setOnClickListener(v ->
-//                                QWebViewActivity.start(HomeMainActivity.this, getString(R.string.course), URL_COURSE));
-//                    }
-//                });
-//    }
+    // open web
 
     @Override
     protected void onPause() {
@@ -311,27 +325,59 @@ public class HomeMainActivity extends BaseActivity {
     }
 
     private void startPyService() {
-        Log.d(TAG, "startPyService");
+        // confirm the SL4A Service is started
         Intent intent = new Intent(this, QPyScriptService.class);
         startService(intent);
     }
 
     private void openQpySDK() {
-        Log.d("HomeMainActivity", "openQpySDK");
+        //Log.d("HomeMainActivity", "openQpySDK");
+
         String[] permssions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("security_agree",false))
+        {
+            QpySdkAgree(permssions);
+        } else {
+            if (qpysdk==null)
+                qpysdk = new QPySDK(HomeMainActivity.this, HomeMainActivity.this);
+            File filesDir = HomeMainActivity.this.getFilesDir();
+            qpysdk.extractRes("resource", filesDir,true);
+            CONF.pyVer = "-1";
+            String content = FileHelper.getFileContents(filesDir+"/text/"+getString(R.string.lang_flag)+"/security_tip");
+            new AlertDialog.Builder(HomeMainActivity.this, R.style.MyDialog)
+                    .setTitle(R.string.notice)
+                    .setMessage(content)
+                    .setPositiveButton(R.string.agree, (dialog1, which) -> {
+                        PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("security_agree",true).apply();
+                        QpySdkAgree(permssions);
+                    })
+                    .setNegativeButton(R.string.disagree, (dialog1, which) -> finish())
+                    .setOnCancelListener(dialog1 -> finish())
+                    .create()
+                    .show();
+        }
+    }
+
+    private void QpySdkAgree(String[] permssions){
         checkPermissionDo(permssions, new BaseActivity.PermissionAction() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onGrant() {
                 //这里只执行一次做为初始化
 
-                if (!NAction.isQPyInterpreterSet(HomeMainActivity.this)) {
-                    new AlertDialog.Builder(HomeMainActivity.this, R.style.MyDialog)
+                if ( NAction.isQPyInterpreterSet(HomeMainActivity.this) ) {
+                    getPyVer(true);
+                } else {
+                    /*new AlertDialog.Builder(HomeMainActivity.this, R.style.MyDialog)
                             .setTitle(R.string.notice)
                             .setMessage(R.string.py2_or_3)
                             .setPositiveButton(R.string.use_py3, (dialog1, which) -> initQpySDK3())
                             .setNegativeButton(R.string.use_py2, (dialog1, which) -> initQpySDK())
                             .create()
-                            .show();
+                            .show();*/
+                    NAction.setQPyInterpreter(HomeMainActivity.this, "3.x");
+                    initQPy();
                 }
             }
 
@@ -339,16 +385,18 @@ public class HomeMainActivity extends BaseActivity {
             public void onDeny() {
                 Toast.makeText(HomeMainActivity.this,  getString(R.string.grant_storage_hint), Toast.LENGTH_SHORT).show();
             }
+
         });
     }
 
     /**
      * 在工作线程中作初始化
-     */
+     *
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void initQpySDK3() {
         Log.d(TAG, "initQpySDK3");
         NAction.setQPyInterpreter(HomeMainActivity.this, "3.x");
-        initQPy(true);
+        initQPy();
         initIcon();
     }
     private void initQpySDK() {
@@ -356,95 +404,57 @@ public class HomeMainActivity extends BaseActivity {
         initQPy(false);
         NAction.setQPyInterpreter(HomeMainActivity.this, "2.x");
         initIcon();
-    }
+    }*/
 
-    private void initQPy(boolean py3) {
-        new Thread(() -> {
-            QPySDK qpysdk = new QPySDK(HomeMainActivity.this, HomeMainActivity.this);
-            //这里会在切换qpy3的时候再次释放相关资源
-            qpysdk.extractRes(py3?"private31":"private1", HomeMainActivity.this.getFilesDir());
-            qpysdk.extractRes(py3?"private32":"private2", HomeMainActivity.this.getFilesDir());
-            qpysdk.extractRes(py3?"private33":"private3", HomeMainActivity.this.getFilesDir());
-            if (py3) {
-                qpysdk.extractRes("notebook3", HomeMainActivity.this.getFilesDir());
-            }
-            File externalStorage = new File(Environment.getExternalStorageDirectory(), "qpython");
-            FileHelper.createDirIfNExists(externalStorage + "/cache");
-            FileHelper.createDirIfNExists(externalStorage + "/log");
-            FileHelper.createDirIfNExists(externalStorage + "/notebooks");
-
-            qpysdk.extractRes(py3?"public3":"public", new File(externalStorage + "/lib"));
-
-            qpysdk.extractRes("ipynb", new File(externalStorage + "/notebooks"));
-
-            extractRes();
-        }).start();
-    }
-
-
-    /**
-     * 初始化内置python项目
-     */
-    public void extractRes() {
-        File externalStorage = new File(QPyConstants.ABSOLUTE_PATH);
-        if (checkExpired("public", new File(externalStorage + "/lib").getAbsolutePath(), "programs"+NAction.getPyVer(this))) {
-            String name, sFileName;
-            InputStream content;
-
-            R.raw a = new R.raw();
-            java.lang.reflect.Field[] t = R.raw.class.getFields();
-            Resources resources = getResources();
-
-            for (int i = 0; i < t.length; i++) {
-                try {
-                    name = resources.getText(t[i].getInt(a)).toString();
-                    sFileName = name.substring(name.lastIndexOf('/') + 1, name.length());
-                    content = getResources().openRawResource(t[i].getInt(a));
-                    content.reset();
-
-                    if (sFileName.equals("projects2.zip")) {
-                        Utils.createDirectoryOnExternalStorage("qpython/projects/");
-                        Utils.unzip(content, Environment.getExternalStorageDirectory().getAbsolutePath() + "/qpython/projects/", false);
-
-                    } else if (sFileName.equals("scripts2.zip")) {
-                        Utils.unzip(content, Environment.getExternalStorageDirectory().getAbsolutePath() + "/qpython/scripts/", false);
-
-                    } else if (sFileName.equals("projects3.zip")) {
-                        Utils.createDirectoryOnExternalStorage("qpython/projects3/");
-                        Utils.unzip(content, Environment.getExternalStorageDirectory().getAbsolutePath() + "/qpython/projects3/", false);
-
-                    } else if (sFileName.equals("scripts3.zip")) {
-                        Utils.createDirectoryOnExternalStorage("qpython/scripts3/");
-                        Utils.unzip(content, Environment.getExternalStorageDirectory().getAbsolutePath() + "/qpython/scripts3/", false);
-
-                    } if (sFileName.equals("ipynb.zip")) {
-                        Utils.createDirectoryOnExternalStorage("qpython/notebooks/");
-                        Utils.unzip(content, Environment.getExternalStorageDirectory().getAbsolutePath() + "/qpython/notebooks/", false);
-                    }
-
-                } catch (Exception e) {
-                    Log.e("HomeMainActivity", "Failed to copyResourcesToLocal", e);
-
-                }
-            }
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void initQPy(){
+        /*if (qpysdk==null)
+            qpysdk = new QPySDK(HomeMainActivity.this, HomeMainActivity.this);*/
+        //new Thread(() -> {
+            File filesDir = HomeMainActivity.this.getFilesDir();
+        if (!CONF.pyVer.equals("-1"))
+            qpysdk.extractRes("resource", filesDir,true);
+        /*try {
+            FileUtils.chmod(new File(this.getFilesDir()+"/bin/qpython.sh"),0777);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }*/
+        //}).start();
+        //Toast.makeText(this,getString(R.string.extract_resource),Toast.LENGTH_LONG).show();
+        //NAction.startInstalledAppDetailsActivity(this);
+        new AlertDialog.Builder(HomeMainActivity.this, R.style.MyDialog)
+                .setTitle(R.string.notice)
+                .setMessage(
+                        getString(R.string.welcome)+"\n\n"+
+                                getString(R.string.shortcut_permission))
+                .setPositiveButton(R.string.setting, (dialog1, which) -> {
+                    NAction.startInstalledAppDetailsActivity(this);
+                    getPyVer(false);
+                })
+                .setNegativeButton(R.string.ignore, (dialog1, which) -> getPyVer(false))
+                .setOnCancelListener(cancel -> getPyVer(false))
+                .create()
+                .show();
+        ScriptExec.getInstance().playScript(this,
+                "setup", null,false);
+        try {
+            checkOtherPermission();
+        } catch (Exception e) {
+            Toast.makeText(this,e.toString(),Toast.LENGTH_LONG).show();
         }
     }
 
-    private void init() {
-        openQpySDK();
-    }
-
-    @Override
+    /*@Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case LOGIN_REQUEST_CODE:
-                    binding.login.setText(Html.fromHtml(getString(R.string.welcome_s, App.getUser().getNick())));
+                    //binding.login.setText(Html.fromHtml(getString(R.string.welcome_s, App.getUser().getNick())));
                     break;
             }
         }
-    }
+    }*/
 
     @Subscribe
     public void startQrCodeActivity(StartQrCodeActivityEvent event) {
@@ -462,6 +472,19 @@ public class HomeMainActivity extends BaseActivity {
             }
         });
     }
+
+    private void runShortcut(Intent intent) {
+        String action = intent.getAction();
+        if (action!=null && action.equals(Intent.ACTION_VIEW)){
+        String path = intent.getStringExtra("path");
+        String arg = intent.getStringExtra("arg");
+        boolean isProj = intent.getBooleanExtra("isProj", false);
+        if (isProj) {
+            ScriptExec.getInstance().playProject(this, path, arg,false);
+        } else {
+            ScriptExec.getInstance().playScript(this, path, arg, false);
+        }
+    }}
 
     public static class StartQrCodeActivityEvent {
 

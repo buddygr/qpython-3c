@@ -1,5 +1,6 @@
 package org.qpython.qpy.main.activity;
 
+import android.app.ActivityManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,6 +12,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class SplashActivity extends AppCompatActivity {
+
+    private static int delay = 1000;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -24,7 +27,9 @@ public class SplashActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             }
-        },1000);
+        },delay);
+        setTaskDescription(new ActivityManager.TaskDescription(getString(R.string.main_window)));
+        delay = 100;
     }
 
 }

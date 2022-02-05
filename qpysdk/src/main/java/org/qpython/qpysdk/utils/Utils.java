@@ -8,20 +8,17 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ConfigurationInfo;
 import android.graphics.Bitmap;
-import android.os.Build;
+import android.net.Uri;
 import android.util.Log;
 
-import com.quseit.qpyengine.R;
-
+import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
-import java.sql.Time;
 
 /**
  * Created by yhc on 16/8/21.
@@ -29,15 +26,21 @@ import java.sql.Time;
 public class Utils {
     static final String TAG = "Utils";
 
-    public final int KIVY_REQUEST_CODE = 10103;
     public static final String TITLE = "title";
     public static final String PATH = "path";
 
     public static void checkRunTimeLog(Context context, String title, String path) {
         final Intent updateIntent = new Intent();
-        updateIntent.setClassName(context.getPackageName(), "org.qpython.qpy.main.activity.LogActivity");
+        if (path.toLowerCase().endsWith(".htm")){
+            Uri uri=Uri.fromFile(new File(path));
+            updateIntent.setClassName(context.getPackageName(), "org.qpython.qpy.main.activity.QWebViewActivity");
+            updateIntent.setDataAndType(uri, "text/html");
+        } else {
+            updateIntent.setClassName(context.getPackageName(), "org.qpython.qpy.main.activity.LogActivity");
+            updateIntent.putExtra(PATH, path);
+        }
         updateIntent.putExtra(TITLE, title);
-        updateIntent.putExtra(PATH, path);
+        updateIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT|Intent.FLAG_ACTIVITY_MULTIPLE_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(updateIntent);
 
     }
@@ -62,7 +65,7 @@ public class Utils {
 
     public static Notification getNotification(Context context, String contentTitle, String contentText, PendingIntent intent,
                                                int smallIconId, Bitmap largeIconId, int flags) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+        {
             Notification notification = new Notification.Builder(context) //new Notification(icon, tickerText, when);
                     .setTicker(contentTitle)
                     .setContentTitle(contentTitle)
@@ -74,24 +77,6 @@ public class Utils {
                     .build();
 
             return notification;
-        } else if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
-            Notification notification = new Notification.Builder(context) //new Notification(icon, tickerText, when);
-                    .setTicker(contentTitle)
-                    .setContentTitle(contentTitle)
-                    .setContentText(contentText)
-                    .setSmallIcon(smallIconId)
-                    .setSmallIcon(smallIconId)
-                    .setLargeIcon(largeIconId)
-                    .setAutoCancel(true)
-                    .setContentIntent(intent)
-                    .getNotification();
-            return notification;
-        } else {
-            Notification notification = new Notification(smallIconId, contentTitle, System.currentTimeMillis());
-            notification.tickerText = contentTitle;
-            notification.contentIntent = intent;
-            notification.flags |= flags;
-            return null;
         }
     }
 

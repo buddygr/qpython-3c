@@ -2,7 +2,7 @@ package org.qpython.qpysdk;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Build;
+import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.os.Message;
 import android.util.Log;
@@ -17,7 +17,6 @@ import org.qpython.qpysdk.utils.StreamGobbler;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -80,14 +79,7 @@ public class QPySDK {
 
         File f = new File(script);
 
-        if (Build.VERSION.SDK_INT >= 20) {
-            binaryPath = this.context.getFilesDir() + "/bin/python-android5";
-            ;
-        } else {
-            binaryPath = this.context.getFilesDir() + "/bin/python";
-            ;
-        }
-
+        binaryPath = this.context.getFilesDir() + "/bin/python";
 
         int[] pid = new int[1];
 
@@ -151,15 +143,15 @@ public class QPySDK {
 
         File externalStorage = new File(Environment.getExternalStorageDirectory(), "org.qpython.qpy");
 
-        environmentVariables.add("PYTHONPATH=" + externalStorage + "/lib/python2.7/site-packages/:"
+        /*environmentVariables.add("PYTHONPATH=" + externalStorage + "/lib/python2.7/site-packages/:"
                 + filesDir + "/lib/python2.7/site-packages/:"
                 + filesDir + "/lib/python2.7/:"
                 + filesDir + "/lib/python27.zip:"
                 + filesDir + "/lib/python2.7/lib-dynload/:"
-                + pyPath);
+                + pyPath);*/
 
         //environmentVariables.add("PYTHONSTARTUP=" + externalStorage + "/lib/python2.7/site-packages/qpythoninit.py");
-        environmentVariables.add("PYTHONOPTIMIZE=2");
+        environmentVariables.add("PYTHONOPTIMIZE=1");
 
         environmentVariables.add("TMPDIR=" + externalStorage + "/cache");
         environmentVariables.add("TEMP=" + externalStorage + "/cache");
@@ -181,20 +173,68 @@ public class QPySDK {
         return environment;
     }
 
+    public String getVersion(){
+        try {
+            return activity.getPackageManager().getPackageInfo(activity.getPackageName(),0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            return "0";
+        }
+    }
+
+    public String readDiskVersion(String filename){
+        String disk_version = "0";
+        try {
+            byte buf[] = new byte[64];
+            InputStream is = new FileInputStream(filename);
+            int len = is.read(buf);
+            disk_version = new String(buf, 0, len);
+            is.close();
+            return disk_version;
+        } catch (Exception e) {
+            return "0";
+        }
+    }
+
+    public void writeDataVersion(String diskVerFn,String dataVer) throws IOException {
+        // Write version file.
+        FileOutputStream os = new FileOutputStream(diskVerFn);
+        os.write(dataVer.getBytes());
+        os.close();
+    }
+
+    public boolean needUpdateRes(){
+        String fn = context.getFilesDir()+"/text/ver/qpython";
+        if (readDiskVersion(fn).equals(getVersion())){
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public String[] getPyVer(){
+        String verPath = context.getFilesDir() + "/text/ver/python";
+        String[] pyVer = new String[2];
+        pyVer[1] = readDiskVersion(verPath);
+        pyVer[0] = "python"+pyVer[1].substring(0, pyVer[1].lastIndexOf("."));
+        pyVer[1] = "Python"+pyVer[1];
+        return pyVer;
+    }
+
+
     public void extractRes(File file, File target, boolean forceExtrac) {
         String fileName = file.getName().startsWith(".") ? file.getName().substring(1, file.getName().length()) : file.getName();
         fileName = fileName.substring(0, !file.getName().contains(".") ? file.getName().length() : file.getName().indexOf("."));
 
-        String data_version = resourceManager.getString(fileName + "_version");
-        if (data_version==null) {
+        String data_version = getVersion();
+        // resourceManager.getString(fileName + "_version");
+        /*if (data_version==null) {
             data_version = "0";
-        }
-        String disk_version = "0";
+        }*/
 
-        Log.d(TAG, "extractRes:"+fileName+"["+data_version+"]"+"["+disk_version+"]");
+        //Log.d(TAG, "extractRes:"+fileName+"["+data_version+"]"+"["+disk_version+"]");
 
         String disk_version_fn = target.getAbsolutePath() + "/" + fileName + ".version";
-        try {
+        /*try {
             byte buf[] = new byte[64];
             InputStream is = new FileInputStream(disk_version_fn);
             int len = is.read(buf);
@@ -204,9 +244,10 @@ public class QPySDK {
             disk_version = "0";
         } catch (IOException e) {
             disk_version = "0";
-        }
+        }*/
+        String disk_version = readDiskVersion(disk_version_fn);
 
-        if ((int) (Double.parseDouble(data_version) - Double.parseDouble(disk_version)) > 0 || disk_version.equals("0") || forceExtrac) {
+        if (!data_version.equals(disk_version) || disk_version.equals("0") || forceExtrac) {
             target.mkdirs();
             if (!new FileExtract().extractTar(file, target.getAbsolutePath())) {
                 Log.d(TAG,"Could not extract " + fileName + " data.");
@@ -218,34 +259,24 @@ public class QPySDK {
 
     public void extractRes(final String resource, File target, boolean force) {
         // The version of data in memory and on disk.
-        String data_version = resourceManager.getString(resource + "_version");
-        String disk_version = "0";
+        String data_version = getVersion();
 
         //LogUtil.d(TAG, "data_version:"+data_version+"-"+resource + "_version"+"-"+resourceManager);
         // If no version, no unpacking is necessary.
-        if (data_version == null) {
+        /*f (data_version == null) {
             return;
-        }
+        }*/
 
         // Check the current disk version, if any.
         String filesDir = target.getAbsolutePath();
         String disk_version_fn = filesDir + "/" + resource + ".version";
 
-        try {
-            byte buf[] = new byte[64];
-            InputStream is = new FileInputStream(disk_version_fn);
-            int len = is.read(buf);
-            disk_version = new String(buf, 0, len);
-            is.close();
-        } catch (Exception e) {
-            disk_version = "0";
-        }
-
+        String disk_version = readDiskVersion(disk_version_fn);
 
         //LogUtil.d(TAG, "data_version:"+Math.round(Double.parseDouble(data_version))+"-disk_version:"+Math.round(Double.parseDouble(disk_version))+"-RET:"+(int)(Double.parseDouble(data_version)-Double.parseDouble(disk_version)));
-        if (((int) (Double.parseDouble(data_version) - Double.parseDouble(disk_version)) > 0 || disk_version.equals("0"))
+        if ((!data_version.equals(disk_version) || disk_version.equals("0"))
                 || force) {
-            Log.v(TAG, "Extracting " + resource + " assets.");
+            //Log.v(TAG, "Extracting " + resource + " assets.");
 
             //recursiveDelete(target);
             target.mkdirs();
@@ -263,20 +294,21 @@ public class QPySDK {
                     // Write .nomedia.
                     new File(target, ".nomedia").createNewFile();
 
-                    // Write version file.
+                    /*/ Write version file.
                     FileOutputStream os = new FileOutputStream(disk_version_fn);
                     os.write(data_version.getBytes());
-                    os.close();
+                    os.close();*/
+                    writeDataVersion(disk_version_fn,data_version);
                 } catch (Exception e) {
                     Log.w("python", e);
-                    Toast.makeText(this.context, "Could not extract " + resource + " data, make sure your device have enough space.", Toast.LENGTH_LONG);
+                    Toast.makeText(this.context, "Could not extract " + resource + " data, make sure your device have enough space.", Toast.LENGTH_LONG).show();
                 }
             }
         } else {
             Log.d(TAG, "NO EXTRACT");
 
         }
-        if (resource.startsWith("private") || resource.startsWith("notebook")) {
+        if (resource.startsWith("resource")) {
             chmodX();
         }
     }
@@ -286,30 +318,21 @@ public class QPySDK {
     }
 
 
-    public void extractRes2(final String resource, File target) {
+    /*public void extractRes2(final String resource, File target) {
         Log.d(TAG, "extractRes:" + target);
         // The version of data in memory and on disk.
-        String data_version = resourceManager.getString(resource + "_version");
-        String disk_version;
+        String data_version = getVersion();
 
         // If no version, no unpacking is necessary.
-        if (data_version == null) {
+        / *if (data_version == null) {
             return;
-        }
+        }* /
 
         // Check the current disk version, if any.
         String filesDir = target.getAbsolutePath();
         String disk_version_fn = filesDir + "/" + resource + ".version";
 
-        try {
-            byte buf[] = new byte[64];
-            InputStream is = new FileInputStream(disk_version_fn);
-            int len = is.read(buf);
-            disk_version = new String(buf, 0, len);
-            is.close();
-        } catch (Exception e) {
-            disk_version = "";
-        }
+        String disk_version = readDiskVersion(disk_version_fn);
 
         // If the disk data is out of date, extract it and write the
         // version file.
@@ -329,9 +352,10 @@ public class QPySDK {
                     new File(target, ".nomedia").createNewFile();
 
                     // Write version file.
-                    FileOutputStream os = new FileOutputStream(disk_version_fn);
+                    / *FileOutputStream os = new FileOutputStream(disk_version_fn);
                     os.write(data_version.getBytes());
-                    os.close();
+                    os.close();* /
+                    writeDataVersion(disk_version_fn,data_version);
                 } catch (Exception e) {
                     Log.w("unpackData", e);
                 }
@@ -341,16 +365,16 @@ public class QPySDK {
         if (resource.startsWith("private") || resource.startsWith("notebook")) {
             chmodX();
         }
-    }
+    }*/
 
     private void chmodX () {
-        File bind = new File(this.context.getFilesDir() + "/bin");
-        if (bind.listFiles() != null) {
-            for (File bin : bind.listFiles()) {
+        File bind = new File(this.context.getFilesDir() , "bin");
+        File[] fileList = bind.listFiles();
+        if (fileList != null) {
+            for (File bin : fileList) {
                 try {
                     //LogUtil.d(TAG, "chmod:"+bin.getAbsolutePath());
-
-                    FileUtils.chmod(bin, 0755);
+                    FileUtils.chmod(bin, 0777);
                 } catch (Exception e1) {
                     e1.printStackTrace();
                 }

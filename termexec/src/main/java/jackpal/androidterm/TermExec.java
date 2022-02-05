@@ -116,20 +116,7 @@ public class TermExec {
     public static int createSubprocess(ParcelFileDescriptor masterFd, String cmd, String[] args, String[] envVars) throws IOException {
         final int integerFd;
 
-        if (Build.VERSION.SDK_INT >= 12)
-            integerFd = FdHelperHoneycomb.getFd(masterFd);
-        else {
-            try {
-                if (descriptorField == null) {
-                    descriptorField = FileDescriptor.class.getDeclaredField("descriptor");
-                    descriptorField.setAccessible(true);
-                }
-
-                integerFd = descriptorField.getInt(masterFd.getFileDescriptor());
-            } catch (Exception e) {
-                throw new IOException("Unable to obtain file descriptor on this OS version: " + e.getMessage());
-            }
-        }
+        integerFd = FdHelperHoneycomb.getFd(masterFd);
         return createSubprocessInternal(cmd, args, envVars, integerFd);
     }
 

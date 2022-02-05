@@ -7,22 +7,15 @@ import android.os.Environment;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
-import android.widget.Toast;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.qpython.qpy.R;
-import org.qpython.qpy.main.activity.NotebookActivity;
-import org.qpython.qpy.main.activity.PurchaseActivity;
-import org.qpython.qpy.main.activity.QWebViewActivity;
-import org.qpython.qpy.main.activity.SettingActivity;
-import org.qpython.qpy.main.app.CONF;
-import org.qpython.qpy.main.utils.Utils;
-import org.qpython.qpy.texteditor.EditorActivity;
 
 import com.quseit.util.FileHelper;
 
-import org.qpython.qpy.utils.NotebookUtil;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.qpython.qpy.main.activity.QWebViewActivity;
+import org.qpython.qpy.main.app.CONF;
+import org.qpython.qpy.main.utils.Utils;
+import org.qpython.qpy.texteditor.EditorActivity;
 import org.qpython.qpysdk.QPyConstants;
 
 import java.io.File;
@@ -231,11 +224,11 @@ public class Bean {
     @JavascriptInterface
     public File getLibFile(String smodule, String cat) {
         //String code = NAction.getCode(this);
-        boolean isQpy3 = Utils.isQPy3(context);
-        String base = isQpy3 ? "python3.2/site-packages" : "python2.7/site-packages";
-        String sbase = isQpy3 ? "python3.2" : "python2.7";
-        String ubase = isQpy3 ? "scripts3" : "scripts";
-        String pbase = isQpy3 ? "projects3" : "projects";
+        //boolean isQpy3 = Utils.isQPy3();
+        //String base = isQpy3 ? "python3.2/site-packages" : "python2.7/site-packages";
+        String sbase =  CONF.pyVer;//"python" + QPyConstants.py3Ver;
+        String ubase =  "scripts3";
+        String pbase =  "projects3";
 
         File libFile;
         if (cat.equals("script")) {
@@ -308,7 +301,7 @@ public class Bean {
 
     @JavascriptInterface
     public void openPurchaseActivity(String articleID) {
-        PurchaseActivity.start(context, articleID);
+        //PurchaseActivity.start(context, articleID);
     }
 
     @JavascriptInterface
@@ -340,7 +333,7 @@ public class Bean {
         }
     }
 
-    @JavascriptInterface
+    /*@JavascriptInterface
     public void qpynotebook(){
         boolean notebookenable = NotebookUtil.isNotebookEnable(context);
         if (notebookenable) {
@@ -348,7 +341,7 @@ public class Bean {
             return;
         }
         NotebookActivity.start(context,null, false);
-    }
+    }*/
 
     @JavascriptInterface
     public void onNext(String act) {
@@ -359,7 +352,7 @@ public class Bean {
         context.sendBroadcast(intent1);
     }
 
-    @JavascriptInterface
+    /*@JavascriptInterface
     public void openNotebook(String url){
         Log.d(TAG, "openNotebook:"+url);
         boolean notebookenable = NotebookUtil.isNotebookEnable(context);
@@ -370,7 +363,7 @@ public class Bean {
         }
 
         NotebookActivity.startFromUrl(context,url, false);
-    }
+    }*/
     // for debug
     @JavascriptInterface
     public void loadHtml(String data) {

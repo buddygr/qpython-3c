@@ -166,13 +166,12 @@ public class NewsDetailAdapter extends RecyclerView.Adapter<MyViewHolder> {
             }
         });
         //fork
-        if (App.getUser() == null || mGistBean.getUser().getUserName().equals(App.getUser()
-                .getUserName())) {
+        //if (App.getUser() == null || mGistBean.getUser().getUserName().equals(App.getUser().getUserName())) {
             binding.btnFork.setVisibility(View.GONE);
-        } else {
-            binding.btnFork.setVisibility(View.VISIBLE);
-            binding.btnFork.setOnClickListener(view -> EventBus.getDefault().post(new GistEvent(FORK)));
-        }
+        //} else {
+         //   binding.btnFork.setVisibility(View.VISIBLE);
+         //   binding.btnFork.setOnClickListener(view -> EventBus.getDefault().post(new GistEvent(FORK)));
+        //}
     }
 
     @Override

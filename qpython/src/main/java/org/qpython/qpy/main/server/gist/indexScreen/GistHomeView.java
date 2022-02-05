@@ -1,9 +1,7 @@
 package org.qpython.qpy.main.server.gist.indexScreen;
 
 import org.qpython.qpy.main.server.gist.BaseView;
-import org.qpython.qpy.main.server.gist.response.ADBean;
 import org.qpython.qpy.main.server.gist.response.GistBean;
-import org.qpython.qpy.main.server.model.CourseAdModel;
 
 import java.util.List;
 
@@ -20,7 +18,7 @@ public interface GistHomeView extends BaseView {
     void loadMoreGist(List<GistBean> list);
     void favorite(boolean is);
     void showError(String msg);
-    void hideError();
-    void setAD(List<CourseAdModel.QpyBean.ExtAdBean.FeaturedBean> list);
-    void hideAd();
+    //void hideError();
+    //void setAD(List<CourseAdModel.QpyBean.ExtAdBean.FeaturedBean> list);
+    //void hideAd();
 }

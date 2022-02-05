@@ -1,24 +1,31 @@
 package org.qpython.qpy.main.app;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
 import android.support.multidex.MultiDex;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.NotificationCompat;
 
 import com.google.gson.Gson;
 import com.quseit.common.CrashHandler;
 import com.quseit.common.updater.downloader.DefaultDownloader;
 import com.squareup.leakcanary.LeakCanary;
 
+import org.qpython.qpy.R;
+import org.qpython.qpy.main.activity.HomeMainActivity;
+import org.qpython.qpy.main.auxActivity.ProtectActivity;
 import org.qpython.qpy.main.server.Service;
 import org.qpython.qpy.main.server.gist.Api;
 import org.qpython.qpy.main.server.gist.TokenManager;
 import org.qpython.qpy.main.server.gist.response.GistBean;
 import org.qpython.qpy.main.server.http.Retrofitor;
-import org.qpython.qpy.utils.NotebookUtil;
 import org.qpython.qpysdk.QPyConstants;
 import org.qpython.qsl4a.QSL4APP;
 
@@ -94,7 +101,7 @@ public class App extends QSL4APP {
 //    public static void setActivity(AppCompatActivity activity) {
 //        sActivity = activity;
 //    }
-    public static User getUser() {
+    /*public static User getUser() {
         if (mPreferences.getString("email", null) == null) {
             return null;
         }
@@ -105,13 +112,13 @@ public class App extends QSL4APP {
         user.setEmail(mPreferences.getString("email", ""));
         user.setAvatarUrl(mPreferences.getString("avatar", ""));
         return user;
-    }
+    }*/
 
     public static DefaultDownloader getDownloader() {
         return downloader;
     }
 
-    public static void setUser(User user) {
+    /*public static void setUser(User user) {
         SharedPreferences.Editor editor = mPreferences.edit();
         if (user == null) {
             editor.clear();
@@ -127,7 +134,7 @@ public class App extends QSL4APP {
             editor.apply();
         }
 
-    }
+    }*/
 
     private static List<String> favorites = new ArrayList<>();
 
@@ -208,11 +215,11 @@ public class App extends QSL4APP {
 //        }
 
         // restart Notebook
-        if (NotebookUtil.isNBSrvSet(this)) {
+        /*if (NotebookUtil.isNBSrvSet(this)) {
 
             NotebookUtil.killNBSrv(this);
             NotebookUtil.startNotebookService2(this);
-        }
+        }*/
     }
 
 

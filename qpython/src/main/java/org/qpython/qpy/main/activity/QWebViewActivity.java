@@ -1,8 +1,7 @@
 package org.qpython.qpy.main.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +16,8 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
@@ -26,30 +27,26 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
-
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.quseit.base.QBaseApp;
 import com.quseit.util.NAction;
-import com.quseit.util.NUtil;
 
 import org.apache.http.Header;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 import org.qpython.qpy.R;
 import org.qpython.qpy.console.ScriptExec;
 import org.qpython.qpy.databinding.ActivityQwebviewBinding;
 import org.qpython.qpy.main.app.App;
 import org.qpython.qpy.main.event.Bean;
-import org.qpython.qpy.main.receiver.DownloadNotebookReceiver;
 import org.qpython.qpy.main.utils.Utils;
-import org.qpython.qpy.utils.NotebookUtil;
 import org.qpython.qpysdk.QPyConstants;
 import org.qpython.qpysdk.utils.FileHelper;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -60,7 +57,6 @@ import java.io.File;
 public class QWebViewActivity extends BaseActivity {
     protected static final String TAG                    = "QWebViewActivity";
     protected final static int    FILECHOOSER_RESULTCODE = 1;
-    private static final   int    PURCHASE_REQUEST_CODE  = 233;
 
     public static final String IS_NO_HEADER = "is_no_header";
     public static final String IS_DRAWER    = "is_drawer";
@@ -75,7 +71,7 @@ public class QWebViewActivity extends BaseActivity {
     protected            String wvCookie     = "";
     protected            String wvDocument   = "";
     private              String launchScript = "";
-    private DownloadNotebookReceiver receiver;
+    private              String logPath      = QPyConstants.WEB_LOG;
 
     protected ValueCallback<Uri> mUploadMessage;
 
@@ -108,13 +104,13 @@ public class QWebViewActivity extends BaseActivity {
                         launchScript = script;
                     }
                     break;
-                case "opennotebook":
+                /*case "opennotebook":
                     String notebookurl = getIntent().getStringExtra(URL);
                     String downloadDir = "qpython/notebooks";
                     Log.d(TAG, "opennotebook:"+notebookurl);
 
                     App.getService().downloadFile(getApplicationContext(), notebookurl, NUtil.getFileFromUrl(notebookurl), "", downloadDir);
-                    break;
+                    break;*/
                 case "onnext":
                     break;
                 case "loadhtml":
@@ -130,7 +126,7 @@ public class QWebViewActivity extends BaseActivity {
     public static void start(Context context, String title, String url) {
         Intent starter = new Intent(context, QWebViewActivity.class);
         if (context == App.getContext()) {
-            starter.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            starter.setFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT|Intent.FLAG_ACTIVITY_MULTIPLE_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);;
         }
         starter.putExtra(QWebViewActivity.TITLE, title);
         starter.putExtra(QWebViewActivity.URL, url);
@@ -140,7 +136,7 @@ public class QWebViewActivity extends BaseActivity {
     public static void start(Context context, String act, String title, String url, String logPath) {
         Intent starter = new Intent(context, QWebViewActivity.class);
         if (context == App.getContext()) {
-            starter.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            starter.setFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT|Intent.FLAG_ACTIVITY_MULTIPLE_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);;
         }
         starter.putExtra(QWebViewActivity.ACT, act);
         starter.putExtra(QWebViewActivity.TITLE, title);
@@ -154,30 +150,43 @@ public class QWebViewActivity extends BaseActivity {
         starter.putExtra(TYPE, HTML);
         starter.putExtra(HTML, html);
         starter.putExtra(TITLE, title);
+        starter.setFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT|Intent.FLAG_ACTIVITY_MULTIPLE_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(starter);
     }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_qwebview);
-        receiver = new DownloadNotebookReceiver();
 
         Intent i = getIntent();
         String title = i.getStringExtra(TITLE);
         String type = i.getStringExtra(TYPE);
+        if (title != null && title.equals("")){
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
+        logPath = Utils.getWebLog(i.getStringExtra(QWebViewActivity.SRC),i.getStringExtra(QWebViewActivity.LOG_PATH));
+
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_qwebview);
+
         if (launchScript == null || launchScript.isEmpty())
             launchScript = i.getStringExtra(LOG_PATH);
 
-        setSupportActionBar(binding.lt.toolbar);
-        binding.lt.toolbar.setNavigationIcon(R.drawable.ic_back);
-        binding.lt.toolbar.setNavigationOnClickListener(view -> QWebViewActivity.this.finish());
+            setSupportActionBar(binding.lt.toolbar);
+            binding.lt.toolbar.setNavigationIcon(R.drawable.ic_back);
+            binding.lt.toolbar.setNavigationOnClickListener(view -> QWebViewActivity.this.finish());
 
         if (title != null) {
             setTitle(title);
+            if (title.equals("")){
+              binding.lt.getRoot().setVisibility(View.GONE);
+            }
         } else {
             setTitle(R.string.app_name);
         }
+
+        binding.wv.getSettings().setSupportZoom(true);
+        binding.wv.getSettings().setBuiltInZoomControls(true);
 
         switch (type == null ? "" : type) {
             case HTML:
@@ -223,12 +232,11 @@ public class QWebViewActivity extends BaseActivity {
                 Intent resultIntent = new Intent(this, LogActivity.class);
                 if (launchScript.contains("/scripts")) {
                     String proj = new File(launchScript).getName();
-
-                    resultIntent.putExtra(LogActivity.LOG_PATH, QPyConstants.ABSOLUTE_LOG);
+                    resultIntent.putExtra(LogActivity.LOG_PATH, logPath);
                     resultIntent.putExtra(LogActivity.LOG_TITLE, proj);
                 } else {
                     String proj = new File(launchScript).getParentFile().getName();
-                    resultIntent.putExtra(LogActivity.LOG_PATH, QPyConstants.ABSOLUTE_LOG);
+                    resultIntent.putExtra(LogActivity.LOG_PATH, logPath);
                     resultIntent.putExtra(LogActivity.LOG_TITLE, proj);
                 }
 
@@ -295,13 +303,13 @@ public class QWebViewActivity extends BaseActivity {
     }
 
     private void writeWebLog(String data) {
-        FileHelper.writeToFile(QPyConstants.ABSOLUTE_LOG,data+"\n", true);
+        FileHelper.writeToFile(logPath,data+"\n", true);
     }
 
     //
+    @SuppressLint("SetJavaScriptEnabled")
     public void initWebView() {// 初始化
         binding.WebViewProgress.setMax(100);
-
         Bean bean = new Bean(this, binding.wv);
         String act = getIntent().getStringExtra(ACT);
 
@@ -315,19 +323,26 @@ public class QWebViewActivity extends BaseActivity {
 //            String isDrawer = getIntent().getStringExtra(IS_DRAWER);
         }
 
-        binding.wv.setInitialScale(1);
-        binding.wv.getSettings().setAllowFileAccess(true);
-        binding.wv.getSettings().setPluginState(WebSettings.PluginState.ON);
-        binding.wv.getSettings().setPluginState(WebSettings.PluginState.ON_DEMAND);
-        binding.wv.getSettings().setLoadWithOverviewMode(true);
-        binding.wv.getSettings().setUseWideViewPort(true);
+        WebSettings ws = binding.wv.getSettings();
 
-        binding.wv.getSettings().setJavaScriptEnabled(true);// 可用JS
+        binding.wv.setInitialScale(1);
+        ws.setAllowFileAccess(true);
+        ws.setPluginState(WebSettings.PluginState.ON);
+        ws.setPluginState(WebSettings.PluginState.ON_DEMAND);
+        ws.setLoadWithOverviewMode(true);
+        ws.setUseWideViewPort(true);
+
+        ws.setJavaScriptEnabled(true);// 可用JS
         binding.wv.addJavascriptInterface(bean, "milib");
         binding.wv.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);// 滚动条风格，为0就是不给滚动条留空间，滚动条覆盖在网页上
-        binding.wv.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
-        binding.wv.getSettings().setBlockNetworkImage(false);
-        binding.wv.getSettings().setAllowFileAccess(true);
+        ws.setRenderPriority(WebSettings.RenderPriority.HIGH);
+        ws.setBlockNetworkImage(false);
+        ws.setAllowFileAccess(true);
+
+        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ws.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        //}
+
         binding.wv.setWebViewClient(new WebViewClient() {
             public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
                 writeWebLog("[Console] Loading URL:" + url);
@@ -359,8 +374,7 @@ public class QWebViewActivity extends BaseActivity {
 
             @Override
             public void onProgressChanged(WebView view, int progress) {// 载入进度改变而触发
-                if (binding.WebViewProgress != null)
-                    binding.WebViewProgress.setProgress(binding.wv.getProgress());
+                binding.WebViewProgress.setProgress(binding.wv.getProgress());
                 super.onProgressChanged(view, progress);
             }
 
@@ -397,7 +411,7 @@ public class QWebViewActivity extends BaseActivity {
             }
         });
 
-        binding.wv.getSettings().setLoadWithOverviewMode(true);
+        ws.setLoadWithOverviewMode(true);
     }
 
     @Override
@@ -428,8 +442,8 @@ public class QWebViewActivity extends BaseActivity {
         try {
             u = new URL(url);
             String path = u.getPath();
-            if (path!=null
-                    && NotebookUtil.isNotebookLibInstall(this)
+            /*if (  NotebookUtil.isNotebookLibInstall(this)
+                    && path!=null
                     && path.endsWith((NotebookUtil.ext))) {
 
 
@@ -452,10 +466,10 @@ public class QWebViewActivity extends BaseActivity {
                         })
                         .create()
                         .show();
-            } else {
+            } else {*/
                 view.loadUrl(url);// 载入网页
 
-            }
+           // }
         } catch (MalformedURLException e) {
             e.printStackTrace();
             view.loadUrl(url);// 载入网页
@@ -493,7 +507,7 @@ public class QWebViewActivity extends BaseActivity {
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    /*@Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(CreateNotebookDownloadFinishEvent event) {
         String notebook = event.fileName;
         Toast.makeText(this, notebook+" is downloaded", Toast.LENGTH_SHORT).show();
@@ -501,6 +515,6 @@ public class QWebViewActivity extends BaseActivity {
     }
     public static class CreateNotebookDownloadFinishEvent {
         public String fileName;
-    }
+    }*/
 
 }

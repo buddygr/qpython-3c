@@ -15,8 +15,8 @@ import com.quseit.common.updater.Updater;
 
 import org.qpython.qpy.R;
 
-import org.qpython.qpy.plugin.CloudPluginManager;
-import org.qpython.qpy.plugin.PluginDetailDialogFragment;
+import org.qpython.qpy.plugin.manager.CloudPluginManager;
+import org.qpython.qpy.plugin.fragment.PluginDetailDialogFragment;
 import org.qpython.qpy.plugin.model.CloudPluginBean;
 
 import java.util.ArrayList;

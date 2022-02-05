@@ -190,25 +190,10 @@
         <item>2000</item>
     </string-array>
 
-    <string-array name="sku" translatable="false">
-        <item>course_0.99</item>
-        <item>course_1.99</item>
-        <item>course_2.99</item>
-        <item>course_3.99</item>
-        <item>course_4.99</item>
-    </string-array>
-
-    <string-array name="crowdfunding">
-        <item>crowdfunding_5.99</item>
-        <item>crowdfunding_7.99</item>
-        <item>crowdfunding_9.99</item>
-        <item>crowdfunding15.99</item>
-    </string-array>
-
     <string-array name="support_file_ext" translatable="false">
         <item>py</item>
         <item>txt</item>
-        <item>kv</item>
+        <item>pyw</item>
         <item>html</item>
         <item>htm</item>
         <item>js</item>
@@ -220,13 +205,12 @@
         <item>pyx</item>
         <item>png</item>
         <item>jpg</item>
-        <item>ipynb</item>
     </string-array>
 
     <string-array name="text_ext" translatable="false">
         <item>py</item>
         <item>txt</item>
-        <item>kv</item>
+        <item>pyw</item>
         <item>html</item>
         <item>htm</item>
         <item>js</item>
@@ -236,6 +220,7 @@
         <item>log</item>
         <item>c</item>
         <item>h</item>
+        <item>ini</item>
 
     </string-array>
 
@@ -248,49 +233,13 @@
         <item>py</item>
         <item>xml</item>
         <item>log</item>
-        <item>kv</item>
+        <item>pyw</item>
         <item>pyx</item>
         <item>pxd</item>
     </string-array>
 
-    <string-array name="qpy2compatible_zip" translatable="false">
-        <item>private21.mp3</item>
-        <item>private22.mp3</item>
-        <item>private23.mp3</item>
-    </string-array>
-
-
     <string-array name="qpy3_zip" translatable="false">
-        <item>private31.mp3</item>
-        <item>private32.mp3</item>
-        <item>private33.mp3</item>
-    </string-array>
-
-    <string-array name="funding_count_divider" translatable="false">
-        <item>100</item>
-        <item>500</item>
-        <item>2000</item>
-    </string-array>
-
-    <string-array name="funding_price">
-        <item>5.99</item>
-        <item>7.99</item>
-        <item>9.99</item>
-        <item>15.99</item>
-    </string-array>
-
-     <!--CN Only-->
-    <string-array name="wechat_funding_price">
-        <item>36</item>
-        <item>48</item>
-        <item>60</item>
-        <item>96</item>
-    </string-array>
-
-    <string-array name="funding_stage">
-        <item>Elementary</item>
-        <item>Intermediate</item>
-        <item>Advanced</item>
+        <item>resource.mp3</item>
     </string-array>
 
     <string-array name="time_label">
@@ -301,13 +250,4 @@
         <item> secs ago</item>
     </string-array>
 
-
-    <string-array name="switch_py_inters_val">
-        <item>0</item>
-        <item>1</item>
-    </string-array>
-    <string-array name="switch_py_inters">
-        <item>Switch to Python 3</item>
-        <item>Switch to Python 2</item>
-    </string-array>
 </resources>

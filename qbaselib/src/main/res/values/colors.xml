@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <color name="toolbar">#FF4A4A4A</color>
+  <color name="search_bottom">#FFE8E8E8</color>
+  <color name="transparency">#00FFFFFF</color>
+  <color name="text_color_hint">#FF9B9B9B</color>
+  <color name="topbar">#1f1f1f</color>
+  <color name="maintextcolor">#000000</color>
+  <color name="theme_green">#FF4BAC07</color>
+  <color name="theme_bg">#FF363636</color>
+
+    <color name="link">#FF0066CC</color>
+
+    <color name="cmain3">#c8c800</color>
+
+    <color name="cmain8">#2eb3e4</color>
+
+    <color name="cwhite">#ffffff</color>
+    <color name="cwhite3">#fbfbfb</color>
+
+    <color name="cgrey6">#e8e8e8</color>
+
+    <color name="white">#ffffff</color>
+  <color name="black">#000000</color>
+</resources>

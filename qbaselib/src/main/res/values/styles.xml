@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+	<style name="prompt_title">
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:layout_marginLeft">18sp</item>
+		<item name="android:layout_marginRight">18sp</item>
+		<item name="android:gravity">left</item>		
+	</style>	
+	<style name="prompt_value">
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_margin">10dip</item>
+		<item name="android:scrollHorizontally">true</item>
+		<item name="android:autoText">false</item>		
+		<item name="android:capitalize">none</item>		
+		<item name="android:gravity">fill_horizontal</item>		
+	</style>
+
+	<style name="p_line">
+		<item name="android:background">@drawable/horizontal_separation_line</item>
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">1.0dip</item>
+		<item name="android:layout_centerVertical">true</item>
+		<item name="android:layout_margin">10dip</item>		
+	</style>
+    <!--market-->
+    <style name="gridBox">
+		<item name="android:background">@drawable/panel_bg</item>
+	
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:layout_marginTop">5dip</item>
+		<item name="android:layout_marginBottom">5dip</item>
+		<item name="android:layout_marginLeft">10dip</item>
+		<item name="android:layout_marginRight">10dip</item>
+		
+		<item name="android:paddingLeft">10dip</item>
+		<item name="android:paddingRight">10dip</item>
+		<item name="android:paddingTop">10dip</item>
+		
+	</style>
+
+    <style name="gridBox_Title">
+		<item name="android:textSize">15dp</item>
+		<item name="android:textColor">#FF7D899D</item>
+		<item name="android:gravity">center_vertical</item>
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:layout_marginLeft">10dip</item>
+		<item name="android:layout_marginTop">5dp</item>
+		<item name="android:layout_alignParentLeft">true</item>
+		<item name="android:layout_alignParentTop">true</item>
+	</style>
+	<style name="gridBox_Value">
+		<item name="android:textSize">15dp</item>
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:layout_marginLeft">10dip</item>
+	</style>	 
+		<style name="gridBox_desc">
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:layout_marginTop">5dp</item>
+		<item name="android:textColor">#FF7D899D</item>
+		<item name="android:layout_marginLeft">10dip</item>		
+		<item name="android:layout_marginRight">10dip</item>		
+	</style>
+
+    <style name="gridBox_RTag">
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:layout_alignParentRight">true</item>
+		<item name="android:layout_marginRight">5dp</item>
+		<item name="android:layout_marginTop">5dp</item>		
+	</style>
+
+	<!--&lt;!&ndash; Base application theme. &ndash;&gt;
+	<style name="AppThemeLight" parent="Theme.AppCompat.Light.DarkActionBar">
+		&lt;!&ndash; Customize your theme here. &ndash;&gt;
+	</style>
+
+	<style name="AppThemeDark" parent="ThemeOverlay.AppCompat.Dark">
+		&lt;!&ndash; Customize your theme here. &ndash;&gt;
+	</style>-->
+
+</resources>

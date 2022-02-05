@@ -256,12 +256,12 @@ public class GistEditActivity extends AppCompatActivity implements TextWatcher, 
     }
 
     private boolean loginCheck() {
-        User user = App.getUser();
+        /*User user = App.getUser();
         if (user == null) {
-            showToast(getString(R.string.login_first));
+            showToast(getString(R.string.login_first));*/
             return false;
-        } else {
+        /*} else {
             return true;
-        }
+        }*/
     }
 }

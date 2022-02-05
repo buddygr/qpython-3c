@@ -1,14 +1,4 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ExtraTranslation">
-    <string name="private1_version" translatable="false">1347438995.05</string>
-    <string name="private2_version" translatable="false">1347438995.05</string>
-    <string name="private3_version" translatable="false">1347438995.05</string>
-    <string name="private31_version" translatable="false">1347438791.05</string>
-    <string name="private32_version" translatable="false">1347438791.05</string>
-    <string name="private33_version" translatable="false">1347438791.05</string>
-    <string name="public_version" translatable="false">12500</string>
-    <string name="public3_version" translatable="false">1347438610.05</string>
-    <string name="notebook3_version" translatable="false">20200206.1205</string>
-    <string name="ipynb_version" translatable="false">20200207.1205</string>
 
     <string name="privacy_html" translatable="false">https://www.qpython.org/privacy.html</string>
     <string name="thanks_link" translatable="false">https://www.qpython.org/contributors.html</string>
@@ -49,6 +39,7 @@
 
     <string name="setting">Setting</string>
     <string name="editor">Editor</string>
+    <string name="qpy_editor">QPython Editor</string>
     <string name="community">Community</string>
     <string name="gist">Gist</string>
 
@@ -234,14 +225,13 @@
     <string name="local_app">Local APP</string>
     <string name="task">Task</string>
     <string name="root_mode">Root mode</string>
-    <string name="star_it">Rate it</string>
     <string name="disable_root">Disable</string>
     <string name="http_qpypi_qpython_org">https://pypi.python.org/simple/</string>
     <string name="add">add</string>
     <string name="sl4a_running">SL4A server is running</string>
     <string name="sl4a_un_running">SL4A server is not running</string>
     <string name="service_toggle">Server taggle</string>
-    <string name="qpy_description">QPython is a script engine running on android devices like phone or tablet.</string>
+    <string name="qpy_description">QPython 3C is the Python applet engine for Android devices. It supports PyVer, new SL4A, FileProvider, DocumentFile, encryption and decryption, GUI, audio and video play.</string>
     <string name="warning">Warning</string>
     <string name="reset_warning">Reset storage will lost all setting and downloaded libs, are you sure you want to reset?</string>
     <string name="downloading">Library</string>
@@ -353,7 +343,7 @@
 
     <string name="paste">Paste</string>
     <string name="install_with_python_s_pypi">QPYPI CLIENT</string>
-    <string name="py_pi"><![CDATA[You can manager and install Python packages from QPYPI and Python\'s PYPI]]></string>
+    <string name="py_pi"><![CDATA[You can manager and install Python packages from QPYPI and Python\'s PYPI, support tsinghua and BFSU source .]]></string>
     <string name="download_fail">Download fail</string>
     <string name="key_reset">reset_storage</string>
     <string name="key_ftp_state">running_state</string>
@@ -366,7 +356,7 @@
     <string name="key_about">about</string>
     <string name="dir_not_valid">The direction is not valid</string>
     <string name="already_newest">Already newest</string>
-    <string name="share_text">QPython is a script engine running on android devices like phone or tablet, It embeds the Python interpreter, console, editor, SL4A Library for Android, which can make your android device run Python https://www.qpython.com/privacy.html</string>
+    <string name="bili_web_tip">"Course / download / check update : "</string>
     <string name="new_folder">New Folder</string>
     <string name="folder_name">Folder name</string>
     <string name="untitled_folder">untitled folder</string>
@@ -394,8 +384,8 @@
     <string name="read_script_from_qrcode">Read code from QRCode</string>
 
     <string name="course">QPython Courses</string>
+    <string name="open_source_library_bili">Open Source Library (Bilibili)</string>
     <string name="lost_connect">Lose Connect</string>
-    <string name="featured_courses">Courses</string>
     <string name="programs">Programs</string>
     <string name="open_gl2_is_not_supported">OpenGL2 is not supported</string>
     <string name="unable_extract">Unable to extract python files</string>
@@ -467,6 +457,8 @@
     <string name="lout">Do you want to sign out?</string>
     <string name="log_noti">Log Notification</string>
     <string name="app_noti">App Notifications</string>
+    <string name="noti">Notifications</string>
+    <string name="abou_feed_cont">About / Update / Contributors</string>
     <string name="override_hint">Override local file?</string>
     <string name="file_downloaded">File downloaded</string>
     <string name="login_error">Login error</string>
@@ -474,6 +466,7 @@
     <string name="my_space_empty">My Space (— / 100 files)</string>
     <string name="save_amp_push"><![CDATA[Save & Push]]></string>
     <string name="shortcut_create_suc">Shortcut %s is created success</string>
+    <string name="shortcut_create_unsuc">If the shortcut was not created successfully, check the application permissions .</string>
     <string name="need_grant">You need grant these permissions</string>
     <string name="no_space">You don\'t have enough space to upload</string>
     <string name="no_file">No file within this folder</string>
@@ -489,12 +482,6 @@
 
 
     <string name="update_time_hint">Update: %s</string>
-    <string name="aipy_list_empty_hint">Can\'t find any AIPy package, please locate the error by following the steps below.\n
-        1. Make sure you have installed AIPy application\n
-        2. Make sure QPython has the permission of write file\n
-        3. Try to refresh by clicking the upper right corner button\n\n
-        If that dose\'t work, feel free to contact us by Email or github
-    </string>
     <string name="package_installed">This package already installed</string>
     <string name="install_suc">Install success</string>
     <string name="install_fail">Install fail, please try again later</string>
@@ -504,7 +491,6 @@
 
     <string name="jupyter_not_release">Please Install and run setup from QPyNotebook App</string>
     <string name="aipy_not_support">AIPY does not support QPY3 yet</string>
-    <string name="jupyter_not_support">QPyNotebook do not support QPY3 yet</string>
 
     <string name="aipy_lib_hint">You can install or upgrade AIPY App to get more features</string>
     <string name="album">Album</string>
@@ -534,20 +520,10 @@
     <string name="file_new">File</string>
     <string name="install_py3">Install Python 3</string>
     <string name="py2_or_3">Do you want to use Python 3 or 2 by default ?</string>
-    <string name="use_py2">Use Python 2</string>
     <string name="use_py3">Use Python 3</string>
-    <string name="py2_now">Using Python 2 now</string>
     <string name="py3_now">Using Python 3 now</string>
     <string name="install_py3_first">To switch to Python 3, please download it\'s resource</string>
     <string name="install_py2compatible_first">To switch to Python 2 Compatible, please download it\'s resource</string>
-
-    <string name="choose_py3_inter"><![CDATA[You have downloaded it, you can switch to Python 3 to use it\'s interpreter]]></string>
-    <string name="choose_py2compatible_inter"><![CDATA[You have downloaded it, you can switch to Python 2 Compatible to use it\'s interpreter]]></string>
-    <string name="install_notebook_first">To Start QPyNotebook Service, please install first</string>
-
-    <string name="choose_notebook_inter"><![CDATA[You can Start QPyNotebook Service now]]></string>
-
-    <string name="notebook_first">First run, it will extract the notebook resource</string>
 
     <string name="py_resources">Download Python Resource</string>
 
@@ -562,53 +538,30 @@
 
     <string name="switch_py2compatible">Reset to Python 2 Compatible</string>
 
-    <string name="py_inter">Choose Python Interpreter</string>
-    <string name="notebook_res">QPyNotebook Resource</string>
-
     <string name="install_aipy">Enable AIPY</string>
-    <string name="notebook">QPyNotebook</string>
-    <string name="notebook_for_py">QPyNotebook for Python {0}</string>
 
     <string name="install_notebook">Install QPyNotebook</string>
-    <string name="notebook_service">QPyNotebook Service</string>
-    <string name="notebook_service_not_ready">QPyNotebook Service is not ready, please retry</string>
-    <string name="notebook_service_restart">Do you want to reload this notebook or restart the service?</string>
-    <string name="notebook_restart">Restart</string>
-    <string name="notebook_reload">Reload</string>
-
-    <string name="notebook_open">Do you want to open it with QPyNotebook?</string>
-
-    <string name="notebook_explorer">Start QPyNotebook Service</string>
-    <string name="notebook_explorer_bg_start">It will run when QPython starts</string>
 
     <string name="enter_history">History</string>
     <string name="qpy_featured">QPython Featured</string>
     <string name="history_emp">History is empty</string>
-    <string name="no_google">Can\'t login without Google service</string>
     <string name="pip_no_net">Can\'t open pip without network</string>
     <string name="key_py3" translatable="false">switch_py3</string>
     <string name="key_py2" translatable="false">switch_py2</string>
-    <string name="key_py2compatible" translatable="false">switch_py2compatible</string>
 
     <string name="key_py_inter" translatable="false">py_inter</string>
     <string name="key_aipy" translatable="false">aipy</string>
     <string name="key_notebook" translatable="false">notebook</string>
     <string name="key_notebook_run" translatable="false">notebook_run</string>
 
-    <string name="key_notebook_page" translatable="false">notebook_page</string>
-
     <string name="py3_not_install">QPY3 not install</string>
     <string name="install_py3_hint">Confirm to download Python 3 Resource?</string>
     <string name="install_py2compatible_hint">Confirm to download Python 2 Compatible Resource?</string>
-
-    <string name="install_notebook_hint">Install QPyNotebook</string>
 
     <string name="open_app_market">Install with App</string>
     <string name="download_it">Download it</string>
     <string name="download_py">Download Python Resource</string>
     <string name="download_progress_need_sometime">It may take some time, please check the progress from notification bar</string>
-
-    <string name="download_notebook">Download QPyNotebook Resource</string>
 
     <string name="release_error">Packages not release</string>
 
@@ -624,61 +577,39 @@
     <string name="event_commu" translatable="false">Open_community</string>
     <string name="event_setting" translatable="false">Open_setting</string>
     <string name="event_file" translatable="false">Open_explorer</string>
-    <string name="event_course" translatable="false">Open_course</string>
     <string name="event_top" translatable="false">Open_Top</string>
-    <string name="browser">QPyBrowser</string>
-    <string name="switch_py3_hint">The interpreter are using python 2 now, do you want to switch to python 3?</string>
+    <string name="qpy_browser">QPython Browser</string>
     <string name="goto_setting">Go to setting</string>
     <string name="net_lagging">The net seems lagging, please wait with patience</string>
     <string name="usage_not_init">Usage is not init, please wait with patient</string>
     <string name="free_plan">My Space Plan : Free (10M Max)</string>
     <string name="share_body">Share the body</string>
-    <string name="crowdfunding">Crowdfunding%d%%</string>
-    <string name="funding">Donate</string>
     <string name="support">Support</string>
     <string name="my">My</string>
-    <string name="course_introduction">Course Introduction</string>
     <string name="show">Show</string>
-    <string name="course_content">Course Content</string>
     <string name="about_the_author">About The Author</string>
     <string name="hide">Hide</string>
-    <string name="support_count">%s person supported</string>
     <string name="free">Learn</string>
-    <string name="explanation">Crowdfunding Description: ：\n\n\u0020\u0020Welcome to Crowdfunding QPython Premium Curriculum. QPython\'s crowdfunding encourages the creation of quality, original Python text content for your learning.</string>
-    <string name="explanation_more">\u0020\u0020Over 100 people complete the crowdfunding, the author will launch a quality beginner\'s program in less than a week. Over 500 people complete the crowdfunding, the author will launch an intermediate learning course within two weeks. When more than 2,000 people complete the crowdfunding, the author will launch an advanced learning course within three weeks. \n\n\u0020\u0020The cost of crowdfunding varies from stage to stage. For the first 100 people, you only need %1$s for the first stage. When in the medium stage you need %2$s, and %3$s for the advanced stage. If you want to participate in the learning after the crowdfunding is completed, you have to pay at least %4$s.\n\n\u0020\u0020You can participate in the crowdfunding at any stage, and after the crowdfunding you will have access to the corresponding course. You can read materials, practice programming, share programs and get a more interesting learning experience. If you are interested in this course, welcome to participate as soon as possible.</string>
-    <string name="support_explanation">Your reward is the motivation for us to continue to write good courses.</string>
     <string name="from_content">Comment</string>
     <string name="author">Author</string>
     <string name="basics">Basics</string>
     <string name="database">Database</string>
-    <string name="explore_course">Explore more courses</string>
     <string name="featured">Featured</string>
     <string name="other">Other</string>
     <string name="support_us">Support Us</string>
     <string name="thank">Thanks</string>
     <string name="start">Start</string>
-    <string name="buy_course">Buy Course</string>
     <string name="rmb">%s RMB</string>
-    <string name="notebook_installed">After starting QPyNotebook Service, you can browse the ipynb file from explorer</string>
-    <string name="notebook_not_started">QPyNotebook is not started</string>
 
-    <string name="notebook_py3_support">QPyNotebook only supports Python 3</string>
     <string name="notebook_enable" translatable="false">notebook_enable</string>
-    <string name="start_learn">Start to learn</string>
     <string name="entertainment">Entertainment</string>
-    <string name="ennable_notebook_first">Please enable QPyNotebook in setting.</string>
     <string name="funny">Funny</string>
-    <string name="back_course">Back this course</string>
-    <string name="c_funding">Crowdfunding</string>
 
-    <string name="elementary">Primary course</string>
-    <string name="intermediate">Intermediate course</string>
-    <string name="advanced">Advanced course</string>
     <string name="dialog_alert">Notice</string>
     <string name="conn_error">connection error!</string>
     <string name="create_shortcut">Create Shortcut</string>
     <string name="run_with_params">Run with params</string>
-    <string name="open_with_editor">Edit</string>
+    <string name="open_with_editor">Open With Editor</string>
 
     <string name="enter_u_params">Enter your params</string>
     <string name="params">Params</string>
@@ -703,7 +634,7 @@
     <string name="choose_action">Choose action</string>
     <string name="learn_course">Learn QPython with courses</string>
     <string name="get_help">Get support</string>
-    <string name="get_support_from_community">Get support from community</string>
+    <string name="get_support_from_community">Get support from community or feedback</string>
     <string name="my_gists">My Gists</string>
     <string name="my_stars">My Stars</string>
     <string name="gist_intro">And I want to share my code to support forum</string>
@@ -725,14 +656,74 @@
     <string name="key_update_qpy3" translatable="false">update_py3</string>
     <string name="key_update_qpy2compatible" translatable="false">update_py2compatible</string>
 
-    <string name="python_interpreter">Python Interpreter</string>
+    <string name="python_interpreter">BlackWhite Python Interpreter</string>
     <string name="action_notebook">Notebook</string>
 
-    <string name="shell_terminal">Shell Terminal</string>
+    <string name="shell_terminal">Traditional Shell Terminal</string>
     <string name="ip_address">My IP Adress</string>
-    <string name="ip_address_need_wifi">Please connect your wifi</string>
-
-
+    <string name="ip_address_need_wifi_or_ap">Please connect your WiFi or turn on WiFi hotspot</string>
     <string name="editor_override">Do you want to override?</string>
+    <string name="welcome">Welcome to use QPython 3C , enjoy your mobile phone programming journey now .</string>
+    <string name="notice">Notice</string>
+    <string name="package_name_title">Package Name</string>
+    <string name="qpython_android">github: qpython-android</string>
+    <string name="fork_from_title">Forked From</string>
+    <string name="origin_author">OriginAuthor:北京优趣天下</string>
+    <string name="modify_author">ModifyAuthor:乘着船</string>
+    <string name="bilibili_website">https://www.bilibili.com/read/readlist/rl321663</string>
+    <string name="community_website">https://tieba.baidu.com/f?kw=qpython</string>
+    <string name="ipython_interactive">IPython Interactive Interpreter</string>
+    <string name="can_long_press">can long press</string>
+    <string name="proj_scri">Projects and Scripts</string>
+    <string name="click_ball">click or long press the small ball</string>
+    <string name="screen_record">Screen Record</string>
+    <string name="click_force_open">click force open</string>
+    <string name="browser_console">QPython Browser Console</string>
+    <string name="choose_file">Choose File</string>
+    <string name="qpython_protect">QPython Background Protect</string>
+    <string name="qpython_avoid_close">Open the hide suspension window to prevent QPython from being accidentally closed in the background</string>
+    <string name="click_again">Click Again</string>
+    <string name="backup_download">Backup Download</string>
+    <string name="qpython_github">https://github.com/qpython-android</string>
+    <string name="backup_down_addr">https://share.weiyun.com/Nz85QWKA</string>
+    <string name="qpython_edu">http://edu.qpython.org</string>
+    <string name="start_record">Start Record</string>
+    <string name="stop_record">Stop Record</string>
+    <string name="start_record_step_2">Start Record Step 2\nMake sure the device is in horizontal screen</string>
+    <string name="exit_window">Exit Window</string>
+    <string name="screen_record_video_path">Screen Record Video Path :</string>
+    <string name="auto_generate">Auto generate, not editable .</string>
+    <string name="horizontal_screen">Horizontal Screen</string>
+    <string name="qpy_back_task">QPython Background Task</string>
+    <string name="qpy_back_run">QPython Background Task is running</string>
+    <string name="float_view_android"><![CDATA[Float View Only Support Android >= 8.0 .]]></string>
+    <string name="float_view_permission">Need Float View Permission .</string>
+    <string name="lang_flag">en</string>
+    <string name="lang_env">en_US</string>
+    <string name="qsl4a_future">QSL4A FutureActivity</string>
+    <string name="shortcut_permission">It is recommended to go to the system settings and manually open the create shortcut permission and notification permission.</string>
+    <string name="open_source_protocol">Open Source Protocol</string>
+    <string name="apache2">https://www.apache.org/licenses/LICENSE-2.0</string>
+    <string name="main_window">QPython Main Window</string>
+    <string name="aux_window">QPython Aux Window</string>
+    <string name="restart_valid">Takes effect after restarting the QPython .</string>
+    <string name="fork_to_title">Forked To</string>
+    <string name="qpython_3c_text">github: qpython-3c</string>
+    <string name="qpython_3c_github">https://github.com/buddygr/qpython-3c/releases</string>
+    <string name="qpython_protect_run">QPython Background Protect Hide Suspended Window is running</string>
+    <string name="agree">Agree</string>
+    <string name="disagree">Disagree</string>
+    <string name="security_tip">Related to granting permissions: QPython3C will not collect any user information. You can grant corresponding permissions according to your own situation. Unauthorized permissions will lose their corresponding functions.  Open source software security tips: If a security vulnerability occurs when using QPython3C, the QPython3C developer may not have the time or ability to repair it. Continued use means that the QPython3C users bears the relevant security risks, which has nothing to do with the QPython developer.  Open source is free but requires support: Open source software production requires investment cost. Please support more QPython developers. QPython3C is completely free for personal learning and research, at present, QPython3C does not allow commercial use, the rest follow the Apache open source protocol.  Support QPython developers, Bilibili Accout: Origin Author: QPYIO Modify Author: 乘着船 Welcome to give the thumbs-up, collection and/or insert coin . QPython developers may not have time to reply to every problem, or some problems QPython developers can\'t solve themselves now .</string>
+    <string name="ignore">Ignore</string>
+    <string name="set">Set</string>
+    <string name="course_official">Course Official</string>
+    <string name="edu_qpy_org">edu.qpython.org</string>
+    <string name="video_account_bili">Official Video Account (Bilibili)</string>
+    <string name="bili_com">bilibili.com</string>
+    <string name="bilibili_video_website">https://space.bilibili.com/1357778956</string>
+    <string name="sl4a_gui_console">Python SL4A GUI Console</string>
+    <string name="color_python_interpreter">Color Python Interpreter</string>
+    <string name="tradition_bug">There are too many bugs in the traditional terminal. It is recommended to use it only for testing.</string>
+    <string name="python_shell_terminal">Python Color Shell Terminal</string>
 
 </resources>

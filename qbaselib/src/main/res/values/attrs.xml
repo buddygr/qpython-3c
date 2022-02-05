@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<declare-styleable name="android_Theme">
+		<attr name="homeBackgroundStyle" format="reference"/>
+		<attr name="regularBackgroundStyle" format="reference"/>
+		<attr name="actionbarBackgroundStyle" format="reference"/>
+		<attr name="actionbarButtonStyle" format="reference"/>
+		<attr name="dashboardItemStyle" format="reference"/>
+		<attr name="dashboardItemCaptionStyle" format="reference"/>
+		<attr name="dashboardItemNumberStyle" format="reference"/>
+		<attr name="dashboardItemIconStyle" format="reference"/>
+		<attr name="eventDateStyle" format="reference"/>
+		<attr name="dialogBackgroundStyle" format="reference"/>
+		<attr name="photowallItemStyle" format="reference"/>
+		<attr name="searchBackgroundStyle" format="reference"/>
+		<attr name="eventTypeColors" format="reference" />
+		<attr name="tabContainerStyle" format="reference" />
+		<attr name="tabStyle" format="reference" />
+		<attr name="searchResultItemStyle" format="reference" />
+		<attr name="searchResultItemIconStyle" format="reference" />
+		<attr name="listItemContainerStyle" format="reference" />
+		<attr name="listItemFooterStyle" format="reference" />
+		<attr name="listItemFooterTextUpStyle" format="reference" />
+		<attr name="listItemFooterTextDownStyle" format="reference" />
+		<attr name="spinnerTextStyle" format="reference" />
+	</declare-styleable>
+
+    <declare-styleable name="SearchBar">          
+        <attr name="defaultText" format="string" />
+    </declare-styleable>
+
+    <attr name="layout_overlap" 		format="dimension" />
+    <attr name="layout_overlapTop" 		format="dimension" />
+    <attr name="layout_overlapBottom" 	format="dimension" />
+    <attr name="layout_overlapLeft" 	format="dimension" />
+    <attr name="layout_overlapRight" 	format="dimension" />
+    <attr name="layout_margin" 			format="dimension" />
+    <attr name="layout_marginTop" 		format="dimension" />
+    <attr name="layout_marginBottom" 	format="dimension" />
+    <attr name="layout_marginLeft" 		format="dimension" />
+    <attr name="layout_marginRight" 	format="dimension" />
+    
+    <attr name="touchMode">
+        <flag name="none" 				value="0" />
+        <flag name="scroll_horizontal" 	value="1" />
+        <flag name="scroll_vertical" 	value="2" />
+        <flag name="scroll"	 			value="3" />
+        <flag name="swipe_horizontal" 	value="4" />
+        <flag name="swipe_vertical" 	value="8" />
+        <flag name="swipe" 				value="12" />
+        <flag name="pull_horizontal" 	value="16" />
+        <flag name="pull_vertical" 		value="32" />
+        <flag name="fling_horizontal" 	value="64" />
+        <flag name="fling_vertical" 	value="128" />
+        <flag name="fling" 				value="192" />
+    </attr>
+        
+    <declare-styleable name="GestureView">
+    	<attr name="touchMode" />
+    </declare-styleable>
+    
+    <declare-styleable name="SwipeOverlay">          
+        <attr name="layout_overlap" />
+        <attr name="layout_overlapTop" />
+        <attr name="layout_overlapBottom" />
+        <attr name="layout_overlapLeft" />
+        <attr name="layout_overlapRight" />
+        <attr name="layout_showOuterMargins" format="boolean" />
+        <attr name="layout_childrenMargin" format="dimension" />
+        <attr name="scrollType">
+        	<enum name="none" value="0"/>
+        	<enum name="swipe" value="1"/>
+        	<enum name="scroll_and_swipe" value="2"/>
+        	<enum name="pull_or_swipe" value="3"/>
+        </attr>
+    </declare-styleable>
+    
+    <attr name="swipeMode">
+    	<enum name="next_item" value="1" />
+    	<enum name="next_page" value="2" />
+    </attr>
+    
+    <attr name="layout_unit">
+    	<enum name="rows" value="1" />
+    	<enum name="columns" value="2" />
+    	<enum name="all" value="3" />
+    </attr>
+    
+    <attr name="layout_gravity">
+        <flag name="left" 				value="1" />
+        <flag name="right" 				value="2" />
+        <flag name="center_horizontal" 	value="4" />
+        
+        <flag name="top" 				value="16" />
+        <flag name="bottom"	 			value="32" />
+        <flag name="center_vertical" 	value="64" />
+        
+        <flag name="center"				value="68" />
+    </attr>
+
+    <declare-styleable name="AbstractTouchableLayout">          
+        <attr name="layout_overlap" />
+        <attr name="layout_overlapTop" />
+        <attr name="layout_overlapBottom" />
+        <attr name="layout_overlapLeft" />
+        <attr name="layout_overlapRight" />
+		<attr name="layout_margin" />
+	    <attr name="layout_marginTop" />
+	    <attr name="layout_marginBottom" />
+	    <attr name="layout_marginLeft" />
+	    <attr name="layout_marginRight" />
+		        
+        <attr name="layout_childWidth" format="dimension" />
+        <attr name="layout_childHeight" format="dimension" />
+        <attr name="layout_childMaxWidth" format="dimension" />
+        <attr name="layout_childMaxHeight" format="dimension" />
+        <attr name="layout_childGridSizeX" format="integer" />
+        <attr name="layout_childGridSizeY" format="integer" />
+        <attr name="layout_childGridCenterVertical" format="boolean" />
+        <attr name="layout_childGridCenterHorizontal" format="boolean" />
+        <attr name="layout_childEntireGridAutoCenter" format="boolean"/>
+        <attr name="layout_childSquare" format="boolean" />
+        
+        <attr name="layout_gravity" />
+        
+        <attr name="layout_borderChildrenFillOverlap" format="boolean" />
+        <attr name="layout_borderChildrenFillOverlapTop" format="boolean" />
+        <attr name="layout_borderChildrenFillOverlapBottom" format="boolean" />
+        <attr name="layout_borderChildrenFillOverlapLeft" format="boolean" />
+        <attr name="layout_borderChildrenFillOverlapRight" format="boolean" />
+        
+        <attr name="layout_unit" />
+    </declare-styleable>
+
+    <attr name="scrollUnit">
+    	<enum name="all" value="1" />
+    	<enum name="rows" value="2" />
+    	<enum name="columns" value="3" />
+    </attr>
+    
+    
+    <declare-styleable name="SwipeOverlay2D">          
+        <attr name="scrollUnit" />
+        <attr name="flingFriction" format="float" />
+        
+        <attr name="centerItemOnClick" format="boolean" />
+        <attr name="centerItemOnScrollEnd" format="boolean" />
+        <attr name="keepOverlayFilledWithChildren" format="boolean" />
+    </declare-styleable>
+    
+    
+    <declare-styleable name="VideoItem">
+		<attr name="headerText" format="string" />
+		<attr name="desc" format="string" />
+		<attr name="other" format="string" />
+		<attr name="headUrl" format="string" />
+		<attr name="statImage" format="integer" />
+		<attr name="thumbImage" format="integer" />
+		<!--attr name="coverBitmap" format="reference" /-->
+		<attr name="tpl" format="integer" />
+
+	</declare-styleable>
+	
+    <declare-styleable name="CustomImageView">
+    	<attr name="interactive" format="boolean"/>
+    	<attr name="aspectRatio" format="float" />
+    </declare-styleable>
+    
+    <declare-styleable name="CoverFlow">
+        <attr name="imageWidth" format="dimension" />
+        <attr name="imageHeight" format="dimension" />
+        <attr name="withReflection" format="boolean" />
+        <attr name="reflectionGap" format="dimension" />
+        <attr name="imageReflectionRatio" format="float" />
+    </declare-styleable>
+    
+    <declare-styleable name="SlidAdShowView">
+        <attr name="src" format="reference|color"></attr>
+    </declare-styleable>
+    
+    <!--<declare-styleable name="adSplashView">-->
+        <!--<attr name="background" format="reference|color"></attr>-->
+    <!--</declare-styleable>-->
+    
+</resources>

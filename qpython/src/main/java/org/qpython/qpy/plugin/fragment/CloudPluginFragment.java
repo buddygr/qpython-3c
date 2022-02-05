@@ -13,7 +13,7 @@ import android.widget.LinearLayout;
 
 import org.qpython.qpy.R;
 
-import org.qpython.qpy.plugin.CloudPluginManager;
+import org.qpython.qpy.plugin.manager.CloudPluginManager;
 import org.qpython.qpy.plugin.SpaceItemDecoration;
 import org.qpython.qpy.plugin.adapter.CloudPluginAdapter;
 import org.qpython.qpy.plugin.model.CloudPluginBean;

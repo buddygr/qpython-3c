@@ -6,16 +6,10 @@ import org.qpython.qpy.main.server.gist.Controler;
 import org.qpython.qpy.main.server.gist.ResponseHandler;
 import org.qpython.qpy.main.server.gist.TokenManager;
 import org.qpython.qpy.main.server.gist.request.BaseRequest;
-import org.qpython.qpy.main.server.gist.response.ADBean;
 import org.qpython.qpy.main.server.gist.response.GistBean;
 import org.qpython.qpy.main.server.gist.response.ResponseBean;
-import org.qpython.qpy.main.server.model.CourseAdModel;
 
 import java.util.List;
-
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * 文 件 名: GistHomeControler
@@ -33,7 +27,7 @@ public class GistHomeControler extends Controler<GistHomeView> {
         super(view);
     }
 
-    public void getAD() {
+    /*public void getAD() {
         App.getService().getCourseAd()
                 .subscribeOn(Schedulers.io())
                 .flatMap(courseAdModel -> rx.Observable.just(courseAdModel.getQpy().getExt_ad()))
@@ -58,7 +52,7 @@ public class GistHomeControler extends Controler<GistHomeView> {
                         }
                     }
                 });
-    }
+    }*/
 
     public void getGist() {
         logic(mGistService.getAllGists(/*page*/), true, new ResponseHandler<ResponseBean<List<GistBean>>>() {

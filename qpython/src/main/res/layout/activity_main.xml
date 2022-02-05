@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/img_home_bg"
+        android:background="@drawable/star_mountain"
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
@@ -16,35 +15,55 @@
             android:background="@drawable/img_homebar_bg"
             android:padding="@dimen/layout_padding">
 
-            <ImageView
-                android:id="@+id/icon"
+        <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:layout_centerHorizontal="true"
+                android:background="#7F2A2A2A" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/layout_padding"
-                android:src="@drawable/img_home_logo"/>
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#00ffff"
+                android:text="QPython "/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/layout_padding"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#00ff00"
+                    android:text=" 2022"/>
+
+            </LinearLayout>
         </RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/icon_margin_top"
+            android:text="@string/proj_scri"
+            android:background="#7F2A2A2A"
+            android:textColor="#FFF"/>
 
         <ImageView
             android:id="@+id/ll_qpy_app"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:layout_weight="2"
+            android:layout_weight="1"
             android:src="@drawable/ic_home_qpyapp"/>
-
-        <TextView
-            android:id="@+id/login"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/login"
-            android:textColor="#FFF"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_margin="25dp"
             android:layout_weight="5"
-            android:background="#4A4A4A"
+            android:background="#7F2A2A2A"
             android:orientation="vertical">
 
             <LinearLayout
@@ -61,7 +80,7 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ic_home_terminal"/>
+                        android:src="@drawable/ic_home_terminal" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -69,6 +88,13 @@
                         android:layout_marginTop="@dimen/icon_margin_top"
                         android:text="@string/terminal"
                         android:textColor="#FFF"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/can_long_press"
+                        android:textColor="#FF7F7F" />
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -201,32 +227,32 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ic_home_more"/>
+                        android:src="@drawable/ic_home_more" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/icon_margin_top"
                         android:text="@string/more"
-                        android:textColor="#FFF"/>
+                        android:textColor="#FFF" />
                 </LinearLayout>
 
 
                 <LinearLayout
-                    android:id="@+id/ll_course"
+                    android:id="@+id/ll_record"
                     style="@style/row_ll">
 
-                    <!--ImageView
+                    <!-- ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ic_home_course"/>
+                        android:src="@drawable/ic_home_record" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/icon_margin_top"
-                        android:text="@string/course"
-                        android:textColor="#FFF"/-->
+                        android:text="@string/screen_record"
+                        android:textColor="#FFF" / -->
                 </LinearLayout>
 
                 <LinearLayout
@@ -245,8 +271,6 @@
                         android:text="@string/community"
                         android:textColor="#FFF"/-->
                 </LinearLayout>
-
-
 
 
             </LinearLayout>

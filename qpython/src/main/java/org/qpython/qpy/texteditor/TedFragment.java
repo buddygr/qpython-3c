@@ -3,9 +3,7 @@ package org.qpython.qpy.texteditor;
 import android.animation.Animator;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.net.Uri;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
@@ -25,7 +23,6 @@ import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.quseit.util.NAction;
 import com.quseit.util.NStorage;
 
 import org.markdown4j.Markdown4jProcessor;
@@ -33,10 +30,7 @@ import org.qpython.qpy.R;
 import org.qpython.qpy.console.ScriptExec;
 import org.qpython.qpy.databinding.LayoutEditorBinding;
 import org.qpython.qpy.databinding.SearchTopBinding;
-import org.qpython.qpy.main.activity.GistEditActivity;
 import org.qpython.qpy.main.activity.QWebViewActivity;
-import org.qpython.qpy.main.activity.SignInActivity;
-import org.qpython.qpy.main.app.App;
 import org.qpython.qpy.main.widget.Indent;
 import org.qpython.qpy.main.widget.ShortcutLayout;
 import org.qpython.qpy.texteditor.common.Constants;
@@ -56,12 +50,10 @@ import java.util.List;
 import java.util.Scanner;
 
 import static android.content.Context.MODE_PRIVATE;
-import static org.qpython.qpy.texteditor.androidlib.data.FileUtils.deleteItem;
-import static org.qpython.qpy.texteditor.androidlib.data.FileUtils.renameItem;
-import static org.qpython.qpy.texteditor.androidlib.ui.Toaster.showToast;
 
 /**
  * @author River
+ * @modify 乘着船 2022
  */
 
 public class TedFragment extends Fragment implements Constants, TextWatcher, Indent {
@@ -216,12 +208,12 @@ public class TedFragment extends Fragment implements Constants, TextWatcher, Ind
                     ((EditorActivity) getActivity()).promptSaveDirty();
                     return;
                 }
-                if (App.getUser() != null) {
+                /*if (App.getUser() != null) {
                     GistEditActivity.start(getContext(), activity.mCurrentFilePath);
                 } else {
                     Intent intent = new Intent(getContext(), SignInActivity.class);
                     startActivityForResult(intent, LOGIN_REQUEST_CODE);
-                }
+                }*/
             });
         } else {
             binding.share.setVisibility(View.GONE);
@@ -328,32 +320,32 @@ public class TedFragment extends Fragment implements Constants, TextWatcher, Ind
      * Create a list of snippet
      */
     public void SnippetsList() {
-        boolean isQpy3 = NAction.isQPy3(getContext());
+        //boolean isQpy3 = NAction.isQPy3(getContext());
         List<String> listItems = new ArrayList<>();
         String baseDir = Environment.getExternalStorageDirectory().getAbsolutePath()
                 + "/" + QPyConstants.BASE_PATH;
-        String path = baseDir + (isQpy3 ? "/snippets3/" : "/snippets/");
-        String files;
+        String path = baseDir + /*(isQpy3 ? */"/snippets3/"/* : "/snippets/")*/;
+        String filename;
         File folder = new File(path);
         if (folder.exists()) {
             File[] listOfFiles = folder.listFiles();
             if (listOfFiles != null) {
                 for (File listOfFile : listOfFiles) {
                     if (listOfFile.isFile()) {
-                        files = listOfFile.getName();
-                        listItems.add(files);
+                        filename = listOfFile.getName();
+                        listItems.add(filename);
                     }
                 }
             }
         }
 
-        final CharSequence colors[] = listItems.toArray(new CharSequence[listItems.size()]);
+        final CharSequence[] items = listItems.toArray(new CharSequence[listItems.size()]);
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.MyDialog);
         builder.setTitle(R.string.info_snippets);
 
-        builder.setItems(colors, (dialog, which) -> {
+        builder.setItems(items, (dialog, which) -> {
             try {
-                insertSnippet("" + colors[which]);
+                insertSnippet("" + items[which]);
             } catch (IOException e) {
                 Toast.makeText(getContext().getApplicationContext(), R.string.fail_to_insert, Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
@@ -366,11 +358,13 @@ public class TedFragment extends Fragment implements Constants, TextWatcher, Ind
      * @param snippetName Apache_License/The_MIT_License/WEB_PROJECT/CONSOLE_PROJECT/KIVY_PROJECT
      */
     public void insertSnippet(String snippetName) throws IOException {
-        boolean isQPy3 = NAction.isQPy3(getContext());
+       // boolean isQPy3 = NAction.isQPy3(getContext());
         String baseDir = Environment.getExternalStorageDirectory().getAbsolutePath()
                 + "/" + QPyConstants.BASE_PATH;
-        String path = baseDir + (isQPy3 ? "/snippets3/" : "/snippets/");
+        String path = baseDir + /*(isQPy3 ?*/ "/snippets3/"/* : "/snippets/")*/;
         String s;
+        s = readFile(path + snippetName);
+        /*
         switch (snippetName) {
             case Apache_License:
                 s = readFile(path + Apache_License);
@@ -396,14 +390,15 @@ public class TedFragment extends Fragment implements Constants, TextWatcher, Ind
             default:
                 s = readFile(path + "QPy_ConsoleApp");
         }
+         */
         binding.editor.getText().insert(0, s);
     }
 
     public void saveCodeSnippet(String selectText) {
-        boolean isQPy3 = NAction.isQPy3(getContext());
+       // boolean isQPy3 = NAction.isQPy3(getContext());
         String baseDir = Environment.getExternalStorageDirectory().getAbsolutePath()
                 + "/" + QPyConstants.BASE_PATH;
-        String path = baseDir + (isQPy3 ? "/snippets3/" : "/snippets/");
+        String path = baseDir + /*(isQPy3 ? */"/snippets3/"/* : "/snippets/")*/;
 
         new EnterDialog(getContext())
                 .setTitle(getString(R.string.save_as_snippets))

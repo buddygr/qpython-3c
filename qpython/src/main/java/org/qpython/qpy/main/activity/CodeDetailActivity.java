@@ -58,9 +58,9 @@ public class CodeDetailActivity extends AppCompatActivity implements DialogInter
         setTitle(R.string.community);
         binding.lt.toolbar.setNavigationIcon(R.drawable.ic_back);
         binding.lt.toolbar.setNavigationOnClickListener(v -> finish());
-        if (App.getUser() == null) {
+        /*if (App.getUser() == null) {
             return;
-        }
+        }*/
         sendDialog = CodeSendComment.newInstance(gistId, isProj);
         sendDialog.setCallback(comment -> {
             if (binding.emptyHint.getVisibility() == View.VISIBLE) {
