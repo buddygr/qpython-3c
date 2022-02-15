@@ -59,7 +59,7 @@ public class SettingFragment extends PreferenceFragment {
 
     private SharedPreferences settings;
     private Resources         resources;
-    private Preference        mPassWordPref, username_pref, portnum_pref, chroot_pref, lastlog;
+    private Preference        mPassWordPref, username_pref, portnum_pref, chroot_pref, lastlog, ipaddress;
     private CheckBoxPreference sl4a, running_state, root, display_pwd, qpy_protect;//, notebook_run;
 
     //private PreferenceScreen py_inter,notebook_page;
@@ -75,17 +75,21 @@ public class SettingFragment extends PreferenceFragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.v(TAG, "FTPServerService action received: " + intent.getAction());
-            if (intent.getAction().equals(FTPServerService.ACTION_STARTED)) {
-                running_state.setChecked(true);
-                // Fill in the FTP server address
-                setFtpAddress();
-            } else if (intent.getAction().equals(FTPServerService.ACTION_STOPPED)) {
-                running_state.setChecked(false);
-                running_state.setSummary(org.swiftp.R.string.running_summary_stopped);
-            } else if (intent.getAction().equals(FTPServerService.ACTION_FAILEDTOSTART)) {
-                running_state.setChecked(false);
-                running_state.setSummary(org.swiftp.R.string.running_summary_failed);
-                Toast.makeText(getActivity(),R.string.ip_address_need_wifi_or_ap,Toast.LENGTH_LONG).show();
+            switch (intent.getAction()) {
+                case FTPServerService.ACTION_STARTED:
+                    running_state.setChecked(true);
+                    // Fill in the FTP server address
+                    setFtpAddress();
+                    break;
+                case FTPServerService.ACTION_STOPPED:
+                    running_state.setChecked(false);
+                    running_state.setSummary(org.swiftp.R.string.running_summary_stopped);
+                    break;
+                case FTPServerService.ACTION_FAILEDTOSTART:
+                    running_state.setChecked(false);
+                    running_state.setSummary(org.swiftp.R.string.running_summary_failed);
+                    Toast.makeText(getActivity(), R.string.ip_address_need_wifi_or_ap, Toast.LENGTH_LONG).show();
+                    break;
             }
         }
     };
@@ -128,8 +132,7 @@ public class SettingFragment extends PreferenceFragment {
         super.onResume();
     }
 
-    private void initSettings() {
-        Preference ipaddress = findPreference("ipaddress");
+    private boolean showIpAddress(){
         InetAddress ip;
         try {
             ip = FTPServerService.getWifiAndApIp();
@@ -139,10 +142,18 @@ public class SettingFragment extends PreferenceFragment {
         }
         if (ip!=null) {
             ipaddress.setSummary(ip.getHostAddress());
+            return true;
         } else {
             ipaddress.setSummary(R.string.ip_address_need_wifi_or_ap);
+            return false;
         }
-        lastlog = (Preference) findPreference("lastlog");
+    }
+
+    private void initSettings() {
+        ipaddress = findPreference("ipaddress");
+        showIpAddress();
+
+        lastlog = findPreference("lastlog");
         //py_inter = (PreferenceScreen) findPreference(getString(R.string.key_py_inter));
         /*notebook_page = (PreferenceScreen) findPreference(getString(R.string.key_notebook_page));
         notebook_page.setTitle(MessageFormat.format(getString(R.string.notebook_for_py), NAction.getPyVer(getActivity())));
@@ -225,7 +236,7 @@ public class SettingFragment extends PreferenceFragment {
         if (address == null) {
             Log.v(TAG, "Unable to retreive wifi ip address");
             running_state.setSummary(org.swiftp.R.string.cant_get_url);
-            Toast.makeText(getActivity(),R.string.ip_address_need_wifi_or_ap,Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),"FTP: "+getString(R.string.ip_address_need_wifi_or_ap),Toast.LENGTH_LONG).show();
         } else {
             String iptext = "ftp://" + address.getHostAddress() + ":"
                     + FTPServerService.getPort() + "/";
@@ -263,6 +274,8 @@ public class SettingFragment extends PreferenceFragment {
             alert.create().show();
             return false;
         });
+
+        ipaddress.setOnPreferenceClickListener(preference -> showIpAddress());
 
         /*if (!NAction.isQPy3(getActivity())) {
             notebook_run.setSummary(getString(R.string.notebook_py3_support));

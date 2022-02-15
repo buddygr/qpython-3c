@@ -1,6 +1,7 @@
 package org.qpython.qsl4a.qsl4a.facade;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
@@ -34,10 +35,15 @@ import java.util.Map;
 public class PreferencesFacade extends RpcReceiver {
 
   private Service mService;
+  private final AndroidFacade mAndroidFacade;
+  private final Context context;
 
   public PreferencesFacade(FacadeManager manager) {
     super(manager);
+    mAndroidFacade = manager.getReceiver(AndroidFacade.class);
+    context = mAndroidFacade.context;
     mService = manager.getService();
+
   }
 
   @Rpc(description = "Read a value from shared preferences")
@@ -52,12 +58,12 @@ public class PreferencesFacade extends RpcReceiver {
   public void prefPutValue(
       @RpcParameter(name = "key") String key,
       @RpcParameter(name = "value") Object value,
-      @RpcParameter(name = "filename", description = "Desired preferences file. If not defined, uses the default Shared Preferences.") @RpcOptional String filename)
-      throws IOException {
+      @RpcParameter(name = "filename", description = "Desired preferences file. If not defined, uses the default Shared Preferences.") @RpcOptional String filename) {
+    SharedPreferences p;
     if (filename == null || filename.equals("")) {
-      throw new IOException("Can't write to default preferences.");
-    }
-    SharedPreferences p = getPref(filename);
+      //throw new IOException("Can't write to default preferences.");
+      p = PreferenceManager.getDefaultSharedPreferences(context);
+    } else p = getPref(filename);
     Editor e = p.edit();
     if (value instanceof Boolean) {
       e.putBoolean(key, (Boolean) value);
@@ -72,7 +78,7 @@ public class PreferencesFacade extends RpcReceiver {
     } else {
       e.putString(key, value.toString());
     }
-    e.commit();
+    e.apply();
   }
 
   @Rpc(description = "Get list of Shared Preference Values", returns = "Map of key,value")

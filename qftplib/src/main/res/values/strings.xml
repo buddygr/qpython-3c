@@ -1,0 +1,72 @@
+<resources>
+    <string name="app_name">QFtplib</string>
+    <string name="swiftp_name">FTP Server</string>
+    <string name="running_label">Running</string>
+    <string name="running_summary_stopped">Start FTP server</string>
+    <string name="running_summary_started">FTP server running at %s</string>
+    <string name="running_summary_failed">Failed to start the FTP server</string>
+    <string name="settings_label">Settings</string>
+    <string name="username_label">Username</string>
+    <string name="username_default">ftp</string>
+    <string name="password_label">Password</string>
+    <string name="password_default">ftp</string>
+    <string name="show_password_label">
+    Display password
+</string>
+    <string name="show_password_default">
+    false
+</string>
+    <string name="advancedsettings_label">Advanced Settings...</string>
+    <string name="portnumber_label">Port Number</string>
+    <string name="portnumber_default">2121</string>
+    <string name="chroot_label">Stay in folder</string>
+    <string name="chroot_default">/</string>
+    <string name="acceptwifi_label">Accept connection from wifi</string>
+    <string name="acceptwifi_default">true</string>
+    <string name="acceptproxy_label">Accept connection from net proxy</string>
+    <string name="acceptproxy_default">false</string>
+    <string name="wakelock_label">Keep device awake (full CPU speed)</string>
+    <string name="wakelock_default">true</string>
+    <string name="extra_label">Extra</string>
+    <string name="help_label">Help...</string>
+    <string name="about_label">About...</string>
+    <string name="help_dlg_title">FTP Server Help</string>
+    <string name="help_dlg_message">HELP Message</string>
+    <string name="about_dlg_title">FTP Server About</string>
+    <string name="about_dlg_message">ABOUT Message</string>
+
+    <!-- old strings -->
+    <string name="cant_get_url">Can\'t retreive url</string>
+    <string name="notice">Notice</string>
+
+    <string name="unknown">unknown</string>
+    <string name="ok">OK</string>
+    <string name="username_validation_error">The username must consist of 1 or more letters. No other characters are allowed.</string>
+    <string name="password_validation_error">The password must consist of 1 or more alphanumeric characters. No other characters are allowed.</string>
+    <string name="port_validation_error">The port number must be in the range 1 to 65535.</string>
+    <string name="wifi_state_receiver_label">WifiStateReceiver</string>
+    <string name="notif_server_starting">FTP Server started</string>
+    <string name="notif_title">FTP Server is running</string>
+    <string name="notif_text">Server is accepting FTP connections.</string>
+    <string name="pst_connecting">connecting</string>
+    <string name="pst_connected">connected</string>
+    <string name="pst_failed">failed</string>
+    <string name="pst_unreachable">unreachable</string>
+    <string name="pst_disconnected">disconnected</string>
+    <string name="storage_warning">Warning: storage is not available. You may want to unmount it.</string>
+    <string name="widget_name">FTP Server Widget</string>
+    <string name="ftp_title">FTP setting</string>
+    <string name="ftp_server_setting">FTP Server Setting</string>
+    <string name="config">Extensions</string>
+
+
+    <string name="key_reset" translatable="false">reset_storage</string>
+    <string name="key_ftp_state" translatable="false">running_state</string>
+    <string name="key_username" translatable="false">username</string>
+    <string name="key_ftp_pwd" translatable="false">password</string>
+    <string name="key_port_num" translatable="false">portNum</string>
+    <string name="key_show_pwd" translatable="false">show_password</string>
+    <string name="key_root_dir" translatable="false">chrootDir</string>
+    <string name="key_stay_awake" translatable="false">stayAwake</string>
+    <string name="key_about" translatable="false">about</string>
+</resources>

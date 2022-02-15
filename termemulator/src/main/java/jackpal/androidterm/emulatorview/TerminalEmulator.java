@@ -674,6 +674,7 @@ public class TerminalEmulator {
 
         //Log.d(EmulatorDebug.LOG_TAG, "In: '" + EmulatorDebug.bytesToString(buffer, base, length) + "'");
 
+        //乘着船 修改：不同终端不同退格模式
         String s = EmulatorDebug.bytesToString(buffer, base, length);
         if (s.contains("\\x08\\x08  \\x08\\x08"))
             backSpaceType = 1;//传统退格模式

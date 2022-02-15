@@ -1,0 +1,58 @@
+<resources>
+<string name="app_name">QFtplib</string>
+<string name="swiftp_name">FTP 服务器</string>
+<string name="running_label">运行</string>
+<string name="running_summary_stopped">启动 FTP 服务器</string>
+<string name="running_summary_started">FTP 服务运行在 %s</string>
+<string name="running_summary_failed">无法启动 FTP 服务器</string>
+<string name="settings_label">设置</string>
+<string name="username_label">用户名</string>
+<string name="username_default">ftp</string>
+<string name="password_label">密码</string>
+<string name="password_default">ftp</string>
+<string name="show_password_label">
+    显示密码
+</string>
+<string name="show_password_default">
+    假
+</string>
+<string name="advancedsettings_label">高级设置...</string>
+<string name="portnumber_label">端口号</string>
+<string name="portnumber_default">2121</string>
+<string name="chroot_label">停留在文件夹中</string>
+<string name="chroot_default">/</string>
+<string name="acceptwifi_label">接受来自 WiFi 连接</string>
+<string name="acceptwifi_default">true</string>
+<string name="acceptproxy_label">接受来自网络代理连接</string>
+<string name="acceptproxy_default">false</string>
+<string name="wakelock_label">保持设备处于唤醒状态（全CPU速度）</string>
+<string name="wakelock_default">true</string>
+<string name="extra_label">额外</string>
+<string name="help_label">帮助</string>
+<string name="about_label">关于</string>
+<string name="help_dlg_title">FTP 服务器帮助</string>
+<string name="help_dlg_message">帮助信息</string>
+<string name="about_dlg_title">FTP 服务器关于</string>
+<string name="about_dlg_message">有关消息</string>
+
+<!-- old strings -->
+<string name="cant_get_url">不能解析网址</string>
+<string name="unknown">未知</string>
+<string name="ok">OK</string>
+<string name="username_validation_error">用户名必须由1个或多个字母，不允许使用其他字符。</string>
+<string name="password_validation_error">该密码必须由1个或多个字母数字字符,不允许使用其他字符。</string>
+<string name="port_validation_error">该端口号必须在范围为1~65535</string>
+<string name="wifi_state_receiver_label">WifiStateReceiver</string>
+<string name="notif_server_starting">FTP服务器启动</string>
+<string name="notif_title">FTP服务器正在运行</string>
+<string name="notif_text">服务器接受 FTP 连接</string>
+<string name="pst_connecting">连接</string>
+<string name="pst_connected">已连接</string>
+<string name="pst_failed">失败</string>
+<string name="pst_unreachable">无法访问</string>
+<string name="pst_disconnected">断开的</string>
+<string name="storage_warning">警告：存储不可用，你可能想卸载它</string>
+<string name="widget_name">FTP服务器控件</string>
+<string name="config">扩展功能</string>
+
+</resources>

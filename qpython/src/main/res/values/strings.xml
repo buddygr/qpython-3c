@@ -231,7 +231,7 @@
     <string name="sl4a_running">SL4A server is running</string>
     <string name="sl4a_un_running">SL4A server is not running</string>
     <string name="service_toggle">Server taggle</string>
-    <string name="qpy_description">QPython 3C is the Python applet engine for Android devices. It supports PyVer, new SL4A, FileProvider, DocumentFile, encryption and decryption, GUI, audio and video play.</string>
+    <string name="qpy_description">QPython 3C is the Python applet engine for Android devices. It supports PyVer, new SL4A, Open File, Write External Sdcard, Encryption and Decryption, GUI, Audio and Video Play.</string>
     <string name="warning">Warning</string>
     <string name="reset_warning">Reset storage will lost all setting and downloaded libs, are you sure you want to reset?</string>
     <string name="downloading">Library</string>
@@ -656,7 +656,7 @@
     <string name="key_update_qpy3" translatable="false">update_py3</string>
     <string name="key_update_qpy2compatible" translatable="false">update_py2compatible</string>
 
-    <string name="python_interpreter">BlackWhite Python Interpreter</string>
+    <string name="python_interpreter">Traditional Python Interpreter</string>
     <string name="action_notebook">Notebook</string>
 
     <string name="shell_terminal">Traditional Shell Terminal</string>

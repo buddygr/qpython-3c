@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--<PreferenceCategory-->
+    <!--android:layout="@layout/activity_preference"/>-->
+
+    <!--<PreferenceCategory-->
+    <!--android:key="extra_category"-->
+    <!--android:title="@string/extra_label">-->
+    <!--<Preference-->
+    <!--android:key="help"-->
+    <!--android:title="@string/help_label"/>-->
+    <!--<Preference-->
+    <!--android:key="about"-->
+    <!--android:title="@string/about_label"/>-->
+    <!--</PreferenceCategory>-->
+
+</PreferenceScreen>

@@ -135,7 +135,7 @@
     <string name="add">添加</string>
     <string name="sl4a_running">SL4A服务运行中</string>
     <string name="service_toggle">服务开关</string>
-    <string name="qpy_description">QPython 3C是安卓设备Python小程序引擎，支持PyVer、新版SL4A、FileProvider、 DocumentFile、加解密、GUI、音视频播放。</string>
+    <string name="qpy_description">QPython 3C是安卓设备Python小程序引擎，支持PyVer、新版SL4A、打开文件、写外置卡、加解密、图形界面、音视频播放。</string>
     <string name="warning">警告</string>
     <string name="reset_warning">将重置所有设置并删除已下载的库,确定重置吗?</string>
     <string name="downloading">库文件</string>
@@ -448,7 +448,7 @@
     <string name="use_py3">使用 Python 3</string>
     <string name="welcome">欢迎使用QPython 3C，享受您的手机编程之旅吧。</string>
     <string name="notice">提示</string>
-    <string name="python_interpreter">黑白Python解释器</string>
+    <string name="python_interpreter">传统Python解释器</string>
     <string name="shell_terminal">传统 Shell 终端</string>
     <string name="package_name_title">软件包名</string>
     <string name="bili_web_tip">教程/下载/检查更新：</string>

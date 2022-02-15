@@ -16,17 +16,6 @@
 
 package jackpal.androidterm.emulatorview;
 
-import jackpal.androidterm.emulatorview.compat.ClipboardManagerCompat;
-import jackpal.androidterm.emulatorview.compat.ClipboardManagerCompatFactory;
-import jackpal.androidterm.emulatorview.compat.KeycodeConstants;
-import jackpal.androidterm.emulatorview.compat.Patterns;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -55,11 +44,17 @@ import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import android.widget.Scroller;
 
-import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
-import static android.view.inputmethod.EditorInfo.IME_ACTION_NEXT;
-import static android.view.inputmethod.EditorInfo.IME_ACTION_NONE;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.LinkedList;
+
+import jackpal.androidterm.emulatorview.compat.ClipboardManagerCompat;
+import jackpal.androidterm.emulatorview.compat.ClipboardManagerCompatFactory;
+import jackpal.androidterm.emulatorview.compat.KeycodeConstants;
+import jackpal.androidterm.emulatorview.compat.Patterns;
+
 import static android.view.inputmethod.EditorInfo.IME_ACTION_UNSPECIFIED;
-import static android.view.inputmethod.EditorInfo.IME_MASK_ACTION;
 
 /**
  * A view on a {@link TermSession}.  Displays the terminal emulator's screen,
@@ -308,7 +303,7 @@ public class EmulatorView extends View implements GestureDetector.OnGestureListe
             for (lineLen = 0; line[lineLen] != 0; ++lineLen) ;
         }
 
-        SpannableStringBuilder textToLinkify = new SpannableStringBuilder(new String(line, 0, lineLen));
+        SpannableStringBuilder textToLinkify = new SpannableStringBuilder(new String(line, 0, lineLen - 1));//去空格
 
         boolean lineWrap = transcriptScreen.getScriptLineWrap(row);
 
@@ -333,7 +328,7 @@ public class EmulatorView extends View implements GestureDetector.OnGestureListe
                 for (lineLen = 0; line[lineLen] != 0; ++lineLen) ;
             }
 
-            textToLinkify.append(new String(line, 0, lineLen));
+            textToLinkify.append(new String(line, 0, lineLen-1));//去空格
 
             //Check if line after next is wrapped
             lineWrap = transcriptScreen.getScriptLineWrap(nextRow);
@@ -657,7 +652,7 @@ public class EmulatorView extends View implements GestureDetector.OnGestureListe
             private int mSelectedTextEnd;
 
             private void sendText(CharSequence text) {
-                Log.d(TAG, "sendText:"+text);
+                //writeToFile("sendText",text.toString());
                 int n = text.length();
                 char c;
                 try {
@@ -1347,7 +1342,7 @@ public class EmulatorView extends View implements GestureDetector.OnGestureListe
         } else if (handleFnKey(keyCode, true)) {
             return true;
         } else if (isSystemKey(keyCode, event)) {
-            if (!isInterceptedSystemKey(keyCode)) {
+            if (allowSystemKey(keyCode)) {
                 // Don't intercept the system keys
                 return super.onKeyDown(keyCode, event);
             }
@@ -1377,8 +1372,8 @@ public class EmulatorView extends View implements GestureDetector.OnGestureListe
     /**
      * Do we want to intercept this system key?
      */
-    private boolean isInterceptedSystemKey(int keyCode) {
-        return keyCode == KeyEvent.KEYCODE_BACK && mBackKeySendsCharacter;
+    private boolean allowSystemKey(int keyCode) {
+        return keyCode != KeyEvent.KEYCODE_BACK || !mBackKeySendsCharacter;
     }
 
     /**
@@ -1399,7 +1394,7 @@ public class EmulatorView extends View implements GestureDetector.OnGestureListe
             return true;
         } else if (isSystemKey(keyCode, event)) {
             // Don't intercept the system keys
-            if (!isInterceptedSystemKey(keyCode)) {
+            if (allowSystemKey(keyCode)) {
                 return super.onKeyUp(keyCode, event);
             }
         }
