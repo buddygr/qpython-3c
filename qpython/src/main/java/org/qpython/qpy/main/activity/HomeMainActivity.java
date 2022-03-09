@@ -143,8 +143,8 @@ public class HomeMainActivity extends BaseActivity {
     }
 
     private void playPy(String name){
-        ScriptExec.getInstance().playScript(HomeMainActivity.this,
-                CONF.binDir+name+".py", null, false);
+        ScriptExec.getInstance().playQScript(HomeMainActivity.this,
+                CONF.binDir+name+".py", null);
     }
 
     private void initListener() {
@@ -171,13 +171,12 @@ public class HomeMainActivity extends BaseActivity {
             startPyService();
 
             CharSequence[] chars = new CharSequence[]{
+                    this.getString(R.string.python_interpreter),
                     this.getString(R.string.color_python_interpreter),
-                    //this.getString(R.string.action_notebook),
                     this.getString(R.string.ipython_interactive),
                     this.getString(R.string.sl4a_gui_console),
                     this.getString(R.string.browser_console),
                     this.getString(R.string.shell_terminal),
-                    this.getString(R.string.python_interpreter),
                     this.getString(R.string.python_shell_terminal),
             };
             new AlertDialog.Builder(this, R.style.MyDialog)
@@ -185,22 +184,22 @@ public class HomeMainActivity extends BaseActivity {
                     .setItems(chars, (dialog, which) -> {
                         switch (which) {
                             case 0:
-                                startShell("color");
+                                startShell("default");
                                 break;
                             case 1:
-                                startShell("ipython.py");
+                                startShell("colorConsole.py");
                                 break;
                             case 2:
-                                playPy("SL4A_GUI_Console");
+                                startShell("ipython.py");
                                 break;
                             case 3:
-                                playPy("browserConsole");
+                                playPy("SL4A_GUI_Console");
                                 break;
                             case 4:
-                                startShell("shell");
+                                playPy("browserConsole");
                                 break;
                             case 5:
-                                startShell("qpython.sh");
+                                startShell("shell");
                                 break;
                             case 6:
                                 startShell("shell.py");

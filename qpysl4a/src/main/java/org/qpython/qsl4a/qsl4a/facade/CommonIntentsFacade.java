@@ -1,6 +1,5 @@
 package org.qpython.qsl4a.qsl4a.facade;
 
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.app.Service;
@@ -11,21 +10,22 @@ import android.content.pm.ShortcutManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Picture;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.ContactsContract;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.content.FileProvider;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.view.Display;
 import android.webkit.MimeTypeMap;
-import android.widget.Toast;
 
-import org.json.JSONArray;
+import com.google.zxing.BinaryBitmap;
+import com.google.zxing.DecodeHintType;
+import com.google.zxing.RGBLuminanceSource;
+import com.google.zxing.common.HybridBinarizer;
+import com.google.zxing.qrcode.QRCodeReader;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
@@ -35,11 +35,10 @@ import org.qpython.qsl4a.qsl4a.rpc.RpcOptional;
 import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A selection of commonly used intents. <br>
@@ -88,6 +87,35 @@ public class CommonIntentsFacade extends RpcReceiver {
           return null;
       }
   }
+
+    @Rpc(description = "scan Barcode From Image", returns = "Scan Result String .")
+    public String scanBarcodeFromImage(
+            @RpcParameter(name = "path") String path
+    ) throws Exception {
+        if (TextUtils.isEmpty(path)) {
+            return null;
+        }
+        // DecodeHintType和EncodeHintType
+        Hashtable<DecodeHintType, String> hints = new Hashtable<>();
+        hints.put(DecodeHintType.CHARACTER_SET, "utf-8"); // 设置二维码内容的编码
+        //hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);//优化精度
+        //hints.put(DecodeHintType.PURE_BARCODE, Boolean.TRUE);//复杂模式，开启PURE_BARCODE模式
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true; // 先获取原大小
+        Bitmap scanBitmap = BitmapFactory.decodeFile(path, options);
+        options.inJustDecodeBounds = false; // 获取新的大小
+        int sampleSize = (int) (options.outHeight / (float) 200);
+        if (sampleSize <= 0)
+            sampleSize = 1;
+        options.inSampleSize = sampleSize;
+        scanBitmap = BitmapFactory.decodeFile(path, options);
+        int[] data = new int[scanBitmap.getWidth() * scanBitmap.getHeight()];
+        scanBitmap.getPixels(data, 0, scanBitmap.getWidth(), 0, 0, scanBitmap.getWidth(), scanBitmap.getHeight());
+        RGBLuminanceSource source = new RGBLuminanceSource(scanBitmap.getWidth(),scanBitmap.getHeight(),data);
+        BinaryBitmap bitmap1 = new BinaryBitmap(new HybridBinarizer(source));
+        QRCodeReader reader = new QRCodeReader();
+        return reader.decode(bitmap1, hints).toString();
+    }
 
   /*private void view(Uri uri, String type, String title, boolean wait) throws Exception {
     Intent intent = new Intent();

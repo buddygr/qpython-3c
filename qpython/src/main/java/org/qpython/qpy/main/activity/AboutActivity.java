@@ -95,7 +95,7 @@ public class AboutActivity extends BaseActivity {
         );
 
         binding.ForkTo.setOnClickListener(v ->
-                viewWebSite(R.string.qpython_3c_github)
+            viewWebSite(R.string.qpython_3c_gitee)
         );
 
         binding.tvThanks.setOnClickListener(v ->

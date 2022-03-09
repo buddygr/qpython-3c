@@ -114,11 +114,11 @@ public class ShellTermSession extends GenericTermSession {
 
         File enf = new File(CONF.binDir +"init.sh");
         //if (! enf.exists()) {
-        String content = "#!/system/bin/sh";
+        StringBuilder content = new StringBuilder("#!/system/bin/sh");
         for (int i=0;i<env.length;i++) {
-            content += "\nexport "+env[i];
+            content.append("\nexport ").append(env[i]);
         }
-        FileHelper.putFileContents(context, enf.getAbsolutePath(), content.trim());
+        FileHelper.putFileContents(context, enf.getAbsolutePath(), content.toString().trim());
         try {
             FileUtils.chmod(enf, 0755);
         }

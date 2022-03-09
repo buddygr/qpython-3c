@@ -1163,10 +1163,11 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
         String shell_type = intent.getStringExtra(TYPE);
         if (shell_type==null) {
             if (mArgs!=null) shell_type = "";
-            else shell_type = "color";
+            else shell_type = "default";
         }
-        if (shell_type.equals("color"))
-            mArgs = new String[]{CONF.qpyccs, CONF.qpyccs};
+        if (shell_type.equals("default")) {
+            session = createTermSession(this, settings, getScmd() + " && exit", CONF.filesDir);
+        }
         else if (shell_type.endsWith(".py")) {
             shell_type = CONF.binDir + shell_type;
             mArgs = new String[]{shell_type, shell_type};

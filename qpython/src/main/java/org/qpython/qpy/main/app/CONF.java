@@ -27,7 +27,7 @@ public class CONF implements QPyConstants {
     public static final String pytho = binDir + "python";
     public static final String qpysh = binDir + "qpython.sh";
     public static final String qpyshr = binDir + "qpython-root.sh";
-    public static final String qpyccs = binDir + "colorConsole.py";
+    //public static final String qpyccs = binDir + "colorConsole.py";
     public static final String qpypiPath = filesDir + "/lib/"+pyVer+"/site-packages/";
 
 }

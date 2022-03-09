@@ -1,7 +1,7 @@
 # About
 
 
-<p align="center"><a href="https://github.com/buddygr/qpython-3c/blob/master/qpython/src/main/res/drawable-xxhdpi/ic_launcher.png" target="_blank"><img src="https://github.com/buddygr/qpython-3c/blob/master/qpython/src/main/res/drawable-xxhdpi/ic_launcher.png?raw=true"></a></p>
+<p align="center"><a href="https://gitee.com/buddygr/qpython-3c/raw/master/qpython/src/main/res/drawable-xxhdpi/ic_launcher.png" target="_blank"><img src="https://gitee.com/buddygr/qpython-3c/raw/master/qpython/src/main/res/drawable-xxhdpi/ic_launcher.png"></a></p>
 
 Welcome to the QPython project!
 
@@ -23,7 +23,7 @@ QPython 3C is forked from QPython OP (one branch of QPython Ox) . QPython 3C is 
 This repository is the QPython 3C project repository, you can follow the below steps to run it.
 
 - Macos + Android studio, (Ubuntu may work too)
-- git clone https://github.com/buddygr/qpython-3c
+- git clone https://gitee.com/buddygr/qpython-3c.git
 - git submodule init
 - git submodule sync
 - git submodule update
@@ -35,6 +35,7 @@ This repository is the QPython 3C project repository, you can follow the below s
 
 ## Related 
 
+- [Setup QPython 3C](https://www.bilibili.com/read/cv13322251)
 - [QPython 3x features](https://github.com/qpython-android/qpython.org/blob/master/qpython-docs/source/en/qpython_3x_featues.rst), [QPython Ox features](https://github.com/qpython-android/qpython.org/blob/master/qpython-docs/source/en/qpython_ox_featues.rst)
 - [QPySL4A APIs](https://github.com/qpython-android/qpysl4a/blob/master/doc/en/APIs.rst) and [test scripts](https://github.com/qpython-android/qpysl4a/issues/1)
 - [new SL4A Functions 拍照录音录像、截屏录屏、外置卡读写](https://www.bilibili.com/read/cv13418026)
@@ -45,12 +46,6 @@ This repository is the QPython 3C project repository, you can follow the below s
 
 ## How to ask QPython related questions
 In order to benefit those guys who have the same issue with QPython, we suggest that you should ask the issue which is related with QPython within public techical communities.
-
-
-### English QPythonista Community
-
-- [Ask in stackoverflow](https://stackoverflow.com/questions/tagged/qpython)
-- [Discuss QPython Programming in QPython Group](https://www.facebook.com/groups/qpython/)
 
 ### Chinese QPythonista Community
 
@@ -70,7 +65,7 @@ Please tell us your phone's informatioin, android os information, QPython branch
 ### Original Version
 - harford (Wechat)
 - 晨晖 (Wechat)
-- ### Edited (3C) Version
+### Edited (3C) Version
 - [乘着船 (Bilibili)](https://space.bilibili.com/9185070)
 
 THANK YOU VERY MUCH FOR DONATION!
@@ -79,9 +74,6 @@ THANK YOU VERY MUCH FOR DONATION!
 ## How to contribute
 WE NEED YOUR HELP AND CONTRIBUTE, WE WILL BE VERY GRATEFUL IF YOU CAN TELL US YOUR IDEA OR SUGGESTION.
 
-IF YOU WANT TO PARTICIPATE THIS PROJECT, PLEASE SEND YOUR EMAIL TO US.
-
-- Email: support@qpython.org
 - [在贴吧反馈](https://tieba.baidu.com/f?ie=utf-8&kw=qpython)
 - [在B站相关视频或文章下反馈](https://www.bilibili.com/read/readlist/rl321663)
 

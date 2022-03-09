@@ -46,6 +46,7 @@ dependencies {
     api rootProject.ext.libSupportDesign
     //api rootProject.ext.libSupportV7
     api rootProject.ext.libGoogleGuava
+    implementation 'com.google.zxing:core:3.4.1'
     compile project(path: ':qbaselib')
 }
 

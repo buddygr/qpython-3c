@@ -448,8 +448,8 @@
     <string name="use_py3">使用 Python 3</string>
     <string name="welcome">欢迎使用QPython 3C，享受您的手机编程之旅吧。</string>
     <string name="notice">提示</string>
-    <string name="python_interpreter">传统Python解释器</string>
-    <string name="shell_terminal">传统 Shell 终端</string>
+    <string name="python_interpreter">Python解释器</string>
+    <string name="shell_terminal">Shell 终端</string>
     <string name="package_name_title">软件包名</string>
     <string name="bili_web_tip">教程/下载/检查更新：</string>
     <string name="fork_from_title">来源自</string>
@@ -515,4 +515,6 @@
     <string name="tradition_bug">传统终端bug太多，建议仅用于测试。</string>
     <string name="open_source_library_bili">开源库 (B站)</string>
     <string name="python_shell_terminal">Python 彩色 Shell 终端</string>
+    <string name="qr_info">确认</string>
+    <string name="qr_goto">你想访问这个URL吗？</string>
 </resources>
