@@ -1,18 +1,16 @@
 # About
 
-
 <p align="center"><a href="https://gitee.com/buddygr/qpython-3c/raw/master/qpython/src/main/res/drawable-xxhdpi/ic_launcher.png" target="_blank"><img src="https://gitee.com/buddygr/qpython-3c/raw/master/qpython/src/main/res/drawable-xxhdpi/ic_launcher.png"></a></p>
 
 Welcome to the QPython project!
 
 QPython is the Python engine for android. It contains some amazing features such as Python interpreter, runtime environment, editor and QPYPI and integrated SL4A. It makes it easy for you to use Python on Android. And it's FREE.
 
-
 Compared with other Python apps, QPython mainly solves how to use Python to drive your Android device work. Good SL4A support is our main goal, such as android's camera, sensor, sms, media, storage, crypto, GUI APIs etc.
 
 QPython already has millions of users worldwide and it is also an open source project.
 
-For different usage scenarios, QPython has three branches, namely QPython Ox , 3x and 3C .
+For different usage scenarios, QPython has three branches, namely [QPython Ox , QPython 3x](https://github.com/qpython-android/qpython) and [QPython 3C](https://gitee.com/buddygr/qpython-3c) .
 
 QPython Ox is mainly aimed at programming learners, and it provides more friendly features for beginners.  
 QPython 3x is mainly for experienced Python users, and it provides some advanced technical features.  
@@ -33,7 +31,7 @@ This repository is the QPython 3C project repository, you can follow the below s
 - Get more information from [wiki](https://github.com/qpython-android/qpython/wiki) for developing QPython OP .
 - Get more information from [开源库 in Bilibili](https://www.bilibili.com/read/readlist/rl321663) for developing QPython 3C .
 
-## Related 
+## Related 相关链接
 
 - [Setup QPython 3C](https://www.bilibili.com/read/cv13322251)
 - [QPython 3x features](https://github.com/qpython-android/qpython.org/blob/master/qpython-docs/source/en/qpython_3x_featues.rst), [QPython Ox features](https://github.com/qpython-android/qpython.org/blob/master/qpython-docs/source/en/qpython_ox_featues.rst)
@@ -41,8 +39,9 @@ This repository is the QPython 3C project repository, you can follow the below s
 - [new SL4A Functions 拍照录音录像、截屏录屏、外置卡读写](https://www.bilibili.com/read/cv13418026)
 - [new SL4A Functions 电话、悬浮窗、网页等](https://www.bilibili.com/read/cv11197543)
 - [new SL4A Functions Javax.Crypto.Cipher 加解密](https://www.bilibili.com/read/cv11108237)
-- new SL4A Functions [Open File](https://www.bilibili.com/read/cv11037013) and [Video Play](https://www.bilibili.com/read/cv10618059)
-- QPYPI Packages
+- new SL4A Functions [Open File](https://www.bilibili.com/read/cv11037013) and [Video Play](https://www.bilibili.com/BV1xK4y1D7eV)
+- [play new SL4A game](https://www.bilibili.com/read/cv15206348)
+- 图形界面：[音乐播放器、文件选择器、列表选择器](https://www.bilibili.com/BV1Pz4y1C7ds)、[长文本框](https://www.bilibili.com/BV1d7411R7ic)
 
 ## How to ask QPython related questions
 In order to benefit those guys who have the same issue with QPython, we suggest that you should ask the issue which is related with QPython within public techical communities.
@@ -56,25 +55,33 @@ In order to benefit those guys who have the same issue with QPython, we suggest 
 
 Please tell us your phone's informatioin, android os information, QPython branch, and your code, where did you install it and the detailed stituation you have encountered.
 
+#### original QPython
 - [Report an app's issue](https://github.com/qpython-android/qpython/issues)
 - [Report an non-app's issue](https://github.com/qpython-android/qpython.org/issues)
 - [Request to support a package](https://github.com/qpython-android/qpypi/issues)
+#### QPython 3C
+- [在gitee反馈](https://gitee.com/buddygr/qpython-3c/issues)
+- [在B站相关视频或文章下反馈](https://www.bilibili.com/read/readlist/rl321663)
 
 ## Donation
 
-### Original Version
+### original QPython
+- QPYIO (Wechat Video)
 - harford (Wechat)
-- 晨晖 (Wechat)
-### Edited (3C) Version
+### QPython 3C
 - [乘着船 (Bilibili)](https://space.bilibili.com/9185070)
 
 THANK YOU VERY MUCH FOR DONATION!
-
 
 ## How to contribute
 WE NEED YOUR HELP AND CONTRIBUTE, WE WILL BE VERY GRATEFUL IF YOU CAN TELL US YOUR IDEA OR SUGGESTION.
 
 - [在贴吧反馈](https://tieba.baidu.com/f?ie=utf-8&kw=qpython)
+### original QPython
+- QPYIO (Wechat Video)
+### QPython 3C
 - [在B站相关视频或文章下反馈](https://www.bilibili.com/read/readlist/rl321663)
 
 THANK YOU.
+
+# Thanks to [original QPython project](https://github.com/qpython-android) very much !!!

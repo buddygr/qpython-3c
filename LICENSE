@@ -1,0 +1,43 @@
+Related to granting permissions:
+QPython3C will not collect any user information. You can grant corresponding permissions according to your own situation. Unauthorized permissions will lose their corresponding functions.
+
+Open source software security tips:
+If a security vulnerability occurs when using QPython3C, the QPython3C developer may not have the time or ability to repair it. Continued use means that the QPython3C users bears the relevant security risks, which has nothing to do with the QPython developer.
+
+Open source is free but requires support:
+Open source software production requires investment cost. Please support more QPython developers.
+QPython3C is completely free for personal learning and research, at present, QPython3C does not allow commercial use, the rest follow the Apache 2.0 open source protocol.
+The developer reserves the right to stop maintaining the project.
+
+Support QPython developers, Bilibili Accout:
+Origin Author: QPYIO
+Modify Author: 乘着船
+Welcome to give the thumbs-up, collection and/or insert coin .
+QPython developers may not have time to reply to every problem, or some problems QPython developers can't solve themselves now .
+
+Lite Python in QPython 3C is build on Termux .
+
+It is strictly prohibited to use the original or modified version of QPython 3C for all kinds of illegal and immoral activities .
+
+
+===== ===== ===== ===== 
+
+授予权限相关：
+QPython3C不会收集任何用户信息，您可以根据自身情况授予相应权限，未被授予的权限将会失去对应功能。
+
+开源软件安全提示：
+使用QPython3C如果出现安全漏洞，QPython3C开发者可能没时间也无力修复，继续使用意味着自行承担与此相关安全风险，与QPython开发者无关。
+
+开源免费但需要支持：
+开源软件制作需要投入成本，请多支持QPython开发者。
+QPython3C针对个人学习研究完全免费，目前QPython3C不允许商用，此外其余部分遵循Apache2.0开源协议。
+开发者保留停止维护项目的权利。
+
+支持QPython开发者，B站号：
+原始作者:QPYIO
+修改作者:乘着船
+欢迎点赞收藏投币，不过QPython开发者不一定有时间回复每一个问题，或者有些问题QPython开发者自己也解决不了。
+
+QPython 3C 上的 精简版 Python 由 Termux 构建。
+
+严禁将 QPython 3C 原版或修改版 用于各类违法违背道德的活动。
