@@ -1,8 +1,11 @@
 package org.qpython.qpy.main.fragment;
 
+import static com.quseit.util.FolderUtils.sortTypeByName;
+
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
@@ -22,7 +25,6 @@ import com.yanzhenjie.recyclerview.swipe.SwipeMenuItem;
 
 import org.qpython.qpy.R;
 import org.qpython.qpy.databinding.FragmentExplorerBinding;
-import org.qpython.qpy.main.app.App;
 import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.texteditor.EditorActivity;
 import org.qpython.qpy.texteditor.common.CommonEnums;
@@ -33,6 +35,7 @@ import org.qpython.qpy.texteditor.ui.view.EnterDialog;
 import org.qpython.qpy.texteditor.widget.crouton.Crouton;
 import org.qpython.qpy.texteditor.widget.crouton.Style;
 import org.qpython.qpy.utils.FileUtils;
+import org.qpython.qpysdk.QPyConstants;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -41,9 +44,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import static com.quseit.util.FolderUtils.sortTypeByName;
-
 
 public class ExplorerFragment extends Fragment {
     private static final int REQUEST_SAVE_AS   = 107;
@@ -54,9 +54,13 @@ public class ExplorerFragment extends Fragment {
     private static final String TYPE = "type";
     private static final String FOLDER_NAME = "folder_name";
     private static final String STORAGE_FOLDER = "/storage";
-    private static final String EMULATED_FOLDER = STORAGE_FOLDER + "/emulated";
+    private static final String MNT_FOLDER = "/mnt";
+    //private static final String EMULATED_FOLDER = STORAGE_FOLDER + "/emulated";
     private static final String SDCARD = "/sdcard";
-    private static String EXT_PATH = Environment.getExternalStorageDirectory().toString();
+    private static String ANDROID_DATA;
+    private static String TOP_FOLDER;
+    private static final String EXT_PATH = Environment.getExternalStorageDirectory().toString();
+    private static boolean needCustom;
 
     private int WIDTH = (int) ImageUtil.dp2px(60);
 
@@ -74,6 +78,7 @@ public class ExplorerFragment extends Fragment {
         ExplorerFragment myFragment = new ExplorerFragment();
 
         Bundle args = new Bundle();
+        getTopFolder();
         args.putInt(TYPE, type);
         myFragment.setArguments(args);
 
@@ -84,11 +89,20 @@ public class ExplorerFragment extends Fragment {
         ExplorerFragment myFragment = new ExplorerFragment();
 
         Bundle args = new Bundle();
+        getTopFolder();
         args.putInt(TYPE, type);
         args.putString(FOLDER_NAME, folder_name);
         myFragment.setArguments(args);
 
         return myFragment;
+    }
+
+    private static void getTopFolder(){
+        ANDROID_DATA = "/data/" + CONF.packageName;
+        if (Build.VERSION.SDK_INT>=30)
+            TOP_FOLDER = MNT_FOLDER;
+        else TOP_FOLDER = STORAGE_FOLDER;
+        needCustom = !CONF.CUSTOM_PATH.equals(CONF.LEGACY_PATH);
     }
 
     @Nullable
@@ -164,7 +178,7 @@ public class ExplorerFragment extends Fragment {
         binding.swipeList.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.swipeList.setSwipeMenuCreator(swipeMenuCreator);
         if (type != REQUEST_CUSTOM_FOLDER) {
-            openDir(CONF.ABSOLUTE_PATH);
+            openDir(CONF.SCOPE_STORAGE_PATH);
         } else {
             openDir(curPath);
         }
@@ -173,8 +187,8 @@ public class ExplorerFragment extends Fragment {
     private String getParentPath(String curPath) {
         String parentPath;
         if(curPath.equals(EXT_PATH) || curPath.equals(SDCARD)){
-            parentPath = STORAGE_FOLDER;
-        } else{
+            parentPath = TOP_FOLDER;
+        } else {
             parentPath = new File(curPath).getParent();
         }
         return parentPath;
@@ -353,9 +367,9 @@ public class ExplorerFragment extends Fragment {
     }
 
     private void openDir(String dirPath) {
-        if (dirPath.equals(EMULATED_FOLDER)){
+        /*if (dirPath.equals(EMULATED_FOLDER)){
             dirPath = SDCARD;
-        }
+        }*/
         if (type == REQUEST_RECENT) {
             folderList.clear();
             for (String path : RecentFiles.getRecentFiles()) {
@@ -375,12 +389,23 @@ public class ExplorerFragment extends Fragment {
                 if (files != null) {
                     Arrays.sort(files, sortTypeByName);
                     folderList.clear();
+                    if (dirPath.equals(TOP_FOLDER)) {
+                        folderList.add(new FolderBean(new File(SDCARD), ""));
+                    } else if (dirPath.endsWith("/Android") && new File(dirPath,"data").exists())
+                        folderList.add(new FolderBean(new File(dirPath,ANDROID_DATA),""));
+                    else if (dirPath.endsWith(ANDROID_DATA)) {
+                        folderList.add(new FolderBean(new File(dirPath.substring(0, dirPath.lastIndexOf("/data"))), ""));
+                        folderList.add(new FolderBean(new File(QPyConstants.LEGACY_PATH), ""));
+                        if (needCustom)
+                            folderList.add(new FolderBean(new File(CONF.CUSTOM_PATH), ""));
+                    } else if (dirPath.equals(QPyConstants.LEGACY_PATH) || (needCustom && dirPath.equals(CONF.CUSTOM_PATH)))
+                        folderList.add(new FolderBean(new File(CONF.SCOPE_STORAGE_PATH), ""));
                     for (File file : files) {
                         //if (!file.getName().startsWith(".")) {
                         folderList.add(new FolderBean(file));
                         //}
                     }
-                    adapter.notifyDataSetChanged();
+                    //adapter.notifyDataSetChanged();
                     binding.tvPath.setText(dirPath);
                     curPath = dirPath;
                     adapter.notifyDataSetChanged();
@@ -418,7 +443,7 @@ public class ExplorerFragment extends Fragment {
         //String qpyDir = Environment.getExternalStorageDirectory().getAbsolutePath()+"/qpython";
 
         //if (curPath == null || qpyDir.equals(curPath) || Environment.getExternalStorageDirectory().getAbsolutePath().equals(curPath)) {
-        if (curPath == null || curPath.equals(STORAGE_FOLDER)) {
+        if (curPath == null || curPath.equals(TOP_FOLDER)) {
             Objects.requireNonNull(getActivity()).finish();
         } else {
             String parentPath = getParentPath(curPath);
@@ -453,7 +478,7 @@ public class ExplorerFragment extends Fragment {
 
     private void savePath(String path) {
         String[] paths = path.split("/");
-        StringBuffer realPath = new StringBuffer(CONF.ABSOLUTE_PATH);
+        StringBuffer realPath = new StringBuffer(CONF.SCOPE_STORAGE_PATH);
         for (String p : paths) {
             if (!TextUtils.isEmpty(p)) {
                 realPath.append("/");

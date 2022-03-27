@@ -12,6 +12,7 @@ import com.quseit.util.NAction;
 import com.quseit.util.NUtil;
 
 import org.qpython.qpy.console.ScriptExec;
+import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpysdk.QPyConstants;
 
 public class MPyService extends Service {
@@ -78,7 +79,7 @@ public class MPyService extends Service {
                             } else {
                                 runMode = 1;
                             }
-                            String script = QPyConstants.ABSOLUTE_PATH + "/cache/last.py";
+                            String script = CONF.SCOPE_STORAGE_PATH + "/cache/last.py";
                             FileHelper.putFileContents(this, script, pycode);
                             ScriptExec.getInstance().playScript(MPyService.this, script, null, false);
                         }

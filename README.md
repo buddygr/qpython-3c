@@ -27,9 +27,13 @@ This repository is the QPython 3C project repository, you can follow the below s
 - git submodule update
 - build it...
 
-### Learn
+### Learn 学习
 - Get more information from [wiki](https://github.com/qpython-android/qpython/wiki) for developing QPython OP .
 - Get more information from [开源库 in Bilibili](https://www.bilibili.com/read/readlist/rl321663) for developing QPython 3C .
+
+## Download in Net Disk 网盘下载
+- [Baidu Net Disk 百度网盘](https://pan.baidu.com/s/1zT1NGtYTe55m6bSRWlePRg) Code提取码:zxcv
+- [Tencent Net Disk 腾讯微云](https://share.weiyun.com/Nz85QWKA)
 
 ## Related 相关链接
 

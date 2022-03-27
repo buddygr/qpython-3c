@@ -32,6 +32,7 @@ import org.qpython.qpy.main.auxActivity.ScreenRecordActivity;
 import org.qpython.qpy.main.utils.Bus;
 import org.qpython.qpy.texteditor.EditorActivity;
 import org.qpython.qpy.texteditor.TedLocalActivity;
+import org.qpython.qpysdk.QPyConstants;
 import org.qpython.qpysdk.QPySDK;
 import org.qpython.qsl4a.QPyScriptService;
 
@@ -364,6 +365,7 @@ public class HomeMainActivity extends BaseActivity {
             @Override
             public void onGrant() {
                 //这里只执行一次做为初始化
+                CONF.CUSTOM_PATH = PreferenceManager.getDefaultSharedPreferences(HomeMainActivity.this).getString(getString(R.string.qpy_custom_dir),CONF.LEGACY_PATH);
 
                 if ( NAction.isQPyInterpreterSet(HomeMainActivity.this) ) {
                     getPyVer(true);

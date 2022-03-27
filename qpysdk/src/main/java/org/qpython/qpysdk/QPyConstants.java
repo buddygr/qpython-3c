@@ -16,10 +16,10 @@ public interface QPyConstants extends BASE_CONF {
     String QSL4A_PROJECT    = "qsl4a";
 
     String BASE_PATH         = "qpython";
-    String AD_URL            = "https://apu2.quseit.com/ad/";
+    //String AD_URL            = "https://apu2.quseit.com/ad/";
 
-    String UPDATE_URL  = "https://apu2.quseit.com/conf/update/";
-    String LOG_URL     = "https://apu2.quseit.com/conf/log/";
+    //String UPDATE_URL  = "https://apu2.quseit.com/conf/update/";
+    //String LOG_URL     = "https://apu2.quseit.com/conf/log/";
     //String IAP_LOG_URL = "https://apu2.quseit.com/conf/iaplog/";
 
     String DFROM_RUN   = ".runtime";
@@ -34,15 +34,8 @@ public interface QPyConstants extends BASE_CONF {
     //String KEY_NOTEBOOK_RES = "setting.notebook3sresource.path";
     //String KEY_NOTEBOOK2_RES = "setting.notebook2resource.path";
 
-    //String py3Ver = "3.9";
-
-    String ABSOLUTE_PATH = Environment.getExternalStorageDirectory().getPath() + "/" + BASE_PATH;
-    String PY_CACHE_PATH = ABSOLUTE_PATH+"/"+PY_CACHE;
-    String ABSOLUTE_LOG = ABSOLUTE_PATH + "/log/last.log";
-    String WEB_LOG = ABSOLUTE_PATH + "/log/web.log";
-    String QUIET_LOG = ABSOLUTE_PATH + "/log/quiet.log";
-
-    //String PYTHON_2 = "2.x";
+    String LEGACY_PATH = Environment.getExternalStorageDirectory().getPath() + "/" + BASE_PATH;
+    String LEGACY_LOG = LEGACY_PATH+"/log/last.log";
 
     String QPYC3 = "https://dl.qpy.io/py3.json";
     String QPYC2COMPATIBLE = "https://dl.qpy.io/py2compatible.json";

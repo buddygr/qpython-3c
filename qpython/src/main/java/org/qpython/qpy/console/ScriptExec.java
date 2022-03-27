@@ -51,7 +51,7 @@ public class ScriptExec {
     private static final int    LOG_NOTIFICATION_ID = (int) System.currentTimeMillis();
     private InputStream  mIn;
     private OutputStream mOut;
-    private String logFile = QPyConstants.ABSOLUTE_LOG;
+    private String logFile = CONF.ABSOLUTE_LOG;
 
     private ScriptExec() { }
 
@@ -124,75 +124,41 @@ public class ScriptExec {
 
         String pyVer = CONF.pyVer;//QPyConstants.py3Ver;
         File filesDir = context.getFilesDir();
-        File externalStorage = new File(QPyConstants.ABSOLUTE_PATH);
+        File externalStorage = new File(CONF.SCOPE_STORAGE_PATH);
+        File externalLegacyStorage = new File(QPyConstants.LEGACY_PATH);
+        boolean needCustom = !CONF.CUSTOM_PATH.equals(CONF.LEGACY_PATH);
         String commDir = filesDir+"/lib/"+pyVer+"/";
 
-        String[] env = new String[24];
+        String[] env = new String[25 + (needCustom?1:0)];
 
         env[0] = "TERM=" + term;
         env[1] = "PATH=" + CONF.filesDir+"/bin"+":"+path;
 
-        /*if (!isQPy3) {
-            File py27so = new File(filesDir+"/lib/libpython2.7.so.1.0");
-            File py27soorg = new File(filesDir.getParentFile()+"/lib/libpython2.7.so");
-
-
-            if (!py27so.exists()) {
-                if (py27soorg.exists()) {
-                    try {
-                        FileUtils.lnOrcopy(py27soorg, py27so, AndroidCompat.SDK);
-                    } catch (Exception e) {
-
-                    }
-
-                }
-            }
-        }*/
-        env[2] = "LD_LIBRARY_PATH=.:" + filesDir + "/lib/" + ":" + filesDir + "/";// + filesDir.getParentFile() + "/lib/";
+        env[2] = "LD_LIBRARY_PATH=.:" + filesDir + "/lib/" + ":" + filesDir + "/";
 
         env[3] = "PYTHONHOME="+filesDir;
         env[4] = "ANDROID_PRIVATE="+filesDir;
 
-
-        // HACKED FOR QPython
-
-        if (!externalStorage.exists()) {
-            externalStorage.mkdir();
-        }
-
-        //if (isQPy3) {
+        if (!externalStorage.exists()) externalStorage.mkdir();
 
             env[5] = "PYTHONPATH="
                     +commDir+":"
                     +commDir+"lib-dynload/:"
                     +commDir+"site-packages/:"
-                    //+filesDir+"/lib/python"+pyVer+"/qpyutil.zip:"
-                    +externalStorage+"/lib/"+pyVer+"/site-packages/";
-                    //+filesDir+"/lib/notebook.zip:";
+                    +externalStorage+"/lib/"+pyVer+"/site-packages/:"
+                    +externalLegacyStorage+"/lib/"+pyVer+"/site-packages/";
+
+            if(needCustom) {
+                env[5] += ":" + CONF.CUSTOM_PATH + "/lib/" + pyVer + "/site-packages/";
+                env[25] = "ANDROID_PUBLIC_CUSTOM=" + CONF.CUSTOM_PATH;
+            }
 
             env[14] = "PYTHONSTARTUP="+commDir+"site-packages/qpy.py";
-
-
-        /*} else {
-
-            env[5] = "PYTHONPATH="
-                    +filesDir+"/lib/python2.7/site-packages/:"
-                    +filesDir+"/lib/python2.7/:"
-                    +filesDir+"/lib/python27.zip:"
-                    +filesDir+"/lib/python2.7/qpyutil.zip:"
-                    +filesDir+"/lib/python2.7/lib-dynload/:"
-                    +externalStorage+"/lib/python2.7/site-packages/:";
-
-            //env[14] = "IS_QPY2=1";
-            env[14] = "PYTHONSTARTUP="+filesDir+"/lib/python2.7/site-packages/qpy.py";
-        }*/
 
         env[6] = "PYTHONOPTIMIZE=1";
 
         File td = new File(externalStorage+"/cache");
-        if (!td.exists()) {
-            td.mkdir();
-        }
+        if (!td.exists()) td.mkdir();
         env[7] = "TMPDIR="+td.getAbsolutePath();
 
 
@@ -201,18 +167,19 @@ public class ScriptExec {
         env[10] = "AP_HANDSHAKE="+SPFUtils.getSP(context, "sl4a.secue");
 
         env[11] = "ANDROID_PUBLIC="+externalStorage;
-        env[12] = "ANDROID_PRIVATE="+context.getFilesDir().getAbsolutePath();
+        env[12] = "ANDROID_PRIVATE="+filesDir;
         env[13] = "ANDROID_ARGUMENT=\""+pyPath+"\"";
 
         env[15] = "QPY_USERNO="+ NAction.getUserNoId(context);
         env[16] = "QPY_ARGUMENT="+NAction.getExtConf(context);
         env[17] = "PYTHONDONTWRITEBYTECODE=1";
         env[18] = "TMP="+externalStorage+"/cache";
-        env[19] = "ANDROID_APP_PATH="+externalStorage+"";
+        env[19] = "ANDROID_PUBLIC_LEGACY="+externalLegacyStorage+"";
         env[20] = "LANG="+context.getString(R.string.lang_env)+".UTF-8";
         env[21] = "HOME="+filesDir;
         env[22] = "ANDROID_DATA="+System.getenv("ANDROID_DATA");
         env[23] = "ANDROID_ROOT="+System.getenv("ANDROID_ROOT");
+        env[24] = "EXTERNAL_STORAGE="+Environment.getExternalStorageDirectory();
         return env;
     }
 

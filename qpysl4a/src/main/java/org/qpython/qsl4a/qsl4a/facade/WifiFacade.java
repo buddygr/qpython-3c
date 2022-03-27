@@ -1,24 +1,16 @@
 package org.qpython.qsl4a.qsl4a.facade;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
 import android.net.wifi.ScanResult;
-import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
-import android.os.Build;
-import android.os.Environment;
 import android.os.Handler;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
 import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
@@ -27,13 +19,10 @@ import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -117,8 +106,61 @@ public class WifiFacade extends RpcReceiver {
   }
 
   @Rpc(description = "Returns information about the currently active access point.")
-  public WifiInfo wifiGetConnectionInfo() {
-    return mWifi.getConnectionInfo();
+  public JSONObject wifiGetConnectionInfo() throws Exception {
+    WifiInfo data = mWifi.getConnectionInfo();
+    JSONObject result = new JSONObject();
+    result.put("hidden_ssid", data.getHiddenSSID());
+    result.put("ip_address", data.getIpAddress());
+    result.put("link_speed", data.getLinkSpeed());
+    result.put("network_id", data.getNetworkId());
+    result.put("rssi", data.getRssi());
+    result.put("bssid", data.getBSSID());
+    result.put("mac_address", data.getMacAddress());
+    result.put("ssid", data.getSSID());
+    result.put("frequency",data.getFrequency());
+    String supplicantState = null;
+    switch (data.getSupplicantState()) {
+      case ASSOCIATED:
+        supplicantState = "associated";
+        break;
+      case ASSOCIATING:
+        supplicantState = "associating";
+        break;
+      case COMPLETED:
+        supplicantState = "completed";
+        break;
+      case DISCONNECTED:
+        supplicantState = "disconnected";
+        break;
+      case DORMANT:
+        supplicantState = "dormant";
+        break;
+      case FOUR_WAY_HANDSHAKE:
+        supplicantState = "four_way_handshake";
+        break;
+      case GROUP_HANDSHAKE:
+        supplicantState = "group_handshake";
+        break;
+      case INTERFACE_DISABLED:
+        supplicantState = "interface_disabled";
+        break;
+      case INACTIVE:
+        supplicantState = "inactive";
+        break;
+      case INVALID:
+        supplicantState = "invalid";
+        break;
+      case SCANNING:
+        supplicantState = "scanning";
+        break;
+      case UNINITIALIZED:
+        supplicantState = "uninitialized";
+        break;
+      case AUTHENTICATING:
+        supplicantState = "authenticating";
+    }
+    result.put("supplicant_state", supplicantState);
+    return result;
   }
 
   @Rpc(description = "Reassociates with the currently active access point.", returns = "True if the operation succeeded.")

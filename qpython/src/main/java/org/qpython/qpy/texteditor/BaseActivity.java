@@ -31,7 +31,7 @@ public class BaseActivity extends QBaseActivity {
 
 	@Override
 	public String confGetUpdateURL(int flag) {
-		if (flag == 2) {
+		/*if (flag == 2) {
 			return QPyConstants.LOG_URL+this.getPackageName()+"/"+NUtil.getVersinoCode(this);
 		} else if (flag == 3) {
 			return QPyConstants.AD_URL+this.getPackageName()+"/"+NUtil.getVersinoCode(this)+"?"
@@ -40,6 +40,7 @@ public class BaseActivity extends QBaseActivity {
 		} else {
 			return QPyConstants.UPDATE_URL+this.getPackageName()+"/"+NUtil.getVersinoCode(this);
 
-		}
+		}*/
+		return "";
 	}
 }

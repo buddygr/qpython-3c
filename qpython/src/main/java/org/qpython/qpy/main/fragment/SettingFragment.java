@@ -39,6 +39,7 @@ import org.qpython.qpy.R;
 import org.qpython.qpy.main.activity.AboutActivity;
 import org.qpython.qpy.main.activity.HomeMainActivity;
 import org.qpython.qpy.main.app.App;
+import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.main.auxActivity.ProtectActivity;
 import org.qpython.qpy.main.auxActivity.ScreenRecordActivity;
 import org.qpython.qpy.main.service.FTPServerService;
@@ -59,7 +60,7 @@ public class SettingFragment extends PreferenceFragment {
 
     private SharedPreferences settings;
     private Resources         resources;
-    private Preference        mPassWordPref, username_pref, portnum_pref, chroot_pref, lastlog, ipaddress;
+    private Preference        mPassWordPref, username_pref, portnum_pref, chroot_pref, lastlog, ipaddress, qpyCustom;
     private CheckBoxPreference sl4a, running_state, root, display_pwd, qpy_protect;//, notebook_run;
 
     //private PreferenceScreen py_inter,notebook_page;
@@ -177,6 +178,7 @@ public class SettingFragment extends PreferenceFragment {
 
 
         root = (CheckBoxPreference) findPreference(resources.getString(R.string.key_root));
+        qpyCustom = findPreference(resources.getString(R.string.qpy_custom_dir));
         sl4a = (CheckBoxPreference) findPreference(resources.getString(R.string.key_sl4a));
         qpy_protect = (CheckBoxPreference) findPreference("qpython_protect");
         app = (SwitchPreference) findPreference(getString(R.string.key_hide_push));
@@ -215,6 +217,7 @@ public class SettingFragment extends PreferenceFragment {
                 resources.getString(org.swiftp.R.string.portnumber_default)));
         chroot_pref.setSummary(settings.getString(resources.getString(R.string.key_root_dir),
                 Environment.getExternalStorageDirectory().getPath()));
+        qpyCustom.setSummary(CONF.CUSTOM_PATH);
 
         //py_inter.setSummary(NAction.isQPy3(getActivity()) ? R.string.py3_now : R.string.py2_now);
         //setNotebookCheckbox();
@@ -259,7 +262,7 @@ public class SettingFragment extends PreferenceFragment {
     private void initListener() {
 
         lastlog.setOnPreferenceClickListener(preference -> {
-            File logFolder = new File(Environment.getExternalStorageDirectory(),"qpython/log");
+            File logFolder = new File(CONF.SCOPE_STORAGE_PATH,"log");
             String[] logFiles = logFolder.list();
             if (logFiles == null || logFiles.length==0){return false;}
             android.app.AlertDialog.Builder alert;
@@ -369,12 +372,12 @@ public class SettingFragment extends PreferenceFragment {
                 return true;
             });
 
-        findPreference("course_official").
+        /*findPreference("course_official").
             setOnPreferenceClickListener(preference ->
             {
                 viewWebSite(R.string.qpython_edu);
                 return true;
-            });
+            });*/
 
         findPreference("community").
             setOnPreferenceClickListener(preference ->
@@ -386,7 +389,7 @@ public class SettingFragment extends PreferenceFragment {
         findPreference("video_account").
                 setOnPreferenceClickListener(preference ->
                 {
-                    viewWebSite(R.string.bilibili_video_website);
+                    viewWebSite(R.string.wechat_video_website);
                     return true;
                 });
 
@@ -525,6 +528,30 @@ public class SettingFragment extends PreferenceFragment {
 
         });
 
+        qpyCustom.setOnPreferenceClickListener(preference ->
+
+        {
+            new EnterDialog(getActivity())
+                    .setTitle(preference.getKey())
+                    .setText(preference.getSummary().toString())
+                    .setConfirmListener(name -> {
+                        if (preference.getSummary().equals(name)) {
+                            return true;
+                        }
+                        File customTest = new File(name);
+                        if (!(customTest.isDirectory() && customTest.canRead())) {
+                            Toast.makeText(getActivity(), R.string.dir_not_valid, Toast.LENGTH_SHORT).show();
+                            return false;
+                        }
+                        CONF.CUSTOM_PATH = customTest.getAbsolutePath();
+                        preference.setSummary(CONF.CUSTOM_PATH);
+                        updatePreference(preference);
+                        return true;
+                    })
+                    .show();
+            return true;
+        });
+
         final CheckBoxPreference wakelock_pref = (CheckBoxPreference) findPreference(resources.getString(R.string.key_stay_awake));
         wakelock_pref.setOnPreferenceChangeListener((preference, newValue) ->
         {
@@ -608,7 +635,7 @@ public class SettingFragment extends PreferenceFragment {
 
 
     private void releaseQPycRes(String path) {
-        final String extarget = QPyConstants.PY_CACHE_PATH;
+        final String extarget = CONF.PY_CACHE_PATH;
 
         if (path!=null && !path.equals("")) {
             File res = new File(path);
@@ -935,7 +962,7 @@ public class SettingFragment extends PreferenceFragment {
                         final String vercode = result.getString("vercode");
                         final String title = result.getString("title");
                         final String vername = result.getString("vername");
-                        final String path = QPyConstants.PY_CACHE_PATH + "/" + target;
+                        final String path = CONF.PY_CACHE_PATH + "/" + target;
 
                         NStorage.setSP(App.getContext(), QPyConstants.KEY_PY3_RES, path);
 
@@ -1020,7 +1047,7 @@ public class SettingFragment extends PreferenceFragment {
         boolean isRelease = true;
         String[] py3Mp3File = getActivity().getResources().getStringArray(R.array.qpy3_zip);
         for (String s : py3Mp3File) {
-            isRelease = isRelease && new File(QPyConstants.PY_CACHE_PATH + "/" + s).exists();
+            isRelease = isRelease && new File(CONF.PY_CACHE_PATH + "/" + s).exists();
         }
         return isRelease;
     }
@@ -1039,14 +1066,14 @@ public class SettingFragment extends PreferenceFragment {
      */
     private void extractQPyCore(Boolean ispy2Compatible) {
         QPySDK qpySDK = new QPySDK(getActivity(), getActivity());
-        File libFolder = new File(QPyConstants.ABSOLUTE_PATH, QPyConstants.PY_CACHE);
+        File libFolder = new File(CONF.SCOPE_STORAGE_PATH, QPyConstants.PY_CACHE);
         String[] pyMp3File = getActivity().getResources().getStringArray(R.array.qpy3_zip);
 
         for (String s : pyMp3File) {
 
             File unzipFile = new File(libFolder, s);
             if (s.contains("public")) {
-                File externalStorage = new File(QPyConstants.ABSOLUTE_PATH);
+                File externalStorage = new File(CONF.SCOPE_STORAGE_PATH);
 
                 qpySDK.extractRes(unzipFile, new File(externalStorage + "/lib"), false);
 

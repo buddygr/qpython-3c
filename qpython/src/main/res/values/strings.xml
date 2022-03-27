@@ -718,12 +718,14 @@
     <string name="set">Set</string>
     <string name="course_official">Course Official</string>
     <string name="edu_qpy_org">edu.qpython.org</string>
-    <string name="video_account_bili">Official Video Account (Bilibili)</string>
+    <string name="video_account_wechat">Official Video Account (WeChat)</string>
     <string name="bili_com">bilibili.com</string>
-    <string name="bilibili_video_website">https://space.bilibili.com/1357778956</string>
+    <string name="wechat_video_website">https://mp.weixin.qq.com/s/gWbEIxaux7BewTMNtRTKJw</string>
     <string name="sl4a_gui_console">Python SL4A GUI Console</string>
     <string name="color_python_interpreter">Color Python Interpreter</string>
     <string name="tradition_bug">There are too many bugs in the traditional terminal. It is recommended to use it only for testing.</string>
     <string name="python_shell_terminal">Python Color Shell Terminal</string>
+    <string name="wechat_com">mp.weixin.qq.com</string>
+    <string name="qpy_custom_dir">QPython Custom Directory</string>
 
 </resources>

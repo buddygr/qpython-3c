@@ -23,6 +23,15 @@ public class FolderBean {
         path = file.getAbsolutePath();
     }
 
+    public FolderBean(File file,String nName) {
+        this.file = file;
+        type = file.isDirectory() ? FileType.FOLDER : FileType.FILE;
+        path = file.getAbsolutePath();
+        if (nName.equals(""))
+            name = path;
+        else name = nName;
+    }
+
     public FileType getFolder() {
         return path.contains("/projects") ? FileType.PROJECT : FileType.SCRIPT;
     }

@@ -8,10 +8,12 @@ import android.os.Build;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
 import android.support.annotation.RequiresApi;
+import android.support.v4.provider.DocumentFile;
 import android.util.Base64;
 
 import com.quseit.util.DocumentsUtils;
 
+import org.json.JSONArray;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
 import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
@@ -124,6 +126,18 @@ public class DocumentFileFacade extends RpcReceiver {
             @RpcParameter(name = "dest") String dest)
             throws Exception{
         DocumentsUtils.copy(context,new File(src),new File(dest));
+    }
+
+    @Rpc(description = "Document File List Files .")
+    public JSONArray documentFileListFiles (
+            @RpcParameter(name = "folder") String folder
+    ) throws Exception {
+        JSONArray jsonArray = new JSONArray();
+        String[] S = DocumentsUtils.listFiles(context,new File(folder));
+        if(S==null) return null;
+        for (String s : S)
+            jsonArray.put(s);
+        return jsonArray;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)

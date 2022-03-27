@@ -1,5 +1,9 @@
 package org.qpython.qpy.main.fragment;
 
+import static android.content.Context.MODE_PRIVATE;
+import static org.qpython.qpy.codeshare.CONSTANT.CLOUDED_MAP;
+import static org.qpython.qpy.codeshare.CONSTANT.IS_UPLOAD_INIT;
+
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
@@ -7,47 +11,33 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.gson.reflect.TypeToken;
-import com.quseit.util.DateTimeHelper;
 import com.quseit.util.ImageUtil;
 import com.yanzhenjie.recyclerview.swipe.SwipeMenuCreator;
 import com.yanzhenjie.recyclerview.swipe.SwipeMenuItem;
 
 import org.qpython.qpy.R;
-import org.qpython.qpy.codeshare.ShareCodeUtil;
 import org.qpython.qpy.codeshare.pojo.CloudFile;
 import org.qpython.qpy.databinding.FragmentRefreshRvBinding;
 import org.qpython.qpy.main.adapter.CloudScriptAdapter;
 import org.qpython.qpy.main.app.App;
 import org.qpython.qpy.main.app.CONF;
-import org.qpython.qpy.main.event.ShareCodeCallback;
-import org.qpython.qpy.texteditor.TedLocalActivity;
-import org.qpython.qpysdk.QPyConstants;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
-
-import static android.content.Context.MODE_PRIVATE;
-import static org.qpython.qpy.codeshare.CONSTANT.CLOUDED_MAP;
-import static org.qpython.qpy.codeshare.CONSTANT.IS_UPLOAD_INIT;
 
 public class MyProjectFragment extends Fragment {
     private int WIDTH = (int) ImageUtil.dp2px(60);
@@ -114,9 +104,9 @@ public class MyProjectFragment extends Fragment {
             HashMap<String, Boolean> clouded = new HashMap<>();
             for (CloudFile cloudFile : cloudFiles) {
                 if (cloudFile.getPath().contains("/projects/")) {
-                    clouded.put(CONF.ABSOLUTE_PATH + "/projects/" + cloudFile.getProjectName(), true);
+                    clouded.put(CONF.SCOPE_STORAGE_PATH + "/projects/" + cloudFile.getProjectName(), true);
                 }
-                clouded.put(CONF.ABSOLUTE_PATH + cloudFile.getPath(), true);
+                clouded.put(CONF.SCOPE_STORAGE_PATH + cloudFile.getPath(), true);
             }
             SharedPreferences sp = getActivity().getPreferences(MODE_PRIVATE);
             Type type = new TypeToken<HashMap<String, Boolean>>() {
@@ -180,7 +170,7 @@ public class MyProjectFragment extends Fragment {
                 case 0:
                     CloudFile cloudFile = scriptList.get(menuBridge.getAdapterPosition());
                     String path;
-                    path = QPyConstants.ABSOLUTE_PATH + cloudFile.getPath();
+                    path = CONF.SCOPE_STORAGE_PATH + cloudFile.getPath();
                     File file = new File(path);
                     if (file.exists()) {
 //                        new AlertDialog.Builder(getContext(), R.style.MyDialog)

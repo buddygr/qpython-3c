@@ -105,7 +105,7 @@ public class JsonBuilder {
         if (data instanceof ScanResult) {
             return buildJsonScanResult((ScanResult) data);
         }
-        if (data instanceof CellLocation) {
+        /*if (data instanceof CellLocation) {
             return buildJsonCellLocation((CellLocation) data);
         }
         if (data instanceof WifiInfo) {
@@ -116,7 +116,7 @@ public class JsonBuilder {
         }
         if (data instanceof InetSocketAddress) {
             return buildInetSocketAddress((InetSocketAddress) data);
-        }
+        }*/
         if (data instanceof byte[]) {
             return Base64Codec.encodeBase64((byte[]) data);
         }
@@ -135,12 +135,12 @@ public class JsonBuilder {
         return result;
     }
 
-    private static Object buildInetSocketAddress(InetSocketAddress data) {
+    /*private static Object buildInetSocketAddress(InetSocketAddress data) {
         JSONArray address = new JSONArray();
         address.put(data.getHostName());
         address.put(data.getPort());
         return address;
-    }
+    }*/
 
     private static <T> JSONArray buildJsonList(final List<T> list) throws JSONException {
         JSONArray result = new JSONArray();
@@ -228,7 +228,7 @@ public class JsonBuilder {
         return result;
     }
 
-    private static JSONObject buildJsonCellLocation(CellLocation cellLocation) throws JSONException {
+    /*private static JSONObject buildJsonCellLocation(CellLocation cellLocation) throws JSONException {
         JSONObject result = new JSONObject();
         if (cellLocation instanceof GsmCellLocation) {
             GsmCellLocation location = (GsmCellLocation) cellLocation;
@@ -298,5 +298,5 @@ public class JsonBuilder {
         result.put("cid", data.getCid());
         result.put("rssi", data.getRssi());
         return result;
-    }
+    }*/
 }

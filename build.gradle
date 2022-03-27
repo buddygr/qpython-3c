@@ -93,7 +93,7 @@ ext {
 
     minSdkVersion = 21
     targetSdkVersion = 28
-    compileSdkVersion = 31
+    compileSdkVersion = 32
     buildToolsVersion = '28.0.3'
 
     // firebase related https://firebase.google.com/docs/android/setup

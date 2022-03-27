@@ -1,6 +1,7 @@
 package org.qpython.qsl4a.qsl4a.facade;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
@@ -21,11 +22,14 @@ import java.io.File;
  */
 public class QPyInterfaceFacade extends RpcReceiver {
     private final Service mService;
+    private final AndroidFacade mAndroidFacade;
+    private final Context context;
 
     public QPyInterfaceFacade(FacadeManager manager) {
         super(manager);
         mService = manager.getService();
-
+        mAndroidFacade = manager.getReceiver(AndroidFacade.class);
+        context = mAndroidFacade.context;
     }
 
     @Override
@@ -149,7 +153,7 @@ public class QPyInterfaceFacade extends RpcReceiver {
         } else if (isWeb || isQApp) {
             //File script = new File(path);
             */
-        String log = Environment.getExternalStorageDirectory() + "/qpython/log/" + logName;
+        String log = context.getExternalFilesDir("").getParent() + "/log/" + logName;
         File lf = new File(log);
         if (lf.exists()) {
             return "# QPython:getLastLog(ok)\n"

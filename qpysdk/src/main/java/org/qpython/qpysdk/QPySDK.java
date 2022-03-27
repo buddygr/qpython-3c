@@ -86,7 +86,7 @@ public class QPySDK {
         mArguments.add(script);
         String[] argumentsArray = mArguments.toArray(new String[mArguments.size()]);
 
-        final File mLog = new File(String.format("%s", QPyConstants.ABSOLUTE_LOG));
+        final File mLog = new File(String.format("%s", QPyConstants.LEGACY_LOG));
         File logDir = mLog.getParentFile();
 
         mFd = Exec.createSubprocess(binaryPath, argumentsArray, getEnvironmentArray(f.getParentFile() + ""), Environment.getExternalStorageDirectory() + "/", pid);

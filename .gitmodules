@@ -1,3 +1,0 @@
-[submodule "qpysdk/src/main/jni"]
-	path = qpysdk/src/main/jni
-	url = git@github.com:qpython-android/pygamesdl2-jni.git

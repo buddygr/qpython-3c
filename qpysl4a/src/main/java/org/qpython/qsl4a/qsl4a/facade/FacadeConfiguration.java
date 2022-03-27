@@ -16,11 +16,11 @@
 
 package org.qpython.qsl4a.qsl4a.facade;
 
+import android.os.Build;
+
 import com.google.common.collect.Maps;
-import org.qpython.qsl4a.qsl4a.LogUtil;
+
 import org.qpython.qsl4a.qsl4a.facade.ui.UiFacade;
-import org.qpython.qsl4a.qsl4a.facade.VideoFacade;
-import org.qpython.qsl4a.qsl4a.facade.CipherFacade;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.MethodDescriptor;
 import org.qpython.qsl4a.qsl4a.rpc.RpcDeprecated;
@@ -54,15 +54,7 @@ public class FacadeConfiguration {
 
   static {
 
-    if (android.os.Build.VERSION.SDK != null) {
-      try {
-        sSdkLevel = Integer.parseInt(android.os.Build.VERSION.SDK);
-      } catch (NumberFormatException e) {
-        LogUtil.e(e);
-      }
-    } else {
-      sSdkLevel = 8; // For documentation purposes.
-    }
+    sSdkLevel = Build.VERSION.SDK_INT;
 
     sFacadeClassList = new HashSet<Class<? extends RpcReceiver>>();
       sFacadeClassList.add(AndroidFacade.class);
@@ -96,6 +88,7 @@ public class FacadeConfiguration {
       sFacadeClassList.add(WebCamFacade.class);
       sFacadeClassList.add(FloatViewFacade.class);
       sFacadeClassList.add(DocumentFileFacade.class);
+      sFacadeClassList.add(HarmonyOsFacade.class);
 
     for (Class<? extends RpcReceiver> recieverClass : sFacadeClassList) {
       for (MethodDescriptor rpcMethod : MethodDescriptor.collectFrom(recieverClass)) {

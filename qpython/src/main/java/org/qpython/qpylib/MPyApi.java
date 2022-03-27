@@ -25,6 +25,7 @@ import com.quseit.util.FileHelper;
 import com.quseit.util.NUtil;
 
 import org.qpython.qpy.main.activity.BaseActivity;
+import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpysdk.QPyConstants;
 
 import java.io.File;
@@ -45,7 +46,7 @@ public class MPyApi extends BaseActivity {
         }
     };
     private boolean           live       = false;
-    private String            logF       = QPyConstants.ABSOLUTE_LOG;
+    private String            logF       = CONF.ABSOLUTE_LOG;
     private Handler           handler    = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -138,7 +139,7 @@ public class MPyApi extends BaseActivity {
                             } else {
                                 runMode = 1;
                             }
-                            String script = QPyConstants.ABSOLUTE_PATH + "/cache/last.py";
+                            String script = CONF.SCOPE_STORAGE_PATH + "/cache/last.py";
                             FileHelper.putFileContents(this, script, pycode);
                             ScriptExec.getInstance().playScript(this,script, null, false);
                         }
@@ -241,7 +242,7 @@ public class MPyApi extends BaseActivity {
             rBundle.putString("result", result);
             rBundle.putString("param", param);
             rBundle.putString("flag", flag);
-            rBundle.putString("log", QPyConstants.ABSOLUTE_LOG);
+            rBundle.putString("log", CONF.ABSOLUTE_LOG);
 
             rIntent.putExtras(rBundle);
 

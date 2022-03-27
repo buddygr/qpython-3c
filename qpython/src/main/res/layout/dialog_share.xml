@@ -27,7 +27,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:visibility="gone"
-            android:src="@drawable/ic_com_facebook"/>
+            android:src="@drawable/ic_com_delete"/>
 
         <ImageView
             android:id="@+id/twitter_iv"
@@ -36,7 +36,7 @@
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
             android:visibility="gone"
-            android:src="@drawable/ic_com_twitter"/>
+            android:src="@drawable/ic_com_delete"/>
 
         <ImageView
             android:id="@+id/copy_link_iv"

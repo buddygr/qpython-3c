@@ -1,32 +1,22 @@
 package org.qpython.qpy.main.app;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
 import android.support.multidex.MultiDex;
-import android.support.v4.app.NotificationCompat;
 
 import com.google.gson.Gson;
 import com.quseit.common.CrashHandler;
 import com.quseit.common.updater.downloader.DefaultDownloader;
 import com.squareup.leakcanary.LeakCanary;
 
-import org.qpython.qpy.R;
-import org.qpython.qpy.main.activity.HomeMainActivity;
-import org.qpython.qpy.main.auxActivity.ProtectActivity;
 import org.qpython.qpy.main.server.Service;
 import org.qpython.qpy.main.server.gist.Api;
 import org.qpython.qpy.main.server.gist.TokenManager;
 import org.qpython.qpy.main.server.gist.response.GistBean;
 import org.qpython.qpy.main.server.http.Retrofitor;
-import org.qpython.qpysdk.QPyConstants;
 import org.qpython.qsl4a.QSL4APP;
 
 import java.util.ArrayList;
@@ -185,7 +175,7 @@ public class App extends QSL4APP {
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create());
         mService = new Service();
 
-        String basePath = QPyConstants.ABSOLUTE_PATH;
+        String basePath = CONF.SCOPE_STORAGE_PATH;
         sProjectPath = String.format("%s/%s", basePath, "projects");
         sScriptPath = String.format("%s/%s", basePath, "scripts");
 

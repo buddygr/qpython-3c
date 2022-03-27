@@ -90,7 +90,12 @@ public class CommonIntentsFacade extends RpcReceiver {
 
     @Rpc(description = "scan Barcode From Image", returns = "Scan Result String .")
     public String scanBarcodeFromImage(
-            @RpcParameter(name = "path") String path
+            @RpcParameter(name = "path") String path,
+            @RpcParameter(name = "sampleSize") @RpcDefault("0") Integer sampleSize,
+            @RpcParameter(name = "x") @RpcDefault("0") Integer x,
+            @RpcParameter(name = "y") @RpcDefault("0") Integer y,
+            @RpcParameter(name = "width") @RpcDefault("0") Integer width,
+            @RpcParameter(name = "height") @RpcDefault("0") Integer height
     ) throws Exception {
         if (TextUtils.isEmpty(path)) {
             return null;
@@ -104,14 +109,25 @@ public class CommonIntentsFacade extends RpcReceiver {
         options.inJustDecodeBounds = true; // 先获取原大小
         Bitmap scanBitmap = BitmapFactory.decodeFile(path, options);
         options.inJustDecodeBounds = false; // 获取新的大小
-        int sampleSize = (int) (options.outHeight / (float) 200);
-        if (sampleSize <= 0)
-            sampleSize = 1;
+        if (sampleSize == 0)
+            sampleSize = 1;//(int) (options.outHeight / (float) 200);
+        //if (sampleSize <= 0)
+        //    sampleSize = 1;
         options.inSampleSize = sampleSize;
         scanBitmap = BitmapFactory.decodeFile(path, options);
-        int[] data = new int[scanBitmap.getWidth() * scanBitmap.getHeight()];
-        scanBitmap.getPixels(data, 0, scanBitmap.getWidth(), 0, 0, scanBitmap.getWidth(), scanBitmap.getHeight());
-        RGBLuminanceSource source = new RGBLuminanceSource(scanBitmap.getWidth(),scanBitmap.getHeight(),data);
+        if(width == 0)
+            width = scanBitmap.getWidth();
+        else width = (int) width / sampleSize;
+        if(height == 0)
+            height = scanBitmap.getHeight();
+        else height = (int) height / sampleSize;
+        if (x != 0)
+            x = (int) x / sampleSize;
+        if (y != 0)
+            y = (int) y / sampleSize;
+        int[] data = new int[width * height];
+        scanBitmap.getPixels(data, 0, width, x, y, width, height);
+        RGBLuminanceSource source = new RGBLuminanceSource(width,height,data);
         BinaryBitmap bitmap1 = new BinaryBitmap(new HybridBinarizer(source));
         QRCodeReader reader = new QRCodeReader();
         return reader.decode(bitmap1, hints).toString();

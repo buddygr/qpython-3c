@@ -23,15 +23,16 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
+import android.hardware.Camera;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
+import android.media.CamcorderProfile;
 import android.media.Image;
 import android.media.ImageReader;
 import android.media.MediaRecorder;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
@@ -40,9 +41,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.view.WindowManager;
-import android.widget.Toast;
 
-import org.json.JSONException;
 import org.qpython.qsl4a.QSL4APP;
 import org.qpython.qsl4a.qsl4a.FutureActivityTaskExecutor;
 import org.qpython.qsl4a.qsl4a.future.FutureActivityTask;
@@ -55,9 +54,13 @@ import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A facade for recording media.
@@ -84,6 +87,7 @@ public class MediaRecorderFacade extends RpcReceiver {
   static int resultCodeMP;
   static MediaProjection mediaProjection;
   static MediaRecorder mMediaRecorder;
+  static Camera camera;
 
   public MediaRecorderFacade(FacadeManager manager) {
     super(manager);
@@ -128,6 +132,11 @@ public class MediaRecorderFacade extends RpcReceiver {
     if (mediaProjection!=null){
       mediaProjection.stop();
       mediaProjection=null;
+    } else if (camera!=null) {
+      camera.lock();
+      camera.stopPreview();
+      camera.release();
+      camera=null;
     }
   }
 
@@ -176,6 +185,7 @@ public class MediaRecorderFacade extends RpcReceiver {
           public void surfaceCreated(SurfaceHolder holder) {
             try {
               mMediaRecorder.setPreviewDisplay(view.getHolder().getSurface());
+              //camera.startPreview();
               mMediaRecorder.prepare();
               setResult(null);
             } catch (IOException e) {
@@ -313,14 +323,14 @@ public class MediaRecorderFacade extends RpcReceiver {
     mMediaRecorder.start();
   }
 
-  @Rpc(description = "Starts an activity for screen record .")
+  /*@Rpc(description = "Starts an activity for screen record .")
   public String screenRecord() throws JSONException {
     Intent intent = mAndroidFacade.startActivityForResult(
             "android.intent.action.VIEW", null, null, null,
             context.getPackageName(), "org.qpython.qpy.main.auxActivity.ScreenRecordActivity");
     //mMediaRecorder = intent.getParcelableExtra("mediaRecorder");
     return intent.getStringExtra("path");
-  }
+  }*/
 
   @Rpc(description = "Capture ScreenShot .")
   public String imageReaderGetScreenShot(
@@ -397,6 +407,100 @@ public class MediaRecorderFacade extends RpcReceiver {
   }*/
   return path;
   }
+
+  @Rpc(description = "Records video from the camera and saves it to the given location.")
+  public String recorderCaptureVideo(
+          @RpcParameter(name = "targetPath") String targetPath,
+          //default duration 10 seconds
+          @RpcParameter(name = "duration") @RpcDefault("10") Integer duration,
+          //cameraId: back==0, front==1
+          @RpcParameter(name = "cameraId") @RpcDefault("0") Integer cameraId,
+          //CamcorderProfile.QUALITY_2160P == 8
+          @RpcParameter(name = "quality") @RpcDefault("8") Integer quality
+  ) throws Exception {
+    int ms = convertSecondsToMilliseconds(duration);
+    try {
+      startVideoRecording(new File(targetPath), ms, cameraId, quality);
+    } catch (Exception e) {
+      throw new Exception(Arrays.toString(e.getStackTrace()));
+    }
+    return targetPath;
+  }
+
+  private void startVideoRecording(File file, int milliseconds, int cameraId, int quality) throws Exception {
+    camera = Camera.open(cameraId);
+    mMediaRecorder = new MediaRecorder();
+    camera.unlock();
+      mMediaRecorder.setCamera(camera);
+      mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+      //mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+    mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+    //mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+    //mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+    mMediaRecorder.setProfile(CamcorderProfile.get(quality));
+      //mMediaRecorder.setVideoSize(width,height);
+    mMediaRecorder.setOutputFile(file.getAbsolutePath());
+    if (milliseconds > 0) {
+      mMediaRecorder.setMaxDuration(milliseconds);
+    }
+    FutureActivityTask<Exception> prepTask = prepare();
+    mMediaRecorder.start();
+    if (milliseconds > 0) {
+      new CountDownLatch(1).await(milliseconds, TimeUnit.MILLISECONDS);
+    }
+    prepTask.finish();
+    recorderStop();
+  }
+
+  /*@Rpc(description = "Records video (and optionally audio) from the camera and saves it to the given location. "
+          + "\nDuration specifies the maximum duration of the recording session. "
+          + "\nIf duration is not provided this method will return immediately and the recording will only be stopped "
+          + "\nwhen recorderStop is called or when a scripts exits. "
+          + "\nOtherwise it will block for the time period equal to the duration argument.")
+  public void recorderCaptureVideo(@RpcParameter(name = "targetPath") String targetPath,
+                                   @RpcParameter(name = "duration") @RpcOptional Integer duration,
+                                   @RpcParameter(name = "recordAudio") @RpcDefault("true") Boolean recordAudio) throws Exception {
+    int ms = convertSecondsToMilliseconds(duration);
+    startVideoRecording(new File(targetPath), ms, recordAudio);
+  }
+
+  private void startVideoRecording(File file, int milliseconds, boolean withAudio) throws Exception {
+    mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+    if (withAudio) {
+      int audioSource = MediaRecorder.AudioSource.MIC;
+      try {
+        Field source =
+                Class.forName("android.media.MediaRecorder$AudioSource").getField("CAMCORDER");
+        audioSource = source.getInt(null);
+      } catch (Exception e) {
+        //LogUtil.e(e);
+      }
+      mMediaRecorder.setAudioSource(audioSource);
+      mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+      mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+    } else {
+      mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+    }
+    mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
+    mMediaRecorder.setOutputFile(file.getAbsolutePath());
+    if (milliseconds > 0) {
+      mMediaRecorder.setMaxDuration(milliseconds);
+    }
+    FutureActivityTask<Exception> prepTask = prepare();
+    mMediaRecorder.start();
+    if (milliseconds > 0) {
+      new CountDownLatch(1).await(milliseconds, TimeUnit.MILLISECONDS);
+    }
+    prepTask.finish();
+  }*/
+
+  private int convertSecondsToMilliseconds(Integer seconds) {
+    if (seconds == null) {
+      return 0;
+    }
+    return (int) (seconds * 1000L);
+  }
+
   }
 
 

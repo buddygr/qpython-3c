@@ -1,0 +1,9 @@
+*.iml
+.gradle
+build
+__MACOSX
+.idea
+keystore
+.DS_Store
+local.properties
+*.apk

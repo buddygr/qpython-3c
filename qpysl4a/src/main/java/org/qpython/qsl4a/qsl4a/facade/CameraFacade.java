@@ -20,12 +20,23 @@ import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.Camera;
+import android.hardware.Camera.AutoFocusCallback;
+import android.hardware.Camera.Parameters;
+import android.hardware.Camera.PictureCallback;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.WindowManager;
 
+import org.qpython.qsl4a.QSL4APP;
+import org.qpython.qsl4a.qsl4a.FileUtils;
+import org.qpython.qsl4a.qsl4a.FutureActivityTaskExecutor;
+import org.qpython.qsl4a.qsl4a.LogUtil;
+import org.qpython.qsl4a.qsl4a.future.FutureActivityTask;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
 import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
@@ -33,8 +44,13 @@ import org.qpython.qsl4a.qsl4a.rpc.RpcOptional;
 import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.CountDownLatch;
 
 
 /**
@@ -44,43 +60,48 @@ import java.util.Date;
 public class CameraFacade extends RpcReceiver {
 
   private final Service mService;
- // private final Parameters mParameters;
+  private final Parameters mParameters;
 
   private final String sdcard;
   private final AndroidFacade mAndroidFacade;
   private final Context context;
   private final String qpyProvider;
 
-  /*private class BooleanResult {
+  private class BooleanResult {
     boolean mmResult = false;
-  }*/
+  }
 
   public CameraFacade(FacadeManager manager) {
     super(manager);
     mService = manager.getService();
-    /*
+
     Camera camera = Camera.open();
     try {
       mParameters = camera.getParameters();
     } finally {
       camera.release();
-    }*/
+    }
     mAndroidFacade = manager.getReceiver(AndroidFacade.class);
     sdcard = Environment.getExternalStorageDirectory().toString();
     context = mAndroidFacade.context;
     qpyProvider = mAndroidFacade.qpyProvider;
   }
 
-  /* 乘着船：过时淘汰
   @Rpc(description = "Take a picture and save it to the specified path.", returns = "A map of Booleans autoFocus and takePicture where True indicates success.")
-  public Bundle cameraCapturePicture(@RpcParameter(name = "targetPath") final String targetPath,
-      @RpcParameter(name = "useAutoFocus") @RpcDefault("true") Boolean useAutoFocus)
-      throws InterruptedException {
+  public String cameraCapturePicture(@RpcParameter(name = "targetPath") final String targetPath,
+                                     //cameraId: back==0, front==1
+                                     @RpcParameter(name = "cameraId") @RpcDefault("0") Integer cameraId,
+                                     @RpcParameter(name = "useAutoFocus") @RpcDefault("true") Boolean useAutoFocus)
+          throws Exception {
     final BooleanResult autoFocusResult = new BooleanResult();
     final BooleanResult takePictureResult = new BooleanResult();
 
-    Camera camera = Camera.open();
-    camera.setParameters(mParameters);
+    Camera camera = Camera.open(cameraId);
+    try{
+      camera.setParameters(mParameters);
+    } catch (Exception e){
+      //throw new Exception(Arrays.toString(e.getStackTrace()));
+    }
 
     try {
       Method method = camera.getClass().getMethod("setDisplayOrientation", int.class);
@@ -103,10 +124,11 @@ public class CameraFacade extends RpcReceiver {
       camera.release();
     }
 
-    Bundle result = new Bundle();
+    /*Bundle result = new Bundle();
     result.putBoolean("autoFocus", autoFocusResult.mmResult);
     result.putBoolean("takePicture", takePictureResult.mmResult);
-    return result;
+    return result;*/
+    return targetPath;
   }
 
   private FutureActivityTask<SurfaceHolder> setPreviewDisplay(Camera camera) throws IOException,
@@ -121,7 +143,7 @@ public class CameraFacade extends RpcReceiver {
         getActivity().getWindow().setSoftInputMode(
             WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED);
         view.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        view.getHolder().addCallback(new Callback() {
+        view.getHolder().addCallback(new SurfaceHolder.Callback() {
           @Override
           public void surfaceDestroyed(SurfaceHolder holder) {
           }
@@ -190,7 +212,7 @@ public class CameraFacade extends RpcReceiver {
     }
   }
 
-  @Rpc(description = "Starts the image capture application to take a picture and saves it to the specified path.")
+  /*@Rpc(description = "Starts the image capture application to take a picture and saves it to the specified path.")
   public void cameraInteractiveCapturePicture(
       @RpcParameter(name = "targetPath") final String targetPath) {
     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -203,9 +225,8 @@ public class CameraFacade extends RpcReceiver {
     } else {
       LogUtil.e("No camera found");
     }
-  }
+  }*/
 
-   */
 
   @Override
   public void shutdown() {

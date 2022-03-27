@@ -47,6 +47,16 @@ public class FolderAdapter extends RecyclerView.Adapter<MyViewHolder<ItemFolderB
             }
         }
         binding.tvFileName.setText(item.getName());
+        if (item.getName().contains("/")){
+            switch (item.getType()) {
+                case FILE:
+                    binding.ivFileIcon.setImageResource(R.drawable.ic_editor_file_2);
+                    break;
+                case FOLDER:
+                    binding.ivFileIcon.setImageResource(R.drawable.ic_editor_folder_2);
+                    break;
+            }
+        } else {
         switch (item.getType()) {
             case FILE:
                 binding.ivFileIcon.setImageResource(R.drawable.ic_editor_file);
@@ -54,7 +64,7 @@ public class FolderAdapter extends RecyclerView.Adapter<MyViewHolder<ItemFolderB
             case FOLDER:
                 binding.ivFileIcon.setImageResource(R.drawable.ic_editor_folder);
                 break;
-        }
+        }}
         if (cloudMap != null) {
             if (cloudMap.containsKey(item.getPath())) {
                 if (item.getFile().isDirectory()) {

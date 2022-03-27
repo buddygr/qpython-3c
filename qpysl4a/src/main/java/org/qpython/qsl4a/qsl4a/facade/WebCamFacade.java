@@ -47,6 +47,7 @@ import android.view.SurfaceView;
 import android.view.WindowManager;
 import android.view.SurfaceHolder.Callback;
 
+import org.json.JSONArray;
 import org.qpython.qsl4a.QSL4APP;
 import org.qpython.qsl4a.qsl4a.FutureActivityTaskExecutor;
 import org.qpython.qsl4a.qsl4a.LogUtil;
@@ -187,18 +188,25 @@ private byte[] compressYuvToJpeg(final byte[] yuvData) {
   }
 
   @Rpc(description = "Starts an MJPEG stream and returns a Tuple of address and port for the stream.")
-  public InetSocketAddress webcamStart(
+  public Object webcamStart(
       @RpcParameter(name = "resolutionLevel", description = "increasing this number provides higher resolution") @RpcDefault("0") Integer resolutionLevel,
       @RpcParameter(name = "jpegQuality", description = "a number from 0-100") @RpcDefault("20") Integer jpegQuality,
       @RpcParameter(name = "port", description = "If port is specified, the webcam service will bind to port, otherwise it will pick any available port.") @RpcDefault("0") Integer port)
       throws Exception {
     try {
       openCamera(resolutionLevel, jpegQuality);
-      return startServer(port);
+      return buildInetSocketAddress(startServer(port));
     } catch (Exception e) {
       webcamStop();
       throw e;
     }
+  }
+
+  private static Object buildInetSocketAddress(InetSocketAddress data) {
+    JSONArray address = new JSONArray();
+    address.put(data.getHostName());
+    address.put(data.getPort());
+    return address;
   }
 
   private InetSocketAddress startServer(Integer port) {

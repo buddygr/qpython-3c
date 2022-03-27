@@ -36,6 +36,7 @@ import org.qpython.qpy.R;
 import org.qpython.qpy.console.ScriptExec;
 import org.qpython.qpy.databinding.ActivityQwebviewBinding;
 import org.qpython.qpy.main.app.App;
+import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.main.event.Bean;
 import org.qpython.qpy.main.utils.Utils;
 import org.qpython.qpysdk.QPyConstants;
@@ -71,7 +72,7 @@ public class QWebViewActivity extends BaseActivity {
     protected            String wvCookie     = "";
     protected            String wvDocument   = "";
     private              String launchScript = "";
-    private              String logPath      = QPyConstants.WEB_LOG;
+    private              String logPath      = CONF.WEB_LOG;
 
     protected ValueCallback<Uri> mUploadMessage;
 

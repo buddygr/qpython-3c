@@ -508,7 +508,7 @@
     <string name="security_tip">开源软件安全提示：本软件不会收集任何用户信息，您可以根据自身情况授予相应权限，未被授予的权限将会失去对应功能。但使用本软件如果出现安全漏洞，软件开发者可能没时间也无力修复，继续使用意味着自行承担与此相关安全风险，与软件开发者无关。</string>
     <string name="set">设置</string>
     <string name="ignore">忽略</string>
-    <string name="video_account_bili">官方视频号 (B站)</string>
+    <string name="video_account_wechat">官方视频号 (微信)</string>
     <string name="course_official">官方课程</string>
     <string name="sl4a_gui_console">Python SL4A GUI 终端</string>
     <string name="color_python_interpreter">彩色Python解释器</string>
@@ -517,4 +517,5 @@
     <string name="python_shell_terminal">Python 彩色 Shell 终端</string>
     <string name="qr_info">确认</string>
     <string name="qr_goto">你想访问这个URL吗？</string>
+    <string name="qpy_custom_dir">QPython自定义目录</string>
 </resources>

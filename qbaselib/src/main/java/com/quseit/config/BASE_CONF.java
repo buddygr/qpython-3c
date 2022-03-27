@@ -7,7 +7,7 @@ public interface BASE_CONF {
     int[] THREA_STAT = {0,0,0};	//FIXME DOWNLOAD STATUS
 
     boolean DEBUG = false;
-    String UPDATER_URL="https://dl.qpy.io/update.json";
+    //String UPDATER_URL="https://dl.qpy.io/update.json";
     int TRY_COUNT = 3;
     long TRY_DELAY = 1000;
 	int ROUND_PIX = 0;	// IMAGE ROUND PIX

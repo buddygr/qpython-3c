@@ -5,12 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-
 import org.qpython.qpy.R;
 import org.qpython.qpy.codeshare.pojo.CloudFile;
 import org.qpython.qpy.databinding.ItemFolderBinding;
+import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.texteditor.ui.adapter.MyViewHolder;
-import org.qpython.qpysdk.QPyConstants;
 
 import java.io.File;
 import java.util.List;
@@ -50,7 +49,7 @@ public class CloudScriptAdapter extends RecyclerView.Adapter<MyViewHolder<ItemFo
         } else {
             binding.uploading.setVisibility(View.GONE);
         }
-        if (new File(QPyConstants.ABSOLUTE_PATH + cloudFile.getPath()).exists()) {
+        if (new File(CONF.SCOPE_STORAGE_PATH + cloudFile.getPath()).exists()) {
             binding.uploaded.setImageResource(R.drawable.ic_check_circle);
             binding.uploaded.setVisibility(View.VISIBLE);
         } else {

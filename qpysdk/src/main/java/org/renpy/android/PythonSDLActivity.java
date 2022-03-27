@@ -276,7 +276,7 @@ public class PythonSDLActivity extends SDLActivity {
             nativeSetEnv("ANDROID_ARGUMENT", path.getAbsolutePath());
 
         } else {
-            nativeSetEnv("ANDROID_ARGUMENT", QPyConstants.ABSOLUTE_PATH);
+            nativeSetEnv("ANDROID_ARGUMENT", QPyConstants.LEGACY_PATH);
 
         }
 
@@ -323,7 +323,7 @@ public class PythonSDLActivity extends SDLActivity {
             path = getFilesDir();
         }
 
-        nativeSetEnv("ANDROID_LOG", QPyConstants.ABSOLUTE_LOG);
+        nativeSetEnv("ANDROID_LOG", QPyConstants.LEGACY_LOG);
 
         File filesDir = getFilesDir();
         //unpackData("private", getFilesDir());
@@ -331,7 +331,7 @@ public class PythonSDLActivity extends SDLActivity {
 
         nativeSetEnv("ANDROID_ARGUMENT", path.getAbsolutePath());
         nativeSetEnv("ANDROID_PRIVATE", getFilesDir().getAbsolutePath());
-        nativeSetEnv("ANDROID_PUBLIC", QPyConstants.ABSOLUTE_PATH);
+        nativeSetEnv("ANDROID_PUBLIC", QPyConstants.LEGACY_PATH);
         nativeSetEnv("ANDROID_OLD_PUBLIC", oldExternalStorage.getAbsolutePath());
 
         nativeSetEnv("LD_LIBRARY_PATH", ".:"+filesDir+"/lib/"+":"+filesDir+"/:"+filesDir.getParentFile()+"/lib/");

@@ -16,7 +16,6 @@ import org.qpython.qpy.main.activity.QWebViewActivity;
 import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.main.utils.Utils;
 import org.qpython.qpy.texteditor.EditorActivity;
-import org.qpython.qpysdk.QPyConstants;
 
 import java.io.File;
 import java.io.IOException;
@@ -153,7 +152,7 @@ public class Bean {
     public String returnTmpScript(String xcode, String flag, String param) {
         try {
             //
-            File root = new File(QPyConstants.ABSOLUTE_PATH + "/cache");
+            File root = new File(CONF.SCOPE_STORAGE_PATH + "/cache");
             if (root != null) {
                 FileHelper.clearDir(root.toString(), 0, false);
             }
@@ -175,7 +174,7 @@ public class Bean {
                 }
 
             } else {
-                py = QPyConstants.ABSOLUTE_PATH + "/cache/main.py";
+                py = CONF.SCOPE_STORAGE_PATH + "/cache/main.py";
                 if (xcode.contains("#{HEADER}")) {
                     code = xcode.replace("#{HEADER}", "PARAM = '" + param + "'");
 

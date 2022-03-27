@@ -14,17 +14,16 @@ import android.widget.Toast;
 
 import com.quseit.util.FileHelper;
 import com.quseit.util.ImageUtil;
-import com.quseit.util.NAction;
 import com.yanzhenjie.recyclerview.swipe.SwipeMenuCreator;
 import com.yanzhenjie.recyclerview.swipe.SwipeMenuItem;
 
 import org.qpython.qpy.R;
 import org.qpython.qpy.databinding.FragmentRefreshRvBinding;
+import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.texteditor.TedLocalActivity;
 import org.qpython.qpy.texteditor.ui.adapter.FolderAdapter;
 import org.qpython.qpy.texteditor.ui.adapter.bean.FolderBean;
 import org.qpython.qpy.texteditor.ui.view.EnterDialog;
-import org.qpython.qpysdk.QPyConstants;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -40,18 +39,8 @@ public class FileFragment extends Fragment {
     public static final  String PROJECT = "projects";
     public static final  String SCRIPT  = "scripts";
 
-    public static final  String PROJECT3 = "projects3";
-    public static final  String SCRIPT3  = "scripts3";
-
-    //private static final String PROJECT_PATH = QPyConstants.ABSOLUTE_PATH + "/" + PROJECT;
-    //private static final String SCRIPT_PATH  = QPyConstants.ABSOLUTE_PATH + "/" + SCRIPT;
-
-    private static final String PROJECT_PATH3 = QPyConstants.ABSOLUTE_PATH + "/" + PROJECT3;
-    private static final String SCRIPT_PATH3  = QPyConstants.ABSOLUTE_PATH + "/" + SCRIPT3;
-
     private FolderAdapter    adapter;
     private List<FolderBean> dataList;
-    private String           curPath;
 
     public static FileFragment newInstance(String type) {
         FileFragment myFragment = new FileFragment();
@@ -93,26 +82,19 @@ public class FileFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         binding = DataBindingUtil.bind(view);
-        //boolean isQPy = NAction.isQPy3(getContext());
         initView();
         initListener();
         String type = getArguments().getString(TYPE);
-        switch (type != null ? type : SCRIPT) {
-            case SCRIPT:
-                curPath = SCRIPT_PATH3;
-                break;
-            case PROJECT:
-                curPath = PROJECT_PATH3;
-                break;
-        }
+        if (type == null) type = SCRIPT;
 
-        File[] files = new File(curPath).listFiles();
-        boolean skip = false;
+        for (String path : CONF.PATHS()) {
+        File[] files = new File(path+"/"+type+"3").listFiles();
+        boolean skip;
         if (files != null){
             for (File file : files) {
                 skip = true;
                 if (!file.getName().startsWith("."))
-                    if (type == SCRIPT) {
+                    if (type.equals(SCRIPT)) {
                         if (file.isFile()) {
                             skip = false;
                         }
@@ -129,7 +111,7 @@ public class FileFragment extends Fragment {
                         dataList.add(new FolderBean(file));
                     }
             }
-        }
+        }}
         Collections.sort(dataList, (FolderBean o1, FolderBean o2) -> {
             String o1Up = o1.getName().toUpperCase();
             String o2Up = o2.getName().toUpperCase();

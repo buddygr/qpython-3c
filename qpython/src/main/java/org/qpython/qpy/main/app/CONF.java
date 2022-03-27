@@ -1,14 +1,10 @@
 package org.qpython.qpy.main.app;
 
-import com.quseit.util.FileHelper;
-import com.quseit.util.NAction;
-
 import org.qpython.qpysdk.QPyConstants;
 
 public class CONF implements QPyConstants {
 
-    public static final String LIB_DOWNLOAD_TEMP = QPyConstants.ABSOLUTE_PATH + "/cache";
-        public static final String QPYPI_URL         = "https://pypi.org/simple/";
+    public static final String QPYPI_URL         = "https://pypi.org/simple/";
 
     public static final String NOTIFICATION_SP_NAME = "NOTIFICATION_EXTRA";
     public static final String NOTIFICATION_SP_OBJ  = "NOTIFICATION_OBJ";
@@ -30,4 +26,21 @@ public class CONF implements QPyConstants {
     //public static final String qpyccs = binDir + "colorConsole.py";
     public static final String qpypiPath = filesDir + "/lib/"+pyVer+"/site-packages/";
 
+    public static final String packageName = App.getContext().getPackageName();
+    public static final String SCOPE_STORAGE_PATH = App.getContext().getExternalFilesDir("").getParent();
+
+    public static String PY_CACHE_PATH = SCOPE_STORAGE_PATH+"/"+PY_CACHE;
+    public static String ABSOLUTE_LOG = SCOPE_STORAGE_PATH + "/log/last.log";
+    public static String WEB_LOG = SCOPE_STORAGE_PATH + "/log/web.log";
+    public static String QUIET_LOG = SCOPE_STORAGE_PATH + "/log/quiet.log";
+
+    public static final String LIB_DOWNLOAD_TEMP = SCOPE_STORAGE_PATH + "/cache";
+
+    public static String CUSTOM_PATH = LEGACY_PATH;
+
+    public static String[] PATHS(){
+        if (CUSTOM_PATH.equals(LEGACY_PATH))
+            return new String[]{CONF.SCOPE_STORAGE_PATH, QPyConstants.LEGACY_PATH};
+        else return new String[]{CONF.SCOPE_STORAGE_PATH, QPyConstants.LEGACY_PATH, CONF.CUSTOM_PATH};
+    }
 }

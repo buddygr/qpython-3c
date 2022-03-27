@@ -26,7 +26,6 @@ import org.qpython.qpy.main.event.AppsLoader;
 import org.qpython.qpy.main.model.AppModel;
 import org.qpython.qpy.main.model.QPyScriptModel;
 import org.qpython.qpysdk.QPyConstants;
-import org.qpython.qpysdk.QPySDK;
 import org.qpython.qpysdk.utils.Utils;
 
 import java.io.File;
@@ -103,7 +102,7 @@ public class AppListActivity extends BaseActivity implements LoaderManager.Loade
 
         ((TextView) findViewById(R.id.tv_folder_name)).setText(R.string.qpy_app);
         ((TextView) findViewById(R.id.tv_ar_back)).setOnClickListener(view -> finish());
-        getScriptList();
+        getProjectScriptList();
     }
 
     private void getProjectList(File projectFile) {
@@ -122,29 +121,17 @@ public class AppListActivity extends BaseActivity implements LoaderManager.Loade
         }
     }
 
-    private void getScriptList() {
-        try {
-            /*String projectPath = NAction.isQPy3(this.getApplicationContext())?QPyConstants.DFROM_PRJ3:QPyConstants.DFROM_PRJ2;
-            File[] projectFiles = FileHelper.getABSPath(QPyConstants.ABSOLUTE_PATH + "/" + projectPath).listFiles();
-            if (projectFiles != null) {
-                Arrays.sort(projectFiles, FolderUtils.sortByName);
-                dataList.clear();
-                for (File file : projectFiles) {
-                    if (file.isDirectory()) {
-                        if (new File(file,"main.py").exists())
-                            dataList.add(new QPyScriptModel(file));
-                        else {
-                            projectFiles.
-                        }
-                    }
-                }
-            }*/
-            File projectFile = new File(QPyConstants.ABSOLUTE_PATH,QPyConstants.DFROM_PRJ3);
+    private void getProjectScriptList() {
+        for (String path : CONF.PATHS()){
+            File projectFile = new File(path,QPyConstants.DFROM_PRJ3);
             getProjectList(projectFile);
+            getScriptList(path);
+        }
+    }
 
-            String scriptPath = /*NAction.isQPy3(this.getApplicationContext())?*/QPyConstants.DFROM_QPY3;//:QPyConstants.DFROM_QPY2;
-
-            File[] files = FileHelper.getFilesByType(FileHelper.getABSPath(QPyConstants.ABSOLUTE_PATH + "/" + scriptPath));
+    private void getScriptList(String path) {
+        try {
+            File[] files = FileHelper.getFilesByType(new File(path + "/" + QPyConstants.DFROM_QPY3));
             if (files!=null && files.length > 0) {
                 Arrays.sort(files, FolderUtils.sortByName);
                 for (File file : files) {
@@ -152,7 +139,7 @@ public class AppListActivity extends BaseActivity implements LoaderManager.Loade
                 }
             }
             adapter.notifyDataSetChanged();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

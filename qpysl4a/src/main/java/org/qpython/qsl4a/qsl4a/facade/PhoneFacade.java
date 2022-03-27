@@ -28,17 +28,27 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Contacts.PhonesColumns;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import android.telephony.CellIdentityLte;
+import android.telephony.CellIdentityNr;
+import android.telephony.CellIdentityWcdma;
 import android.telephony.CellInfo;
+import android.telephony.CellInfoLte;
+import android.telephony.CellInfoNr;
+import android.telephony.CellInfoWcdma;
 import android.telephony.CellLocation;
+import android.telephony.CellSignalStrengthLte;
+import android.telephony.CellSignalStrengthNr;
+import android.telephony.CellSignalStrengthWcdma;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.telephony.cdma.CdmaCellLocation;
+import android.telephony.gsm.GsmCellLocation;
 
-import com.quseit.base.QBaseActivity;
-
+import org.json.JSONObject;
 import org.qpython.qsl4a.qsl4a.MainThread;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
+import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
 import org.qpython.qsl4a.qsl4a.rpc.RpcOptional;
 import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
 import org.qpython.qsl4a.qsl4a.rpc.RpcStartEvent;
@@ -55,6 +65,7 @@ import java.util.concurrent.Callable;
  *
  * @author Damon Kohler (damonkohler@gmail.com)
  * @author Felix Arends (felix.arends@gmail.com)
+ * 乘着船 修改 2021-2022
  */
 @SuppressWarnings("deprecation")
 public class PhoneFacade extends RpcReceiver {
@@ -64,7 +75,7 @@ public class PhoneFacade extends RpcReceiver {
     private final TelephonyManager mTelephonyManager;
     private final Bundle mPhoneState;
     private final Service mService;
-    private PhoneStateListener mPhoneStateListener;
+    private final PhoneStateListener mPhoneStateListener;
 
     public PhoneFacade(FacadeManager manager) {
         super(manager);
@@ -175,9 +186,57 @@ public class PhoneFacade extends RpcReceiver {
     }
 
     @Rpc(description = "Returns the current cell location.")
-    public CellLocation getCellLocation() throws Exception {
+    public JSONObject getCellLocation() throws Exception {
         check_Access_Fine_Location_Permission();
-        return mTelephonyManager.getCellLocation();
+        //return mTelephonyManager.getCellLocation().toString();
+        JSONObject result = new JSONObject();
+        CellLocation cellLocation = mTelephonyManager.getCellLocation();
+        try{
+            String detail = cellLocation.toString();
+        //result.put("detail",detail);
+        if (cellLocation instanceof GsmCellLocation)
+         {
+            GsmCellLocation location = (GsmCellLocation) cellLocation;
+            result.put("Lac", location.getLac());
+            result.put("Cid", location.getCid());
+        } else {
+            CdmaCellLocation location = (CdmaCellLocation) cellLocation;
+            result.put("Sid", location.getSystemId());
+            result.put("Nid", location.getNetworkId());
+            result.put("Bid", location.getBaseStationId());
+        }
+        List<CellInfo> cellInfos = mTelephonyManager.getAllCellInfo();
+        result.put("CellCount",cellInfos.size());
+        for (CellInfo cellInfo : cellInfos) {
+            if(!cellInfo.isRegistered()) continue;
+            //获取NR/LTE/WCDMA小区和信号信息
+            if (Build.VERSION.SDK_INT >= 29 && cellInfo instanceof CellInfoNr){
+                CellIdentityNr nrCellInfoIdetity = (CellIdentityNr) ((CellInfoNr) cellInfo).getCellIdentity();
+                    result.put("Nci",nrCellInfoIdetity.getNci());
+                    result.put("Pci",nrCellInfoIdetity.getPci());
+                    result.put("Tac",nrCellInfoIdetity.getTac());
+                    CellSignalStrengthNr cellSignalStrengthNr = (CellSignalStrengthNr) ((CellInfoNr) cellInfo).getCellSignalStrength();
+                    result.put("DbmNr",cellSignalStrengthNr.getDbm());
+                }
+            else if (cellInfo instanceof CellInfoLte){
+                CellIdentityLte lteCellInfoIdetity = ((CellInfoLte) cellInfo).getCellIdentity();
+                    result.put("Ci", lteCellInfoIdetity.getCi());
+                    result.put("Pci",lteCellInfoIdetity.getPci());
+                    result.put("Tac",lteCellInfoIdetity.getTac());
+                    CellSignalStrengthLte cellSignalStrengthLte = ((CellInfoLte) cellInfo).getCellSignalStrength();
+                    result.put("DbmLte",cellSignalStrengthLte.getDbm());
+                }
+            else if (cellInfo instanceof CellInfoWcdma){
+            CellIdentityWcdma wcdmaCellInfoIdetity = ((CellInfoWcdma) cellInfo).getCellIdentity();
+            result.put("Lac",wcdmaCellInfoIdetity.getLac());
+            result.put("Cid",wcdmaCellInfoIdetity.getCid());
+            CellSignalStrengthWcdma cellSignalStrengthWcdma = ((CellInfoWcdma) cellInfo).getCellSignalStrength();
+            result.put("DbmWcdma",cellSignalStrengthWcdma.getDbm());
+        }}
+        return result;
+       } catch (Exception e){
+           throw new Exception("getCellLocation can't get any information because of No Location Permission or Completely No Signal .");
+       }
     }
 
     @Rpc(description = "Returns the numeric name (MCC+MNC) of current registered operator.")
@@ -203,13 +262,13 @@ public class PhoneFacade extends RpcReceiver {
         check_Read_Phone_State_Permission();
         int networkType;
         //if (Build.VERSION.SDK_INT >= 24) {
-            networkType = mTelephonyManager.getDataNetworkType();
+        networkType = mTelephonyManager.getDataNetworkType();
         //} else {
         //    networkType = mTelephonyManager.getNetworkType();
         //}
         switch (networkType) {
-            case TelephonyManager.NETWORK_TYPE_IWLAN:
-                return "WIFI";
+            //case TelephonyManager.NETWORK_TYPE_IWLAN:
+                //return "WIFI";
             case TelephonyManager.NETWORK_TYPE_NR:
                 return "5G";
             case TelephonyManager.NETWORK_TYPE_LTE:
@@ -217,20 +276,24 @@ public class PhoneFacade extends RpcReceiver {
             case TelephonyManager.NETWORK_TYPE_HSDPA:
             case TelephonyManager.NETWORK_TYPE_HSUPA:
             case TelephonyManager.NETWORK_TYPE_HSPA:
+                return "3G HSPA";
             case TelephonyManager.NETWORK_TYPE_HSPAP:
-            case TelephonyManager.NETWORK_TYPE_TD_SCDMA:
+                return "3G HSPA+";
             case TelephonyManager.NETWORK_TYPE_UMTS:
+                return "3G UMTS";
+            case TelephonyManager.NETWORK_TYPE_TD_SCDMA:
             case TelephonyManager.NETWORK_TYPE_EHRPD:
             case TelephonyManager.NETWORK_TYPE_EVDO_0:
             case TelephonyManager.NETWORK_TYPE_EVDO_A:
             case TelephonyManager.NETWORK_TYPE_EVDO_B:
-                return "3G";
+                return "3G Other";
             case TelephonyManager.NETWORK_TYPE_GSM:
             case TelephonyManager.NETWORK_TYPE_GPRS:
             case TelephonyManager.NETWORK_TYPE_EDGE:
+                return "2G GSM";
             case TelephonyManager.NETWORK_TYPE_1xRTT:
             case TelephonyManager.NETWORK_TYPE_CDMA:
-                return "2G";
+                return "2G CDMA";
             case TelephonyManager.NETWORK_TYPE_UNKNOWN:
                 return "Unknown";
             default:
@@ -317,17 +380,17 @@ public class PhoneFacade extends RpcReceiver {
         return mTelephonyManager.isNetworkRoaming();
     }
 
-    @Rpc(description = "Returns the unique device ID, for example, the IMEI for GSM and the MEID for CDMA phones. Return null if device ID is not available.")
+    /*@Rpc(description = "Returns the unique device ID, for example, the IMEI for GSM and the MEID for CDMA phones. Return null if device ID is not available.")
     public String getDeviceId(
-            @RpcParameter(name = "index", description = "index parameter need Android >= 6.0 .") @RpcOptional Integer index
+            @RpcParameter(name = "index", description = "index parameter need Android >= 6.0 .") @RpcDefault("0") Integer index
     ) throws Exception {
         check_Read_Phone_State_Permission();
         //if (index != null && Build.VERSION.SDK_INT >=23) {
             return mTelephonyManager.getDeviceId(index);
         //} else {
         //    return mTelephonyManager.getDeviceId();
-        //}
-    }
+       // }
+    }*/
 
     @Rpc(description = "MEID for CDMA phones, Need Android >= 8.0 .")
     public String getMeid(
@@ -375,13 +438,11 @@ public class PhoneFacade extends RpcReceiver {
         return mTelephonyManager.getLine1Number();
     }
 
-    @Rpc(description = "Returns the neighboring cell information of the device.")
-    public List<CellInfo> getNeighboringCellInfo() throws Exception {
+    @Rpc(description = "Returns all the neighboring cell information of the device.")
+    public List<CellInfo> getAllCellInfo() throws Exception {
         check_Access_Fine_Location_Permission();
         return mTelephonyManager.getAllCellInfo();
     }
-
-
 
     /*@Rpc(description = "Mobile data traffic flow , need Android >= 8.0")
     public void setDataEnabled(

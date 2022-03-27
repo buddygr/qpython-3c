@@ -7,20 +7,21 @@
         android:key="@string/course"
         android:title="@string/course"/>
 
-    <Preference
+    <!-- Preference
         android:key="course_official"
         android:title="@string/course_official"
-        android:summary="@string/edu_qpy_org"/>
+        android:summary="@string/edu_qpy_org"/ -->
 
     <Preference
         android:key="video_account"
-        android:title="@string/video_account_bili"
-        android:summary="@string/bili_com"/>
+        android:title="@string/video_account_wechat"
+        android:summary="@string/wechat_com"/>
 
     <Preference
+        android:layout_height="wrap_content"
         android:key="open_source_library"
-        android:title="@string/open_source_library_bili"
-        android:summary="@string/bili_com"/>
+        android:summary="@string/bili_com"
+        android:title="@string/open_source_library_bili" />
 
     <PreferenceCategory
         android:key="other"
@@ -51,78 +52,14 @@
 
 
     <Preference
+        android:defaultValue=""
+        android:key="@string/qpy_custom_dir"
+        android:title="@string/qpy_custom_dir"/>
+
+    <Preference
         android:key="lastlog"
         android:title="@string/last_log"
         android:summary="@string/get_last_log"/>
-
-    <!--<PreferenceScreen
-        android:key="@string/key_py_inter"
-        android:title="@string/py_inter">
-
-        <!-PreferenceCategory
-            android:key="py_inter_update"
-            android:title="@string/py_resources">
-
-            <Preference
-                android:key="@string/key_update_qpy3"
-                android:summary=""
-                android:title="@string/update_py3"/>
-
-            <Preference
-                android:key="@string/key_update_qpy2compatible"
-                android:title="@string/update_py2compatible"/>
-
-        </PreferenceCategory-->
-
-        <!--PreferenceCategory
-            android:key="py_inter_update"
-            android:title="@string/py_inter">
-
-            <Preference
-                android:key="@string/key_py3"
-                android:title="@string/switch_py3"/>
-
-            <Preference
-                android:key="@string/key_py2"
-                android:title="@string/switch_py2"/>
-
-
-            <!-Preference
-                android:key="@string/key_py2compatible"
-                android:summary="@string/switch_py2_libs"
-                android:title="@string/switch_py2compatible"/->
-
-        </PreferenceCategory>
-    </PreferenceScreen>-->
-
-
-    <!--CheckBoxPreference
-        android:key="@string/key_aipy"
-        android:summary="@string/aipy_install"
-        android:title="@string/install_aipy"/-->
-    <!--<PreferenceScreen
-       android:summary="@string/notebook_not_started"
-       android:key="@string/key_notebook_page"
-       android:title="@string/notebook">
-       <!-PreferenceCategory
-           android:key="notebook_update"
-           android:title="@string/notebook_res">
-           <Preference
-               android:key="@string/key_notebook"
-               android:title="@string/install_notebook"/>
-
-       </PreferenceCategory->
-
-        <PreferenceCategory
-            android:key="notebook_update"
-            android:title="@string/notebook_service">
-
-            <CheckBoxPreference
-                android:key="@string/key_notebook_run"
-                android:summary="@string/notebook_explorer_bg_start"
-                android:title="@string/notebook_explorer"/>
-        </PreferenceCategory>
-    </PreferenceScreen>-->
 
     <CheckBoxPreference
         android:key="@string/key_root"
@@ -141,10 +78,6 @@
     <PreferenceScreen
         android:key="ftp"
         android:title="@string/ftp_server">
-        <!-- Arbitrary key/value pairs can be included for fragment arguments -->
-        <!--<extra-->
-        <!--android:name="someKey"-->
-        <!--android:value="somePrefValue"/>-->
 
         <CheckBoxPreference
             android:defaultValue="false"

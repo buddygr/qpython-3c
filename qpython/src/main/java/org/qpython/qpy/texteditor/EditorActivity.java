@@ -1,5 +1,15 @@
 package org.qpython.qpy.texteditor;
 
+import static org.qpython.qpy.texteditor.TedFragment.LOGIN_REQUEST_CODE;
+import static org.qpython.qpy.texteditor.TedLocalActivity.REQUEST_OPEN;
+import static org.qpython.qpy.texteditor.TedLocalActivity.REQUEST_RECENT;
+import static org.qpython.qpy.texteditor.TedLocalActivity.REQUEST_SAVE_AS;
+import static org.qpython.qpy.texteditor.androidlib.data.FileUtils.deleteItem;
+import static org.qpython.qpy.texteditor.androidlib.data.FileUtils.getCanonizePath;
+import static org.qpython.qpy.texteditor.androidlib.data.FileUtils.renameItem;
+import static org.qpython.qpy.texteditor.common.Constants.ACTION_WIDGET_OPEN;
+import static org.qpython.qpy.texteditor.common.Constants.EXTRA_FORCE_READ_ONLY;
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,7 +20,6 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
@@ -29,8 +38,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
-import com.quseit.util.FileHelper;
 import com.quseit.util.NAction;
 import com.quseit.util.NStorage;
 
@@ -43,6 +52,7 @@ import org.qpython.qpy.databinding.DrawerEditorBinding;
 import org.qpython.qpy.main.activity.BaseActivity;
 import org.qpython.qpy.main.activity.GistEditActivity;
 import org.qpython.qpy.main.adapter.EditorFileTreeAdapter;
+import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.texteditor.common.RecentFiles;
 import org.qpython.qpy.texteditor.common.Settings;
 import org.qpython.qpy.texteditor.common.TextFileUtils;
@@ -53,7 +63,6 @@ import org.qpython.qpy.texteditor.widget.crouton.Crouton;
 import org.qpython.qpy.texteditor.widget.crouton.Style;
 import org.qpython.qpysdk.QPyConstants;
 import org.qpython.qpysdk.utils.Utils;
-import org.swiftp.Util;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -71,18 +80,6 @@ import java.util.concurrent.TimeUnit;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-
-import static com.quseit.util.FileHelper.LoadDataFromAssets;
-import static com.quseit.util.FileHelper.writeToFile;
-import static org.qpython.qpy.texteditor.TedFragment.LOGIN_REQUEST_CODE;
-import static org.qpython.qpy.texteditor.TedLocalActivity.REQUEST_OPEN;
-import static org.qpython.qpy.texteditor.TedLocalActivity.REQUEST_RECENT;
-import static org.qpython.qpy.texteditor.TedLocalActivity.REQUEST_SAVE_AS;
-import static org.qpython.qpy.texteditor.androidlib.data.FileUtils.deleteItem;
-import static org.qpython.qpy.texteditor.androidlib.data.FileUtils.getCanonizePath;
-import static org.qpython.qpy.texteditor.androidlib.data.FileUtils.renameItem;
-import static org.qpython.qpy.texteditor.common.Constants.ACTION_WIDGET_OPEN;
-import static org.qpython.qpy.texteditor.common.Constants.EXTRA_FORCE_READ_ONLY;
 
 public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnGlobalLayoutListener {
     private DrawerEditorBinding   binding;
@@ -166,7 +163,7 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
         initView();
         initListener();
         updateSetting();
-        initFiles();
+        //initFiles();
     }
 
     @Override
@@ -369,38 +366,38 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
         Settings.updateFromPreferences(PreferenceManager.getDefaultSharedPreferences(this));
     }
 
-    private void initFiles() {
-        //File externalStorage = new File(Environment.getExternalStorageDirectory(), "qpython");
-
-        //if (checkExpired("public", new File(externalStorage + "/lib").getAbsolutePath(), "programs"+NAction.getPyVer(this))) {
-
-            //String code = NAction.getCode(this);
-      //  boolean isQpy3 = NAction.isQPy3(getApplication());
-        String baseDir = QPyConstants.ABSOLUTE_PATH;
-        File root = new File(baseDir);
-        if (!(root.exists() && root.isDirectory())) {
-            root.mkdir();
-        }
-        String path = baseDir + /*(isQpy3 ? */"/snippets3"/* : "/snippets")*/;
-        File folder = new File(path);
-        if (!(folder.exists() && folder.isDirectory())) {
-            folder.mkdir();
-        }
-
-        // init snipples
-        String[] filesList = {"Apache_License", "The_MIT_License", "QPy_WebApp", "QPy_ConsoleApp", "QPy_SL4AApp", "GPL_v3_Licence"};
-        for (int i=0;i<filesList.length;i++) {
-            String fn = filesList[i];
-            File f = new File(path + "/" + fn);
-            if (!f.exists()) {
-                String file1 = LoadDataFromAssets(this, fn);
-                writeToFile(path + "/" + fn, file1);
-            }
-
-        }
-
-        //}
-    }
+    //private void initFiles() {
+    //     //File externalStorage = new File(Environment.getExternalStorageDirectory(), "qpython");
+    //
+    //     //if (checkExpired("public", new File(externalStorage + "/lib").getAbsolutePath(), "programs"+NAction.getPyVer(this))) {
+    //
+    //         //String code = NAction.getCode(this);
+    //   //  boolean isQpy3 = NAction.isQPy3(getApplication());
+    //     String baseDir = QPyConstants.ABSOLUTE_PATH;
+    //     File root = new File(baseDir);
+    //     if (!(root.exists() && root.isDirectory())) {
+    //         root.mkdir();
+    //     }
+    //     String path = baseDir + /*(isQpy3 ? * /"/snippets3"/* : "/snippets")* /;
+    //     File folder = new File(path);
+    //     if (!(folder.exists() && folder.isDirectory())) {
+    //         folder.mkdir();
+    //     }
+    //
+    //     // init snipples
+    //     String[] filesList = {"Apache_License", "The_MIT_License", "QPy_WebApp", "QPy_ConsoleApp", "QPy_SL4AApp", "GPL_v3_Licence"};
+    //     for (int i=0;i<filesList.length;i++) {
+    //         String fn = filesList[i];
+    //         File f = new File(path + "/" + fn);
+    //         if (!f.exists()) {
+    //             String file1 = LoadDataFromAssets(this, fn);
+    //             writeToFile(path + "/" + fn, file1);
+    //         }
+    //
+    //     }
+    //
+    //     //}
+    // }
 
     private String openLastFile() {
         String lastFile = NStorage.getSP(this, "qedit.last_filename");
@@ -442,6 +439,7 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
         } else {
             String text = TextFileUtils.readTextFile(file);
             mCurrentFilePath = getCanonizePath(file);
+            Toast.makeText(this,mCurrentFilePath,Toast.LENGTH_SHORT).show();
             mCurrentFileName = file.getName();
             mReadOnly = !(file.canWrite() && (!forceReadOnly));
             if (textFragment != null) {
@@ -888,7 +886,7 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
                 .setTitle(getString(R.string.new_script))
                 .setExt(".py")
                 .setConfirmListener(name -> {
-                    File file = new File(QPyConstants.ABSOLUTE_PATH + "/" + /*(isQpy3? */QPyConstants.DFROM_QPY3/*:QPyConstants.DFROM_QPY2)*/ + "/" + name);
+                    File file = new File(CONF.SCOPE_STORAGE_PATH + "/" + QPyConstants.DFROM_QPY3 + "/" + name);
                     if (file.exists()) {
                         Crouton.showText(this, R.string.file_exists, Style.ALERT);
 
@@ -923,8 +921,8 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
                 Stack<String> curArtistDir = new Stack<>();
                 //final boolean isQpy3 = NAction.isQPy3(getApplicationContext());
 
-                curArtistDir.push(QPyConstants.ABSOLUTE_PATH
-                        + "/" + /*(isQpy3 ? */QPyConstants.DFROM_PRJ3/* : QPyConstants.DFROM_PRJ2)*/ + "/" + name);
+            curArtistDir.push(CONF.SCOPE_STORAGE_PATH
+                        + "/" + QPyConstants.DFROM_PRJ3 + "/" + name);
 
                 File fileN = new File(curArtistDir.peek());
                 if (fileN.exists()) {

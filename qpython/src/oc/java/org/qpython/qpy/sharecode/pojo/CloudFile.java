@@ -1,14 +1,9 @@
 package org.qpython.qpy.codeshare.pojo;
 
 
-import org.qpython.qpysdk.QPyConstants;
+import org.qpython.qpy.main.app.CONF;
 
 import java.io.Serializable;
-
-import static org.qpython.qpy.codeshare.ShareCodeUtil.PROJECT;
-import static org.qpython.qpy.codeshare.ShareCodeUtil.PROJECT_PATH;
-import static org.qpython.qpy.codeshare.ShareCodeUtil.SCRIPT;
-import static org.qpython.qpy.codeshare.ShareCodeUtil.SCRIPTS_PATH;
 
 public class CloudFile implements Serializable {
     private String projectName;
@@ -80,6 +75,6 @@ public class CloudFile implements Serializable {
     }
 
     public String getAbsolutePath() {
-        return QPyConstants.ABSOLUTE_PATH + getPath();
+        return CONF.SCOPE_STORAGE_PATH + getPath();
     }
 }

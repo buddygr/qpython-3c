@@ -405,6 +405,27 @@ public class DocumentsUtils {
         else copyFile(context,src,dest);
     }
 
+    public static String[] listFiles (
+            Context context,File folder)
+            throws Exception{
+        DocumentFile Folder=DocumentsUtils.getDocumentFile(folder,true,context);
+        if (Folder == null) {
+            File[] Subs = folder.listFiles();
+            if (Subs==null) return null;
+            String[] subs=new String[Subs.length];
+            for (int i=0;i<Subs.length;i++)
+                subs[i]=Subs[i].getName();
+            return subs;
+        }
+        else {
+            DocumentFile[] Subs = Folder.listFiles();
+            String[] subs=new String[Subs.length];
+            for (int i=0;i<Subs.length;i++)
+                subs[i]=Subs[i].getName();
+            return subs;
+        }
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     public static void storageShowOpen(
             String rootPath, Activity context

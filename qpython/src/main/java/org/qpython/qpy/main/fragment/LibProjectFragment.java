@@ -1,14 +1,14 @@
 package org.qpython.qpy.main.fragment;
 
 import android.annotation.SuppressLint;
-import android.os.Environment;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AlertDialog;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +20,6 @@ import android.widget.Toast;
 import com.quseit.common.updater.downloader.Downloader;
 import com.quseit.util.ACache;
 import com.quseit.util.ImageUtil;
-import com.quseit.util.NAction;
 import com.quseit.util.NetStateUtil;
 import com.yanzhenjie.recyclerview.swipe.SwipeMenuCreator;
 import com.yanzhenjie.recyclerview.swipe.SwipeMenuItem;
@@ -79,8 +78,8 @@ public class LibProjectFragment extends RefreshFragment {
         super.onViewCreated(view, savedInstanceState);
         binding = DataBindingUtil.bind(view);
 
-        SCRIPT_DIR = QPyConstants.ABSOLUTE_PATH + "/" + /*(NAction.isQPy3(getActivity())?*/QPyConstants.DFROM_QPY3/*:QPyConstants.DFROM_QPY2)*/ +"/";
-        PROJECT_DIR = QPyConstants.ABSOLUTE_PATH + "/" + /*(NAction.isQPy3(getActivity())?*/QPyConstants.DFROM_PRJ3/*:QPyConstants.DFROM_PRJ2)*/ +"/";
+        SCRIPT_DIR = CONF.SCOPE_STORAGE_PATH + "/" + /*(NAction.isQPy3(getActivity())?*/QPyConstants.DFROM_QPY3/*:QPyConstants.DFROM_QPY2)*/ +"/";
+        PROJECT_DIR = CONF.SCOPE_STORAGE_PATH + "/" + /*(NAction.isQPy3(getActivity())?*/QPyConstants.DFROM_PRJ3/*:QPyConstants.DFROM_PRJ2)*/ +"/";
 
         initDataList();
         initView();

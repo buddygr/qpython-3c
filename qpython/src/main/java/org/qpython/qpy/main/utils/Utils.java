@@ -19,7 +19,7 @@ import android.util.Log;
 import org.qpython.qpy.R;
 import org.qpython.qpy.main.activity.HomeMainActivity;
 import org.qpython.qpy.main.activity.QWebViewActivity;
-import org.qpython.qpysdk.QPyConstants;
+import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpysdk.utils.FileHelper;
 
 import java.io.File;
@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 
 /**
  * Created by mathiasluo on 16-6-1.
+ * 乘着船 修改 2021-2022
  */
 
 public class Utils extends org.qpython.qpysdk.utils.Utils {
@@ -208,8 +209,8 @@ public class Utils extends org.qpython.qpysdk.utils.Utils {
                 }
                 temp="_"+temp;
             }
-            tmp = QPyConstants.WEB_LOG.length()-4;
-            temp = QPyConstants.WEB_LOG.substring(0,tmp)+temp;
+            tmp = CONF.WEB_LOG.length()-4;
+            temp = CONF.WEB_LOG.substring(0,tmp)+temp;
         if (url != null) {
             Pattern pattern = Pattern.compile(":[0-9]+", Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(url);
@@ -230,14 +231,14 @@ public class Utils extends org.qpython.qpysdk.utils.Utils {
 
     public static String getQuietLog(String script) {
         int i,j,k;
-        i = QPyConstants.QUIET_LOG.length()-4;
+        i = CONF.QUIET_LOG.length()-4;
         if (script.endsWith("/main.py")){
             j = script.length()-8;
         } else {
             j = script.length()-3;
         }
         k = script.substring(0,j).lastIndexOf("/") + 1;
-        String f = QPyConstants.QUIET_LOG.substring(0,i) + "_" + script.substring(k,j) + ".log";
+        String f = CONF.QUIET_LOG.substring(0,i) + "_" + script.substring(k,j) + ".log";
         return getLogFile(f);
     }
 
