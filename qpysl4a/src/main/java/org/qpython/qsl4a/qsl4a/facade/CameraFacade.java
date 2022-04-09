@@ -16,17 +16,23 @@
 
 package org.qpython.qsl4a.qsl4a.facade;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PictureCallback;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.support.v4.content.FileProvider;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -60,7 +66,7 @@ import java.util.concurrent.CountDownLatch;
 public class CameraFacade extends RpcReceiver {
 
   private final Service mService;
-  private final Parameters mParameters;
+  private Parameters mParameters;
 
   private final String sdcard;
   private final AndroidFacade mAndroidFacade;
@@ -75,12 +81,6 @@ public class CameraFacade extends RpcReceiver {
     super(manager);
     mService = manager.getService();
 
-    Camera camera = Camera.open();
-    try {
-      mParameters = camera.getParameters();
-    } finally {
-      camera.release();
-    }
     mAndroidFacade = manager.getReceiver(AndroidFacade.class);
     sdcard = Environment.getExternalStorageDirectory().toString();
     context = mAndroidFacade.context;
@@ -97,11 +97,12 @@ public class CameraFacade extends RpcReceiver {
     final BooleanResult takePictureResult = new BooleanResult();
 
     Camera camera = Camera.open(cameraId);
-    try{
+    /*try{
+      mParameters = camera.getParameters();
       camera.setParameters(mParameters);
     } catch (Exception e){
       //throw new Exception(Arrays.toString(e.getStackTrace()));
-    }
+    }*/
 
     try {
       Method method = camera.getClass().getMethod("setDisplayOrientation", int.class);
@@ -201,12 +202,9 @@ public class CameraFacade extends RpcReceiver {
       throws InterruptedException {
     final CountDownLatch latch = new CountDownLatch(1);
     {
-      camera.autoFocus(new AutoFocusCallback() {
-        @Override
-        public void onAutoFocus(boolean success, Camera camera) {
-          result.mmResult = success;
-          latch.countDown();
-        }
+      camera.autoFocus((success, camera1) -> {
+        result.mmResult = success;
+        latch.countDown();
       });
       latch.await();
     }
@@ -312,4 +310,24 @@ public class CameraFacade extends RpcReceiver {
     }
   }
 
-}
+  // 打开或关闭闪光灯
+  @SuppressLint("NewApi")
+  @Rpc(description = "open or close flash light torch of camera.")
+  public void cameraSetTorchMode(@RpcParameter(name = "enabled") Boolean enabled) throws Exception {
+      //获取CameraManager
+      CameraManager mCameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+      //获取当前手机所有摄像头设备ID
+      String[] ids  = mCameraManager.getCameraIdList();
+      for (String id : ids) {
+        CameraCharacteristics c = mCameraManager.getCameraCharacteristics(id);
+        //查询该摄像头组件是否包含闪光灯
+        Boolean flashAvailable = c.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
+        Integer lensFacing = c.get(CameraCharacteristics.LENS_FACING);
+        if (flashAvailable != null && flashAvailable
+                && lensFacing != null && lensFacing == CameraCharacteristics.LENS_FACING_BACK) {
+          //打开或关闭手电筒
+          mCameraManager.setTorchMode(id, enabled);
+        }
+      }
+  }
+  }

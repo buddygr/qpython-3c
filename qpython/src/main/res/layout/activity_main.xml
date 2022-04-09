@@ -176,10 +176,10 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/ll_gist"
+                    android:id="@+id/about"
                     style="@style/row_ll">
 
-                    <!--ImageView
+                    <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_home_gist"/>
@@ -188,8 +188,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/icon_margin_top"
-                        android:text="@string/gist"
-                        android:textColor="#FFF"/-->
+                        android:text="@string/about"
+                        android:textColor="#FFF"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/download"
+                        android:textColor="#FF7F7F" />
                 </LinearLayout>
 
                 <!--<LinearLayout-->

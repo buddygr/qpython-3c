@@ -16,13 +16,20 @@
 
 package org.qpython.qsl4a.qsl4a.facade;
 
+import android.app.NotificationManager;
 import android.app.Service;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.media.AudioManager;
+import android.os.Build;
+import android.os.Environment;
 import android.os.PowerManager;
+import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
+import android.support.annotation.RequiresApi;
+import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
 import org.qpython.qsl4a.QSL4APP;
@@ -30,6 +37,9 @@ import org.qpython.qsl4a.qsl4a.FutureActivityTaskExecutor;
 import org.qpython.qsl4a.qsl4a.LogUtil;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 import org.qpython.qsl4a.qsl4a.future.FutureActivityTask;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
@@ -50,6 +60,8 @@ public class SettingsFacade extends RpcReceiver {
   private final Service mService;
   private final AudioManager mAudio;
   private final PowerManager mPower;
+  private final AndroidFacade mAndroidFacade;
+  private final Context context;
 
   /**
    * Creates a new SettingsFacade.
@@ -62,9 +74,22 @@ public class SettingsFacade extends RpcReceiver {
     mService = manager.getService();
     mAudio = (AudioManager) mService.getSystemService(Context.AUDIO_SERVICE);
     mPower = (PowerManager) mService.getSystemService(Context.POWER_SERVICE);
+    mAndroidFacade = manager.getReceiver(AndroidFacade.class);
+    context = mAndroidFacade.context;
   }
 
-  @Rpc(description = "Sets the screen timeout to this number of seconds.", returns = "The original screen timeout.")
+  private void NotificationPolicyAccessGranted() throws Exception {
+  NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+                && !notificationManager.isNotificationPolicyAccessGranted()) {
+    Intent intent = new Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+    mAndroidFacade.startActivityForResult(intent);
+    if(!notificationManager.isNotificationPolicyAccessGranted()){
+      throw new Exception("Need Permission of NOTIFICATION_POLICY_ACCESS_SETTINGS .");
+    }
+  }}
+
+    @Rpc(description = "Sets the screen timeout to this number of seconds.", returns = "The original screen timeout.")
   public Integer setScreenTimeout(@RpcParameter(name = "value") Integer value) {
     Integer oldValue = getScreenTimeout();
     android.provider.Settings.System.putInt(mService.getContentResolver(),
@@ -114,7 +139,10 @@ public class SettingsFacade extends RpcReceiver {
   }
 
   @Rpc(description = "Toggles ringer silent mode on and off.", returns = "True if ringer silent mode is enabled.")
-  public Boolean toggleRingerSilentMode(@RpcParameter(name = "enabled") @RpcOptional Boolean enabled) {
+  public Boolean toggleRingerSilentMode(
+          @RpcParameter(name = "enabled") @RpcOptional Boolean enabled
+  ) throws Exception {
+    NotificationPolicyAccessGranted();
     if (enabled == null) {
       enabled = !checkRingerSilentMode();
     }
@@ -125,8 +153,11 @@ public class SettingsFacade extends RpcReceiver {
 
   @SuppressWarnings("deprecation")
 @Rpc(description = "Toggles vibrate mode on and off. If ringer=true then set Ringer setting, else set Notification setting", returns = "True if vibrate mode is enabled.")
-  public Boolean toggleVibrateMode(@RpcParameter(name = "enabled") @RpcOptional Boolean enabled,
-      @RpcParameter(name = "ringer") @RpcOptional Boolean ringer) {
+  public Boolean toggleVibrateMode(
+          @RpcParameter(name = "enabled") @RpcOptional Boolean enabled,
+      @RpcParameter(name = "ringer") @RpcOptional Boolean ringer
+  ) throws Exception {
+    NotificationPolicyAccessGranted();
     int atype = ringer ? AudioManager.VIBRATE_TYPE_RINGER : AudioManager.VIBRATE_TYPE_NOTIFICATION;
     int asetting = enabled ? AudioManager.VIBRATE_SETTING_ON : AudioManager.VIBRATE_SETTING_OFF;
     mAudio.setVibrateSetting(atype, asetting);
@@ -151,7 +182,10 @@ public class SettingsFacade extends RpcReceiver {
   }
 
   @Rpc(description = "Sets the ringer volume.")
-  public void setRingerVolume(@RpcParameter(name = "volume") Integer volume) {
+  public void setRingerVolume(
+          @RpcParameter(name = "volume") Integer volume
+  ) throws Exception {
+    NotificationPolicyAccessGranted();
     mAudio.setStreamVolume(AudioManager.STREAM_RING, volume, 0);
   }
 
@@ -224,6 +258,45 @@ public class SettingsFacade extends RpcReceiver {
       throw new UnsupportedOperationException("This feature is only available after Eclair.");
     }
     return result;
+  }
+
+  @Rpc(description = "return isExternalStorageManager if Android >= 11 .")
+  public Boolean isExternalStorageManager(){
+    if (Build.VERSION.SDK_INT<30) return null;
+    return Environment.isExternalStorageManager();
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.N)
+  @Rpc(description = "Get system language and country .")
+  public String getLocale() {
+    return Resources.getSystem().getConfiguration().getLocales().get(0).toString();
+  }
+
+  @Rpc(description = "get system infomation .")
+  public Map<String,String> getSysInfo(){
+    Map<String,String> s = new HashMap<>();
+    s.put("model", Build.MODEL);
+    s.put("sdk",Build.VERSION.SDK);
+    s.put("release",Build.VERSION.RELEASE);
+    s.put("brand",Build.BRAND);
+    s.put("device",Build.DEVICE);
+    s.put("display",Build.DISPLAY);
+    s.put("language", Locale.getDefault().getLanguage());
+    return s;
+  }
+
+  @Rpc(description = "get screen infomation .")
+  public Map<String,Float> getScreenInfo(){
+    Map<String,Float> s = new HashMap<>();
+    DisplayMetrics dm = context.getResources().getDisplayMetrics();
+    s.put("widthPixels",(float)dm.widthPixels);
+    s.put("heightPixels",(float)dm.heightPixels);
+    s.put("densityDpi",(float)dm.densityDpi);
+    s.put("density",dm.density);
+    s.put("xdpi",dm.xdpi);
+    s.put("ydpi",dm.ydpi);
+    s.put("scaledDensity",dm.scaledDensity);
+    return s;
   }
 
   @Override

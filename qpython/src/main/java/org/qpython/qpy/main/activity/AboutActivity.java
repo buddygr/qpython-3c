@@ -2,6 +2,7 @@ package org.qpython.qpy.main.activity;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -52,7 +53,7 @@ public class AboutActivity extends BaseActivity {
             e.printStackTrace();
         }
         progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage(getString(R.string.checking_update));
+        progressDialog.setMessage(getString(R.string.whole_download));
         Toolbar myToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
         setTitle(R.string.about);
@@ -78,7 +79,7 @@ public class AboutActivity extends BaseActivity {
 
         binding.tvQpyDescription.setText(QPY_DESCRIPTION);
 
-        binding.tvUpdate.setOnClickListener(v -> {
+        binding.tvWholeDown.setOnClickListener(v -> {
             //  checkUpdate(false);
             //progressDialog.show();
             ScriptExec.getInstance().playScript(this,
@@ -90,8 +91,18 @@ public class AboutActivity extends BaseActivity {
             viewWebSite(R.string.backup_down_addr)
         );
 
+        String[] words = new String[]{"github", "gitee"};
+        int[] sites = new int[]{R.string.qpython_github, R.string.qpython_gitee};
+
         binding.ForkFrom.setOnClickListener(v ->
-            viewWebSite(R.string.qpython_github)
+        new AlertDialog.Builder(this)
+            .setTitle(R.string.fork_from_title)
+            .setItems(words, (dialogInterface, i) -> {
+                viewWebSite(sites[i]);
+                dialogInterface.dismiss();
+            })
+            .create()
+            .show()
         );
 
         binding.ForkTo.setOnClickListener(v ->

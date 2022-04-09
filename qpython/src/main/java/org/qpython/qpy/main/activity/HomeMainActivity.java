@@ -219,12 +219,9 @@ public class HomeMainActivity extends BaseActivity {
             LibActivity.start(this);
             sendEvent(getString(R.string.event_qpypi));
         });
-//        binding.llCommunity.setOnClickListener(v -> {
-//            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(URL_COMMUNITY)));
-//            sendEvent(getString(R.string.event_commu));
-//        });
-//        binding.llGist.setOnClickListener(view -> GistActivity.startCommunity(HomeMainActivity.this)
-//        );
+        binding.about.setOnClickListener(v -> {
+            AboutActivity.start(this);
+        });
         binding.llSetting.setOnClickListener(v -> {
             SettingActivity.startActivity(this);
             sendEvent(getString(R.string.event_setting));
@@ -335,7 +332,7 @@ public class HomeMainActivity extends BaseActivity {
 
         String[] permssions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("security_agree",false))
+        if (PreferenceManager.getDefaultSharedPreferences(this).getString("security_tip","").equals(getString(R.string.security_version)))
         {
             QpySdkAgree(permssions);
         } else {
@@ -349,7 +346,7 @@ public class HomeMainActivity extends BaseActivity {
                     .setTitle(R.string.notice)
                     .setMessage(content)
                     .setPositiveButton(R.string.agree, (dialog1, which) -> {
-                        PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("security_agree",true).apply();
+                        PreferenceManager.getDefaultSharedPreferences(this).edit().putString("security_tip",getString(R.string.security_version)).apply();
                         QpySdkAgree(permssions);
                     })
                     .setNegativeButton(R.string.disagree, (dialog1, which) -> finish())

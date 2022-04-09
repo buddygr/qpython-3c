@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/star_mountain"
@@ -94,6 +93,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/can_long_press"
+                        android:textSize="11sp"
                         android:textColor="#FF7F7F" />
                 </LinearLayout>
 
@@ -179,10 +179,10 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/ll_gist"
-                    style="@style/grid_item">
+                    android:id="@+id/about"
+                    style="@style/row_ll">
 
-                    <!--ImageView
+                    <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_home_gist"/>
@@ -191,8 +191,15 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/icon_margin_top"
-                        android:text="@string/gist"
-                        android:textColor="#FFF"/-->
+                        android:text="@string/about"
+                        android:textColor="#FFF"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/feed_contribute"
+                        android:textSize="11sp"
+                        android:textColor="#FF7F7F" />
                 </LinearLayout>
 
             </LinearLayout>

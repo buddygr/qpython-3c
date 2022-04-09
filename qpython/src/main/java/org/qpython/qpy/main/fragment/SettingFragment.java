@@ -36,7 +36,6 @@ import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.qpython.qpy.R;
-import org.qpython.qpy.main.activity.AboutActivity;
 import org.qpython.qpy.main.activity.HomeMainActivity;
 import org.qpython.qpy.main.app.App;
 import org.qpython.qpy.main.app.CONF;
@@ -365,14 +364,14 @@ public class SettingFragment extends PreferenceFragment {
                 return false;
             });
 
-        findPreference(resources.getString(R.string.key_about)).
+        /*findPreference(resources.getString(R.string.key_about)).
             setOnPreferenceClickListener(preference ->
             {
                 AboutActivity.start(getActivity());
                 return true;
             });
 
-        /*findPreference("course_official").
+        findPreference("course_official").
             setOnPreferenceClickListener(preference ->
             {
                 viewWebSite(R.string.qpython_edu);

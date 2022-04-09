@@ -28,22 +28,27 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Contacts.PhonesColumns;
 import android.support.v4.app.ActivityCompat;
+import android.telephony.CellIdentityCdma;
+import android.telephony.CellIdentityGsm;
 import android.telephony.CellIdentityLte;
 import android.telephony.CellIdentityNr;
 import android.telephony.CellIdentityWcdma;
 import android.telephony.CellInfo;
+import android.telephony.CellInfoCdma;
+import android.telephony.CellInfoGsm;
 import android.telephony.CellInfoLte;
 import android.telephony.CellInfoNr;
 import android.telephony.CellInfoWcdma;
 import android.telephony.CellLocation;
+import android.telephony.CellSignalStrengthCdma;
+import android.telephony.CellSignalStrengthGsm;
 import android.telephony.CellSignalStrengthLte;
 import android.telephony.CellSignalStrengthNr;
 import android.telephony.CellSignalStrengthWcdma;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.telephony.cdma.CdmaCellLocation;
-import android.telephony.gsm.GsmCellLocation;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.qpython.qsl4a.qsl4a.MainThread;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
@@ -185,6 +190,76 @@ public class PhoneFacade extends RpcReceiver {
         }
     }
 
+    private void getCellLocation(CellInfo cellInfo,JSONObject result,boolean complex) throws Exception {
+        if(complex)
+            result.put("Registered",cellInfo.isRegistered());
+        if (Build.VERSION.SDK_INT >= 29 && cellInfo instanceof CellInfoNr){
+            CellIdentityNr nrCellInfoIdetity = (CellIdentityNr) ((CellInfoNr) cellInfo).getCellIdentity();
+            result.put("Nci",nrCellInfoIdetity.getNci());
+            result.put("Pci",nrCellInfoIdetity.getPci());
+            result.put("Tac",nrCellInfoIdetity.getTac());
+            CellSignalStrengthNr cellSignalStrengthNr = (CellSignalStrengthNr) ((CellInfoNr) cellInfo).getCellSignalStrength();
+            result.put("NrDbm",cellSignalStrengthNr.getDbm());
+            if (complex) {
+                result.put("Mcc,Mnc",nrCellInfoIdetity.getMccString()+","+nrCellInfoIdetity.getMncString());
+                result.put("NrArfcn",nrCellInfoIdetity.getNrarfcn());
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    result.put("Bands",nrCellInfoIdetity.getBands());
+                }
+            }
+        }
+        else if (cellInfo instanceof CellInfoLte){
+            CellIdentityLte lteCellInfoIdetity = ((CellInfoLte) cellInfo).getCellIdentity();
+            result.put("Ci", lteCellInfoIdetity.getCi());
+            result.put("Pci",lteCellInfoIdetity.getPci());
+            result.put("Tac",lteCellInfoIdetity.getTac());
+            CellSignalStrengthLte cellSignalStrengthLte = ((CellInfoLte) cellInfo).getCellSignalStrength();
+            result.put("LteDbm",cellSignalStrengthLte.getDbm());
+            if (complex) {
+                result.put("Mcc,Mnc",lteCellInfoIdetity.getMcc()+","+lteCellInfoIdetity.getMnc());
+                result.put("Earfcn",lteCellInfoIdetity.getEarfcn());
+                //result.put("Bandwidth",lteCellInfoIdetity.getBandwidth()); //总是2147483647
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    result.put("Bands",lteCellInfoIdetity.getBands());
+                }
+            }
+        }
+        else if (cellInfo instanceof CellInfoWcdma){
+            CellIdentityWcdma wcdmaCellInfoIdetity = ((CellInfoWcdma) cellInfo).getCellIdentity();
+            result.put("Lac",wcdmaCellInfoIdetity.getLac());
+            result.put("Cid",wcdmaCellInfoIdetity.getCid());
+            result.put("Psc",wcdmaCellInfoIdetity.getPsc());
+            CellSignalStrengthWcdma cellSignalStrengthWcdma = ((CellInfoWcdma) cellInfo).getCellSignalStrength();
+            result.put("WcdmaDbm",cellSignalStrengthWcdma.getDbm());
+            if (complex) {
+                result.put("Mcc,Mnc",wcdmaCellInfoIdetity.getMcc()+","+wcdmaCellInfoIdetity.getMnc());
+                result.put("Uarfcn",wcdmaCellInfoIdetity.getUarfcn());
+            }
+        }
+        else if (cellInfo instanceof CellInfoCdma){
+            CellIdentityCdma cdmaCellInfoIdetity = ((CellInfoCdma) cellInfo).getCellIdentity();
+            result.put("Sid",cdmaCellInfoIdetity.getSystemId());
+            result.put("Nid",cdmaCellInfoIdetity.getNetworkId());
+            result.put("Bid",cdmaCellInfoIdetity.getBasestationId());
+            CellSignalStrengthCdma cellSignalStrengthCdma = ((CellInfoCdma) cellInfo).getCellSignalStrength();
+            result.put("CdmaDbm",cellSignalStrengthCdma.getDbm());
+            if(complex){
+                result.put("Lat,Long",tudeIntToStr(cdmaCellInfoIdetity.getLatitude())+","+tudeIntToStr(cdmaCellInfoIdetity.getLongitude()));
+            }
+        }
+        else if (cellInfo instanceof CellInfoGsm){
+            CellIdentityGsm gsmCellInfoIdetity = ((CellInfoGsm) cellInfo).getCellIdentity();
+            result.put("Lac",gsmCellInfoIdetity.getLac());
+            result.put("Cid",gsmCellInfoIdetity.getCid());
+            CellSignalStrengthGsm cellSignalStrengthGsm = ((CellInfoGsm) cellInfo).getCellSignalStrength();
+            result.put("GsmDbm",cellSignalStrengthGsm.getDbm());
+            if (complex) {
+                result.put("Mcc,Mnc",gsmCellInfoIdetity.getMcc()+","+gsmCellInfoIdetity.getMnc());
+                result.put("Arfcn",gsmCellInfoIdetity.getArfcn());
+            }
+        }
+    }
+
     @Rpc(description = "Returns the current cell location.")
     public JSONObject getCellLocation() throws Exception {
         check_Access_Fine_Location_Permission();
@@ -192,8 +267,8 @@ public class PhoneFacade extends RpcReceiver {
         JSONObject result = new JSONObject();
         CellLocation cellLocation = mTelephonyManager.getCellLocation();
         try{
-            String detail = cellLocation.toString();
-        //result.put("detail",detail);
+            /*String detail = cellLocation.toString();
+        result.put("detail",detail);
         if (cellLocation instanceof GsmCellLocation)
          {
             GsmCellLocation location = (GsmCellLocation) cellLocation;
@@ -204,40 +279,34 @@ public class PhoneFacade extends RpcReceiver {
             result.put("Sid", location.getSystemId());
             result.put("Nid", location.getNetworkId());
             result.put("Bid", location.getBaseStationId());
-        }
+        }*/
         List<CellInfo> cellInfos = mTelephonyManager.getAllCellInfo();
         result.put("CellCount",cellInfos.size());
         for (CellInfo cellInfo : cellInfos) {
             if(!cellInfo.isRegistered()) continue;
-            //获取NR/LTE/WCDMA小区和信号信息
-            if (Build.VERSION.SDK_INT >= 29 && cellInfo instanceof CellInfoNr){
-                CellIdentityNr nrCellInfoIdetity = (CellIdentityNr) ((CellInfoNr) cellInfo).getCellIdentity();
-                    result.put("Nci",nrCellInfoIdetity.getNci());
-                    result.put("Pci",nrCellInfoIdetity.getPci());
-                    result.put("Tac",nrCellInfoIdetity.getTac());
-                    CellSignalStrengthNr cellSignalStrengthNr = (CellSignalStrengthNr) ((CellInfoNr) cellInfo).getCellSignalStrength();
-                    result.put("DbmNr",cellSignalStrengthNr.getDbm());
-                }
-            else if (cellInfo instanceof CellInfoLte){
-                CellIdentityLte lteCellInfoIdetity = ((CellInfoLte) cellInfo).getCellIdentity();
-                    result.put("Ci", lteCellInfoIdetity.getCi());
-                    result.put("Pci",lteCellInfoIdetity.getPci());
-                    result.put("Tac",lteCellInfoIdetity.getTac());
-                    CellSignalStrengthLte cellSignalStrengthLte = ((CellInfoLte) cellInfo).getCellSignalStrength();
-                    result.put("DbmLte",cellSignalStrengthLte.getDbm());
-                }
-            else if (cellInfo instanceof CellInfoWcdma){
-            CellIdentityWcdma wcdmaCellInfoIdetity = ((CellInfoWcdma) cellInfo).getCellIdentity();
-            result.put("Lac",wcdmaCellInfoIdetity.getLac());
-            result.put("Cid",wcdmaCellInfoIdetity.getCid());
-            CellSignalStrengthWcdma cellSignalStrengthWcdma = ((CellInfoWcdma) cellInfo).getCellSignalStrength();
-            result.put("DbmWcdma",cellSignalStrengthWcdma.getDbm());
-        }}
+            getCellLocation(cellInfo,result,false);
+        }
         return result;
        } catch (Exception e){
            throw new Exception("getCellLocation can't get any information because of No Location Permission or Completely No Signal .");
        }
     }
+
+    @Rpc(description = "Returns all the cells location.")
+    public JSONArray getAllCellsLocation() throws Exception {
+        check_Access_Fine_Location_Permission();
+        try{
+        List<CellInfo> cellInfos = mTelephonyManager.getAllCellInfo();
+        JSONArray Result = new JSONArray();
+        for (CellInfo cellInfo : cellInfos) {
+            JSONObject result = new JSONObject();
+            getCellLocation(cellInfo,result,true);
+            Result.put(result);
+        }
+        return Result;
+    } catch (Exception e){
+        throw new Exception("getAllCellsLocation can't get any information because of No Location Permission or Completely No Signal .");
+    }}
 
     @Rpc(description = "Returns the numeric name (MCC+MNC) of current registered operator.")
     public String getNetworkOperator() {
@@ -380,17 +449,13 @@ public class PhoneFacade extends RpcReceiver {
         return mTelephonyManager.isNetworkRoaming();
     }
 
-    /*@Rpc(description = "Returns the unique device ID, for example, the IMEI for GSM and the MEID for CDMA phones. Return null if device ID is not available.")
+    @Rpc(description = "Returns the unique device ID, for example, the IMEI for GSM and the MEID for CDMA phones. Return null if device ID is not available.")
     public String getDeviceId(
             @RpcParameter(name = "index", description = "index parameter need Android >= 6.0 .") @RpcDefault("0") Integer index
     ) throws Exception {
-        check_Read_Phone_State_Permission();
-        //if (index != null && Build.VERSION.SDK_INT >=23) {
-            return mTelephonyManager.getDeviceId(index);
-        //} else {
-        //    return mTelephonyManager.getDeviceId();
-       // }
-    }*/
+        if (index == null) return mTelephonyManager.getDeviceId();
+        else return mTelephonyManager.getDeviceId(index);
+    }
 
     @Rpc(description = "MEID for CDMA phones, Need Android >= 8.0 .")
     public String getMeid(
@@ -404,7 +469,7 @@ public class PhoneFacade extends RpcReceiver {
                 return mTelephonyManager.getMeid(index);
             }
         } else {
-            throw new Exception("getMeid need Android >= 8.0 .");
+            return getDeviceId(index);
         }
     }
 
@@ -420,7 +485,7 @@ public class PhoneFacade extends RpcReceiver {
                 return mTelephonyManager.getImei(index);
             }
         } else {
-            throw new Exception("getImei need Android >= 8.0 .");
+            return getDeviceId(index);
         }
     }
 
@@ -442,6 +507,10 @@ public class PhoneFacade extends RpcReceiver {
     public List<CellInfo> getAllCellInfo() throws Exception {
         check_Access_Fine_Location_Permission();
         return mTelephonyManager.getAllCellInfo();
+    }
+
+    private String tudeIntToStr(int x){
+        return String.valueOf(Math.round((double) x/0.144D)/100000D);
     }
 
     /*@Rpc(description = "Mobile data traffic flow , need Android >= 8.0")

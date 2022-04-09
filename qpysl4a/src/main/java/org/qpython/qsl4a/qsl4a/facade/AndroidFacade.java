@@ -733,7 +733,7 @@ public class AndroidFacade extends RpcReceiver {
     return null;
   }
 
-  @Rpc(description = "Checks if version of QPython SL4A is greater than or equal to the specified version.")
+  /*@Rpc(description = "Checks if version of QPython SL4A is greater than or equal to the specified version.")
   public boolean requiredVersion(@RpcParameter(name = "requiredVersion") final Integer version) {
     boolean result = false;
     int packageVersion = getPackageVersionCode("com.googlecode.android_scripting");
@@ -741,7 +741,7 @@ public class AndroidFacade extends RpcReceiver {
       result = (packageVersion >= version);
     }
     return result;
-  }
+  }*/
 
   @Rpc(description = "Writes message to logcat.")
   public void log(@RpcParameter(name = "message") String message) {

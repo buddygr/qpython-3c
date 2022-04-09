@@ -8,6 +8,7 @@ import android.icu.text.SimpleDateFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
+import android.text.Html;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -17,14 +18,23 @@ import android.widget.Toast;
 import org.qpython.qpy.R;
 import org.qpython.qpy.console.ScriptExec;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 public class FloatViewActivity extends Activity
     {
-        //状态:坐标x,坐标y
-        static final int[] state = {0,0};
-        //状态:时间,操作类型
-        static final String[] State = {"",""};
+        //按钮数组
+        static final ArrayList<Button> buttons = new ArrayList<>();
+        //x数组
+        static final ArrayList<Integer> xs = new ArrayList<>();
+        //y数组
+        static final ArrayList<Integer> ys = new ArrayList<>();
+        //时间数组
+        static final ArrayList<String> times = new ArrayList<>();
+        //操作类型数组
+        static final ArrayList<String> operations = new ArrayList<>();
+        static WindowManager windowManager;
 
         @SuppressLint({"ClickableViewAccessibility", "SimpleDateFormat"})
         @Override
@@ -39,45 +49,103 @@ public class FloatViewActivity extends Activity
             }
         Intent intent = getIntent();
         if (intent==null) intent = new Intent();
+        int index;
         //返回结果
-        boolean result=intent.getBooleanExtra("result",false);
-        if (result){
+        index=intent.getIntExtra("result",-2);
+        if (index>-2){
+            if(index<0) index=buttons.size()-1;
+            if(index<0 || index>=buttons.size()){
+                Toast.makeText(this,R.string.float_view_out_range,Toast.LENGTH_LONG).show();
+                finish();
+                return;
+            }
             Intent intentR = new Intent();
             //返回横坐标，原点为屏幕中心
-            intentR.putExtra("x",state[0]);
+            intentR.putExtra("x", xs.get(index));
             //返回纵坐标，原点为屏幕中心
-            intentR.putExtra("y",state[1]);
-            intentR.putExtra("time",State[0]);
-            intentR.putExtra("operation",State[1]);
+            intentR.putExtra("y",ys.get(index));
+            intentR.putExtra("time",times.get(index));
+            intentR.putExtra("operation",operations.get(index));
+            intentR.putExtra("index",index);
             setResult(RESULT_OK,intentR);
             finish();
             return;
         }
-        //悬浮窗文本
-        String text=intent.getStringExtra("text");
-        if (text == null) text = "drag move\nlong click close";
-        //悬浮窗宽度
-        int width=intent.getIntExtra("width",300);
-        //悬浮窗高度
-        int height=intent.getIntExtra("height",150);
-        //悬浮窗背景色 格式:aarrggbb或rrggbb
-        int backColor=colorToInt(intent.getStringExtra("backColor"),"7f7f7f7f");
-        //悬浮窗文字颜色 格式:aarrggbb或rrggbb
-        int textColor=colorToInt(intent.getStringExtra("textColor"),"ff000000");
-        //字体大小
-        int textSize=intent.getIntExtra("textSize",10);
-        final String script=intent.getStringExtra("script");
-        final String arg=intent.getStringExtra("arg");
+        windowManager = (WindowManager) this.getSystemService(WINDOW_SERVICE);
+        //删除悬浮窗
+        index=intent.getIntExtra("remove",-2);
+        if (index>-2){
+        if(index==-1){//删除所有悬浮窗
+            for(Button button : buttons)
+                windowManager.removeView(button);
+            buttons.clear();
+            xs.clear();
+            ys.clear();
+            times.clear();
+            operations.clear();
+        } else {//删除一个悬浮窗
+            try {
+                removeButton(index);
+            } catch (Exception e){
+                Toast.makeText(this,e.toString(),Toast.LENGTH_LONG).show();
+            }
+        }
+          finish();
+          return;
+        }
+            //悬浮按钮
+            Button floatButton = null;
+            //悬浮窗文本
+            String text=intent.getStringExtra("text");
+            //是否彩色文本
+            boolean isHtml = false;
+            if (text == null) {
+                text = intent.getStringExtra("html");
+                if (text == null)
+                    text = "drag move\nlong click close";
+                else isHtml = true;
+            }
+            //悬浮窗宽度
+            int width=intent.getIntExtra("width",300);
+            //悬浮窗高度
+            int height=intent.getIntExtra("height",150);
+            //悬浮窗背景色 格式:aarrggbb或rrggbb
+            int backColor=colorToInt(intent.getStringExtra("backColor"),"7f7f7f7f");
+            //悬浮窗文字颜色 格式:aarrggbb或rrggbb
+            int textColor=colorToInt(intent.getStringExtra("textColor"),"ff000000");
+            //字体大小
+            int textSize=intent.getIntExtra("textSize",10);
+            //脚本路径
+            final String script=intent.getStringExtra("script");
+            //脚本参数
+            final String arg=intent.getStringExtra("arg");
         //moveTaskToBack(true);
-        final Button floatButton=new Button(this);//悬浮按钮
-        final WindowManager windowManager = (WindowManager) this.getSystemService(WINDOW_SERVICE);
+        //索引参数
+        index = intent.getIntExtra("index",-1);
+        if (index>=0) {
+            try {
+                floatButton = buttons.get(index);
+            } catch (Exception e){
+                index=-1;
+            }
+        }
+        if(index<0){
+            floatButton = new Button(this);
+            index = buttons.size();
+        }
         final WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
-        floatButton.setOnTouchListener(new View.OnTouchListener() {
+            floatButton.setOnTouchListener(new View.OnTouchListener() {
             private int x;
             private int y;
+
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public boolean onTouch(View view, MotionEvent event) {
+                int index;
+                for(index =0; index < buttons.size(); index++){
+                    if(view==buttons.get(index))
+                        break;
+                }
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         x = (int) event.getRawX();
@@ -95,21 +163,21 @@ public class FloatViewActivity extends Activity
                         // 更新悬浮窗控件布局
                         if (movedX!=0 || movedY!=0){
                             windowManager.updateViewLayout(view, layoutParams);
-                            State[1] = "move";
+                            operations.set(index, "move");
                         } else {
-                            State[1] = "click";
+                            operations.set(index, "click");
                         }
                         //记录结果
-                        state[0]=layoutParams.x;
-                        state[1]=layoutParams.y;
-                        State[0] = new SimpleDateFormat("yyyyMMdd-HHmmss-SSS").format(new Date(System.currentTimeMillis()));
+                        xs.set(index, layoutParams.x);
+                        ys.set(index, layoutParams.y);
+                        times.set(index, getTime());
                         break;
                     case MotionEvent.ACTION_UP:
-                        if (State[1] == "click") {
+                        if (operations.get(index).equals("click")) {
                             if(script!=null)
                                 ScriptExec.getInstance().playScript(FloatViewActivity.this,
                                         script, arg,false);
-                            windowManager.removeView(floatButton);
+                            removeButton(index);
                             FloatViewActivity.this.finish();
                         }
                     default:
@@ -118,7 +186,10 @@ public class FloatViewActivity extends Activity
                 return false;
             }
         });
-        floatButton.setText(text);
+        if(isHtml)
+            floatButton.setText(Html.fromHtml(text));
+        else
+            floatButton.setText(text);
         floatButton.setBackgroundColor(backColor);
         floatButton.setTextColor(textColor);
         floatButton.setTextSize(textSize);
@@ -135,16 +206,23 @@ public class FloatViewActivity extends Activity
         //起始纵坐标，原点为屏幕中心
         layoutParams.y=intent.getIntExtra("y",0);
         //记录结果
-
-        state[0]=layoutParams.x;
-
-        state[1]=layoutParams.y;
-        State[0] = new SimpleDateFormat("yyyyMMdd-HHmmss-SSS").format(new Date(System.currentTimeMillis()));
-        State[1] = "initial";
         try {
-            windowManager.addView(floatButton, layoutParams);
+            if(index>=buttons.size()){
+                windowManager.addView(floatButton, layoutParams);
+                buttons.add(floatButton);
+                xs.add(layoutParams.x);
+                ys.add(layoutParams.y);
+                times.add(getTime());
+                operations.add("initial");
+            } else {
+                xs.set(index,layoutParams.x);
+                ys.set(index,layoutParams.y);
+                times.set(index,getTime());
+                windowManager.updateViewLayout(floatButton, layoutParams);
+                operations.set(index,"modify");
+            }
         } catch (Exception e) {
-            Toast.makeText(this,getString(R.string.float_view_permission)+"\n"+e.toString(),Toast.LENGTH_LONG).show();
+            Toast.makeText(this,getString(R.string.float_view_permission)+"\n"+ e,Toast.LENGTH_LONG).show();
         }
         finish();
         }
@@ -167,5 +245,19 @@ public class FloatViewActivity extends Activity
             l = Long.valueOf(defaultColor,16);
             return (int) l;
         }
+    }
+
+    private void removeButton(int index){
+        windowManager.removeView(buttons.get(index));
+        buttons.remove(index);
+        xs.remove(index);
+        ys.remove(index);
+        times.remove(index);
+        operations.remove(index);
+    }
+
+    @SuppressLint("NewApi")
+    private String getTime(){
+            return new SimpleDateFormat("yyyyMMdd-HHmmss-SSS").format(new Date(System.currentTimeMillis()));
     }
 }

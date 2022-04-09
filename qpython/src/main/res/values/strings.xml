@@ -378,7 +378,7 @@
     <string name="download_apk">Download APK?</string>
     <string name="download_apk_hint">This operation may charge if you ain\'t in wifi state</string>
     <string name="downloading_new_apk">Downloading new package</string>
-    <string name="checking_update">Checking update</string>
+    <string name="whole_download">Whole Download</string>
     <string name="run_bg_title">Run on background</string>
     <string name="scan">Scan</string>
     <string name="read_script_from_qrcode">Read code from QRCode</string>
@@ -458,7 +458,7 @@
     <string name="log_noti">Log Notification</string>
     <string name="app_noti">App Notifications</string>
     <string name="noti">Notifications</string>
-    <string name="abou_feed_cont">About / Update / Contributors</string>
+    <string name="feed_contribute">Update/Contributors</string>
     <string name="override_hint">Override local file?</string>
     <string name="file_downloaded">File downloaded</string>
     <string name="login_error">Login error</string>
@@ -523,7 +523,6 @@
     <string name="use_py3">Use Python 3</string>
     <string name="py3_now">Using Python 3 now</string>
     <string name="install_py3_first">To switch to Python 3, please download it\'s resource</string>
-    <string name="install_py2compatible_first">To switch to Python 2 Compatible, please download it\'s resource</string>
 
     <string name="py_resources">Download Python Resource</string>
 
@@ -531,7 +530,6 @@
     <string name="aipy_installed">AIPy is installed</string>
     <string name="switch_py3">Switch to Python 3</string>
     <string name="update_py3"><![CDATA[Download Py3 Resource]]></string>
-    <string name="update_py2compatible"><![CDATA[Download Py2 Compatible Resource]]></string>
 
     <string name="switch_py2">Reset to Python 2 Standard</string>
     <string name="switch_py2_libs">It will remove all Python 2 libraries you have installed</string>
@@ -556,7 +554,6 @@
 
     <string name="py3_not_install">QPY3 not install</string>
     <string name="install_py3_hint">Confirm to download Python 3 Resource?</string>
-    <string name="install_py2compatible_hint">Confirm to download Python 2 Compatible Resource?</string>
 
     <string name="open_app_market">Install with App</string>
     <string name="download_it">Download it</string>
@@ -657,7 +654,6 @@
     <string name="key_update_qpy2compatible" translatable="false">update_py2compatible</string>
 
     <string name="python_interpreter">Python Interpreter</string>
-    <string name="action_notebook">Notebook</string>
 
     <string name="shell_terminal">Shell Terminal</string>
     <string name="ip_address">My IP Adress</string>
@@ -666,7 +662,7 @@
     <string name="welcome">Welcome to use QPython 3C , enjoy your mobile phone programming journey now .</string>
     <string name="notice">Notice</string>
     <string name="package_name_title">Package Name</string>
-    <string name="qpython_android">github: qpython-android</string>
+    <string name="qpython_android">qpython-android</string>
     <string name="fork_from_title">Forked From</string>
     <string name="origin_author">OriginAuthor:北京优趣天下</string>
     <string name="modify_author">ModifyAuthor:乘着船</string>
@@ -713,7 +709,6 @@
     <string name="qpython_protect_run">QPython Background Protect Hide Suspended Window is running</string>
     <string name="agree">Agree</string>
     <string name="disagree">Disagree</string>
-    <string name="security_tip">Related to granting permissions: QPython3C will not collect any user information. You can grant corresponding permissions according to your own situation. Unauthorized permissions will lose their corresponding functions.  Open source software security tips: If a security vulnerability occurs when using QPython3C, the QPython3C developer may not have the time or ability to repair it. Continued use means that the QPython3C users bears the relevant security risks, which has nothing to do with the QPython developer.  Open source is free but requires support: Open source software production requires investment cost. Please support more QPython developers. QPython3C is completely free for personal learning and research, at present, QPython3C does not allow commercial use, the rest follow the Apache open source protocol.  Support QPython developers, Bilibili Accout: Origin Author: QPYIO Modify Author: 乘着船 Welcome to give the thumbs-up, collection and/or insert coin . QPython developers may not have time to reply to every problem, or some problems QPython developers can\'t solve themselves now .</string>
     <string name="ignore">Ignore</string>
     <string name="set">Set</string>
     <string name="course_official">Course Official</string>
@@ -727,5 +722,9 @@
     <string name="python_shell_terminal">Python Color Shell Terminal</string>
     <string name="wechat_com">mp.weixin.qq.com</string>
     <string name="qpy_custom_dir">QPython Custom Directory</string>
+    <string name="qpython_gitee">https://gitee.com/qpython-android</string>
+    <string name="download">Download</string>
+    <string name="security_version">20220416</string>
+    <string name="float_view_out_range">Float View Index Out of Range .</string>
 
 </resources>

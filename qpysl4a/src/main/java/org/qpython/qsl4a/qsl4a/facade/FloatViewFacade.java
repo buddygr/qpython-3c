@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import org.json.JSONObject;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
+import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
 import org.qpython.qsl4a.qsl4a.rpc.RpcOptional;
 import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
 
@@ -35,17 +36,25 @@ public class FloatViewFacade extends RpcReceiver {
     Intent intent = new Intent();
     intent.setClassName(mService.getPackageName(),floatViewActivity);
     String[] argName = new String[] {
-            "x","y","textSize","width","height",
-            "text","backColor","textColor","script","arg"
+            "x","y","textSize","width","height","index",
+            "text","html",
+            "backColor","textColor","script","arg"
     };
     String ArgName;
-    for(byte i=0;i<5;i++) {
+    for(byte i=0;i<6;i++) {
       ArgName = argName[i];
       try {
         intent.putExtra(ArgName, args.getInt(ArgName));
       } catch (Exception ignored) {}
     }
-    for(byte i=5;i<10;i++) {
+    for(byte i=6;i<8;i++) {
+      ArgName = argName[i];
+      try {
+        intent.putExtra(ArgName, args.getString(ArgName));
+        break;
+      } catch (Exception ignored) {}
+    }
+    for(byte i=8;i<12;i++) {
       ArgName = argName[i];
       try {
         intent.putExtra(ArgName, args.getString(ArgName));
@@ -57,25 +66,26 @@ public class FloatViewFacade extends RpcReceiver {
     }
 
   @Rpc(description = "Return Float View Result.")
-  public JSONObject floatViewResult()
-          throws Exception  {
-    Intent intent = new Intent();
+  public JSONObject floatViewResult(
+          @RpcParameter(name="index") @RpcDefault("-1") Integer index
+  ) throws Exception  {
+    /*Intent intent = new Intent();
     intent.setClassName(mService.getPackageName(),floatViewActivity);
     intent.putExtra("result", true);
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    intent.setAction(Intent.ACTION_VIEW);
+    intent.setAction(Intent.ACTION_VIEW);*/
     JSONObject result = new JSONObject();
-    result.put("result",true);
+    result.put("result",index);
     Intent intentR = mAndroidFacade.startActivityForResult(
             "android.intent.action.VIEW",null,null,result,
             mService.getPackageName(), floatViewActivity);
     result = new JSONObject();
     String[] argName = new String[] {
-            "x","y",
+            "x","y","index",
             "time","operation"
     };
     String ArgName;
-    for(byte i=0;i<2;i++) {
+    for(byte i=0;i<3;i++) {
       ArgName = argName[i];
       try {
         result.put(ArgName,intentR.getIntExtra(ArgName,0));
@@ -83,7 +93,7 @@ public class FloatViewFacade extends RpcReceiver {
         result.put(ArgName,e.toString());
       }
     }
-    for(byte i=2;i<4;i++) {
+    for(byte i=3;i<5;i++) {
       ArgName = argName[i];
       try {
         result.put(ArgName,intentR.getStringExtra(ArgName));
@@ -92,6 +102,19 @@ public class FloatViewFacade extends RpcReceiver {
       }
     }
     return result;
+  }
+
+  @Rpc(description = "Remove Float View .")
+  public void floatViewRemove(
+          @RpcParameter(name = "index") @RpcDefault("-1") Integer index
+  )
+          throws Exception {
+    Intent intent = new Intent();
+    intent.setClassName(mService.getPackageName(), floatViewActivity);
+    intent.putExtra("remove", index);
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    intent.setAction(Intent.ACTION_VIEW);
+    mAndroidFacade.startActivity(intent);
   }
 
   @Rpc(description = "QPython Background Protect .")

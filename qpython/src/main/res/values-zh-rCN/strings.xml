@@ -213,7 +213,7 @@
     <string name="more">更多</string>
     <string name="new_window">打开新终端</string>
     <string name="already_newest">当前已是最新版本</string>
-    <string name="checking_update">检查更新</string>
+    <string name="whole_download">全面下载</string>
     <string name="confirm_window_close_message">确定要关闭终端吗？</string>
     <string name="convert_fail">转换失败</string>
     <string name="course">课程</string>
@@ -443,7 +443,7 @@
     <string name="get_support_from_community">从社区获取帮助/意见反馈</string>
     <string name="get_last_log">检查上次运行时日志</string>
     <string name="noti">推送</string>
-    <string name="abou_feed_cont">关于 / 更新 / 贡献者</string>
+    <string name="feed_contribute">更新/贡献者</string>
     <string name="py2_or_3">您想使用 Python 3 还是 2 ？</string>
     <string name="use_py3">使用 Python 3</string>
     <string name="welcome">欢迎使用QPython 3C，享受您的手机编程之旅吧。</string>
@@ -505,7 +505,6 @@
     <string name="qpython_protect_run">QPython 后台保护 隐藏悬浮窗 正在运行</string>
     <string name="agree">同意</string>
     <string name="disagree">不同意</string>
-    <string name="security_tip">开源软件安全提示：本软件不会收集任何用户信息，您可以根据自身情况授予相应权限，未被授予的权限将会失去对应功能。但使用本软件如果出现安全漏洞，软件开发者可能没时间也无力修复，继续使用意味着自行承担与此相关安全风险，与软件开发者无关。</string>
     <string name="set">设置</string>
     <string name="ignore">忽略</string>
     <string name="video_account_wechat">官方视频号 (微信)</string>
@@ -518,4 +517,6 @@
     <string name="qr_info">确认</string>
     <string name="qr_goto">你想访问这个URL吗？</string>
     <string name="qpy_custom_dir">QPython自定义目录</string>
+    <string name="download">下载</string>
+    <string name="float_view_out_range">悬浮窗索引超出范围。</string>
 </resources>

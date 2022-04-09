@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ShortcutInfo;
 import android.content.pm.ShortcutManager;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Icon;
@@ -17,7 +16,6 @@ import android.provider.ContactsContract;
 import android.support.annotation.RequiresApi;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.webkit.MimeTypeMap;
 
 import com.google.zxing.BinaryBitmap;
@@ -35,10 +33,7 @@ import org.qpython.qsl4a.qsl4a.rpc.RpcOptional;
 import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Locale;
-import java.util.Map;
 
 /**
  * A selection of commonly used intents. <br>
@@ -246,39 +241,6 @@ public class CommonIntentsFacade extends RpcReceiver {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT|Intent.FLAG_ACTIVITY_MULTIPLE_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("title",title);
         mAndroidFacade.doStartActivity(intent,wait);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    @Rpc(description = "Get system language and country .")
-    public String getLocale() {
-       return Resources.getSystem().getConfiguration().getLocales().get(0).toString();
-    }
-
-    @Rpc(description = "get system infomation .")
-    public Map<String,String> getSysInfo(){
-      Map<String,String> s = new HashMap<>();
-      s.put("model", Build.MODEL);
-      s.put("sdk",Build.VERSION.SDK);
-      s.put("release",Build.VERSION.RELEASE);
-      s.put("brand",Build.BRAND);
-      s.put("device",Build.DEVICE);
-      s.put("display",Build.DISPLAY);
-      s.put("language",Locale.getDefault().getLanguage());
-      return s;
-    }
-
-    @Rpc(description = "get screen infomation .")
-    public Map<String,Float> getScreenInfo(){
-        Map<String,Float> s = new HashMap<>();
-        DisplayMetrics dm = context.getResources().getDisplayMetrics();
-        s.put("widthPixels",(float)dm.widthPixels);
-        s.put("heightPixels",(float)dm.heightPixels);
-        s.put("densityDpi",(float)dm.densityDpi);
-        s.put("density",dm.density);
-        s.put("xdpi",dm.xdpi);
-        s.put("ydpi",dm.ydpi);
-        s.put("scaledDensity",dm.scaledDensity);
-        return s;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)

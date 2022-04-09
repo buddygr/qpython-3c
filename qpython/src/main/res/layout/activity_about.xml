@@ -58,9 +58,9 @@
                 android:background="@color/toolbar"/>
 
                 <TextView
-                    android:id="@+id/tv_update"
+                    android:id="@+id/tv_whole_down"
                     style="@style/setting_tv"
-                    android:text="@string/check_update"/>
+                    android:text="@string/whole_download"/>
 
             <View
                 android:layout_width="match_parent"
