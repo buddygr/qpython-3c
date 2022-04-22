@@ -24,7 +24,9 @@ import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+import android.os.Build;
 import android.os.Handler;
+import android.support.annotation.RequiresApi;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
@@ -120,10 +122,10 @@ public class FullScreenTask extends FutureActivityTask<Object> implements OnClic
     result.setOrientation(LinearLayout.VERTICAL);
     EditText text = new EditText(activity);
     text.setText("Error Message :\n" + Error);
-    result.addView(text, LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+    result.addView(text, LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
     Button OK = new Button(activity);
     OK.setText("OK");
-    result.addView(OK, LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+    result.addView(OK, LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
     return result;
   }
 
@@ -203,6 +205,26 @@ public class FullScreenTask extends FutureActivityTask<Object> implements OnClic
     mInflater.getErrors().clear();
     if (v != null) {
       SetList p = new SetList(v, items);
+      mHandler.post(p);
+      try {
+        p.mLatch.await();
+      } catch (InterruptedException e) {
+        mInflater.getErrors().add(e.toString());
+      }
+    } else {
+      return "View " + id + " not found.";
+    }
+    if (mInflater.getErrors().size() == 0) {
+      return "OK";
+    }
+    return mInflater.getErrors().get(0);
+  }
+
+  public String setListHtml(String id, JSONArray items) {
+    View v = getViewByName(id);
+    mInflater.getErrors().clear();
+    if (v != null) {
+      SetListHtml p = new SetListHtml(v, items);
       mHandler.post(p);
       try {
         p.mLatch.await();
@@ -300,6 +322,25 @@ public class FullScreenTask extends FutureActivityTask<Object> implements OnClic
     }
   }
 
+  private class SetListHtml implements Runnable {
+    View mView;
+    JSONArray mItems;
+    CountDownLatch mLatch = new CountDownLatch(1);
+
+    SetListHtml(View view, JSONArray items) {
+      mView = view;
+      mItems = items;
+      mLatch.countDown();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    public void run() {
+      mInflater.setListAdapterHtml(mView, mItems);
+      mView.invalidate();
+    }
+  }
+
   private class SetList2 implements Runnable {
     View mView;
     JSONArray mItems;
@@ -372,10 +413,8 @@ public class FullScreenTask extends FutureActivityTask<Object> implements OnClic
     data.put("key", String.valueOf(keyCode));
     data.put("action", String.valueOf(event.getAction()));
     mEventFacade.postEvent("key", data);
-    boolean overrideKey =
-            (keyCode == KeyEvent.KEYCODE_BACK)
-                    || (mOverrideKeys == null ? false : mOverrideKeys.contains(keyCode));
-    return overrideKey;
+    return (keyCode == KeyEvent.KEYCODE_BACK)
+            || (mOverrideKeys != null && mOverrideKeys.contains(keyCode));
   }
 
   @Override

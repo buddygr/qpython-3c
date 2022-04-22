@@ -33,6 +33,7 @@ public class FutureActivityTaskExecutor {
   private final Map<Integer, FutureActivityTask<?>> mTaskMap =
       new ConcurrentHashMap<Integer, FutureActivityTask<?>>();
   private final AtomicInteger mIdGenerator = new AtomicInteger(0);
+  private final int intentFlags = Intent.FLAG_ACTIVITY_NEW_DOCUMENT | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK;
 
   public FutureActivityTaskExecutor(Context context) {
     mContext = context;
@@ -41,18 +42,23 @@ public class FutureActivityTaskExecutor {
   public void execute(FutureActivityTask<?> task) {
     int id = mIdGenerator.incrementAndGet();
     mTaskMap.put(id, task);
-    launchHelper(id);
+    Intent helper = new Intent(mContext, FutureActivity.class);
+    helper.putExtra(Constants.EXTRA_TASK_ID, id);
+    helper.setFlags(intentFlags);
+    mContext.startActivity(helper);
+  }
+
+  public void execute(FutureActivityTask<?> task,int flags) {
+    int id = mIdGenerator.incrementAndGet();
+    mTaskMap.put(id, task);
+    Intent helper = new Intent(mContext, FutureActivity.class);
+    helper.putExtra(Constants.EXTRA_TASK_ID, id);
+    helper.setFlags(flags);
+    mContext.startActivity(helper);
   }
 
   public FutureActivityTask<?> getTask(int id) {
     return mTaskMap.remove(id);
   }
 
-  private void launchHelper(int id) {
-    Intent helper = new Intent(mContext, FutureActivity.class);
-    //helper.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-    helper.setFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-    helper.putExtra(Constants.EXTRA_TASK_ID, id);
-    mContext.startActivity(helper);
-  }
 }

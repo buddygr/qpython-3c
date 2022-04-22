@@ -4,7 +4,7 @@ import org.qpython.qpysdk.QPyConstants;
 
 public class CONF implements QPyConstants {
 
-    public static final String QPYPI_URL         = "https://pypi.org/simple/";
+    //public static final String QPYPI_URL         = "https://pypi.org/simple/";
 
     public static final String NOTIFICATION_SP_NAME = "NOTIFICATION_EXTRA";
     public static final String NOTIFICATION_SP_OBJ  = "NOTIFICATION_OBJ";
@@ -23,7 +23,6 @@ public class CONF implements QPyConstants {
     public static final String pytho = binDir + "python";
     public static final String qpysh = binDir + "qpython.sh";
     public static final String qpyshr = binDir + "qpython-root.sh";
-    //public static final String qpyccs = binDir + "colorConsole.py";
     public static final String qpypiPath = filesDir + "/lib/"+pyVer+"/site-packages/";
 
     public static final String packageName = App.getContext().getPackageName();

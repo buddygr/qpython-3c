@@ -2,9 +2,6 @@
 
 package org.qpython.qsl4a.qsl4a.jsonrpc;
 
-import android.app.DownloadManager;
-import android.content.ContentResolver;
-
 public abstract class RpcReceiver {
 
   protected final RpcReceiverManager mManager;

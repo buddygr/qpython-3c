@@ -16,14 +16,21 @@
 
 package org.qpython.qsl4a.qsl4a.facade;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 
 
+import org.qpython.qsl4a.qsl4a.activity.FutureActivity;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
 import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
@@ -123,6 +130,7 @@ public class SensorManagerFacade extends RpcReceiver {
   private volatile Float mZMag;
 
   private volatile Float mLight;
+  private volatile Integer mStepCounter;
 
   private volatile Double mAzimuth;
   private volatile Double mPitch;
@@ -133,16 +141,23 @@ public class SensorManagerFacade extends RpcReceiver {
 
   private SensorEventListener mSensorListener;
 
+  private final AndroidFacade mAndroidFacade;
+  private final Context context;
+
+  private final String SENSOR_DESCRIPTION = "1 = All, 2 = Accelerometer, 3 = Magnetometer, 4 = Light, 5 = StepCounter";
+
   public SensorManagerFacade(FacadeManager manager) {
     super(manager);
     mEventFacade = manager.getReceiver(EventFacade.class);
     mSensorManager = (SensorManager) manager.getService().getSystemService(Context.SENSOR_SERVICE);
+    mAndroidFacade = manager.getReceiver(AndroidFacade.class);
+    context = mAndroidFacade.context;
   }
 
   @Rpc(description = "Starts recording sensor data to be available for polling.")
   @RpcStartEvent("sensors")
   public void startSensingTimed(
-      @RpcParameter(name = "sensorNumber", description = "1 = All, 2 = Accelerometer, 3 = Magnetometer and 4 = Light") Integer sensorNumber,
+      @RpcParameter(name = "sensorNumber", description = SENSOR_DESCRIPTION) Integer sensorNumber,
       @RpcParameter(name = "delayTime", description = "Minimum time between readings in milliseconds") Integer delayTime) {
     mSensorNumber = sensorNumber;
     if (delayTime < 20) {
@@ -177,7 +192,22 @@ public class SensorManagerFacade extends RpcReceiver {
           mSensorManager.registerListener(mSensorListener, sensor,
               SensorManager.SENSOR_DELAY_FASTEST);
         }
+          break;
+      case 5:
+        checkActivityRecognizePermission();
+          for (Sensor sensor : mSensorManager.getSensorList(Sensor.TYPE_STEP_COUNTER)) {
+            mSensorManager.registerListener(mSensorListener, sensor,
+                    SensorManager.SENSOR_DELAY_NORMAL);
+          }
       }
+    }
+  }
+
+  private void checkActivityRecognizePermission(){
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && ContextCompat.checkSelfPermission(context, Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
+        ActivityCompat.requestPermissions(new Activity(),
+                new String[]{Manifest.permission.ACTIVITY_RECOGNITION},
+                100);
     }
   }
 
@@ -185,7 +215,7 @@ public class SensorManagerFacade extends RpcReceiver {
   @RpcStartEvent("threshold")
   public void startSensingThreshold(
 
-      @RpcParameter(name = "sensorNumber", description = "1 = Orientation, 2 = Accelerometer, 3 = Magnetometer and 4 = Light") Integer sensorNumber,
+      @RpcParameter(name = "sensorNumber", description = SENSOR_DESCRIPTION) Integer sensorNumber,
       @RpcParameter(name = "threshold", description = "Threshold level for chosen sensor (integer)") Integer threshold,
       @RpcParameter(name = "axis", description = "0 = No axis, 1 = X, 2 = Y, 3 = X+Y, 4 = Z, 5= X+Z, 6 = Y+Z, 7 = X+Y+Z") Integer axis) {
     mSensorNumber = sensorNumber;
@@ -233,6 +263,11 @@ public class SensorManagerFacade extends RpcReceiver {
     return mLight;
   }
 
+  @Rpc(description = "Returns the most recently step counter.")
+  public Integer sensorsGetStepCounter() {
+    return mStepCounter;
+  }
+
   @Rpc(description = "Returns the most recently received accelerometer values.", returns = "a List of Floats [(acceleration on the) X axis, Y axis, Z axis].")
   public List<Float> sensorsReadAccelerometer() {
     synchronized (mSensorReadings) {
@@ -254,14 +289,14 @@ public class SensorManagerFacade extends RpcReceiver {
     }
   }
 
-  @Rpc(description = "Starts recording sensor data to be available for polling.")
+  /*@Rpc(description = "Starts recording sensor data to be available for polling.")
   @RpcDeprecated(value = "startSensingTimed or startSensingThreshhold", release = "4")
   public void startSensing(
       @RpcParameter(name = "sampleSize", description = "number of samples for calculating average readings") @RpcDefault("5") Integer sampleSize) {
     if (mSensorListener == null) {
       startSensingTimed(1, 220);
     }
-  }
+  }*/
 
   @Override
   public void shutdown() {
@@ -387,6 +422,19 @@ public class SensorManagerFacade extends RpcReceiver {
             }
           }
           break;
+          case Sensor.TYPE_STEP_COUNTER:
+            try {
+              mStepCounter = (int) event.values[0];
+            } catch (Exception e){
+              mStepCounter = -1;
+            }
+            if (mThreshing == 0) {
+              mSensorReadings.putInt("stepCounter", mStepCounter);
+              if ((mSensorNumber == 5) && (System.currentTimeMillis() > (mDelayTime + mLastTime))) {
+                mLastTime = System.currentTimeMillis();
+                postEvent();
+              }
+            }
 
         }
         if (mSensorNumber == 1) {

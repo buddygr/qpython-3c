@@ -17,6 +17,7 @@
 
 package org.qpython.qsl4a.qsl4a.facade.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -27,9 +28,12 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.text.Html;
 import android.text.InputType;
 import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.method.DigitsKeyListener;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -51,6 +55,7 @@ import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.qpython.qsl4a.qsl4a.LogUtil;
+import org.qpython.qsl4a.qsl4a.util.HtmlUtil;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -81,6 +86,7 @@ public class ViewInflater {
   private static final Map<String, Integer> mInputTypes = new HashMap<String, Integer>();
   public static final Map<String, String> mColorNames = new HashMap<String, String>();
   public static final Map<String, Integer> mRelative = new HashMap<String, Integer>();
+
   static {
     mColorNames.put("aliceblue", "#f0f8ff");
     mColorNames.put("antiquewhite", "#faebd7");
@@ -496,6 +502,7 @@ public class ViewInflater {
     }
   }
 
+  @SuppressLint("WrongConstant")
   private void setProperty(View view, ViewGroup root, String attr, String value)
           throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
     addln(attr + ":" + value);
@@ -571,7 +578,7 @@ public class ViewInflater {
        }
     } else if (attr.equals("html")){
       TextView textview = (TextView) view;
-      textview.setText(Html.fromHtml(value));
+      textview.setText(HtmlUtil.textToHtml(value));
     }
     else {
       setDynamicProperty(view, attr, value);
@@ -1054,14 +1061,45 @@ public class ViewInflater {
       Method m;
       if (view instanceof Spinner) {
         adapter =
-                new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_item,
+                new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item,
                         android.R.id.text1, list);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         m = view.getClass().getMethod("setAdapter",SpinnerAdapter.class);
       } else {
         adapter =
-                new ArrayAdapter<String>(mContext, android.R.layout.simple_list_item_1,
+                new ArrayAdapter<>(mContext, android.R.layout.simple_list_item_1,
                         android.R.id.text1, list);
+        //adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        m = view.getClass().getMethod("setAdapter", ListAdapter.class);
+      }
+      m.invoke(view, adapter);
+    } catch (Exception e) {
+      mErrors.add("failed to load list " + e.getMessage());
+    }
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.N)
+  public void setListAdapterHtml(View view, JSONArray items) {
+    List<String> list = new ArrayList<String>();
+    try {
+      for (int i = 0; i < items.length(); i++) {
+        list.add(items.get(i).toString());
+      }
+      ArrayAdapter<Spanned> adapter;
+      Method m;
+      Spanned[] listHtml = new Spanned[list.size()];
+      for (int i=0;i<list.size();i++)
+        listHtml[i]=HtmlUtil.textToHtml(list.get(i));
+      if (view instanceof Spinner) {
+        adapter =
+                new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_item,
+                        android.R.id.text1, listHtml);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        m = view.getClass().getMethod("setAdapter",SpinnerAdapter.class);
+      } else {
+        adapter =
+                new ArrayAdapter<>(mContext, android.R.layout.simple_list_item_1,
+                        android.R.id.text1, listHtml);
         //adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         m = view.getClass().getMethod("setAdapter", ListAdapter.class);
       }

@@ -1,7 +1,5 @@
 package org.qpython.qsl4a;
 
-import android.app.Application;
-
 import com.quseit.base.MyApp;
 
 import org.qpython.qsl4a.qsl4a.FutureActivityTaskExecutor;

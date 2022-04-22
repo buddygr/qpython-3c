@@ -25,7 +25,6 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.quseit.base.QBaseApp;
@@ -39,15 +38,11 @@ import org.qpython.qpy.main.app.App;
 import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.main.event.Bean;
 import org.qpython.qpy.main.utils.Utils;
-import org.qpython.qpysdk.QPyConstants;
 import org.qpython.qpysdk.utils.FileHelper;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 /**
@@ -248,11 +243,19 @@ public class QWebViewActivity extends BaseActivity {
     }
 
     public void onDestroy() {
-        super.onDestroy();
+        WebView wv = findViewById(R.id.wv);
+        wv.loadUrl("about:blank");
+        wv.clearHistory();
+        wv.stopLoading();
+        wv.setWebChromeClient(null);
+        wv.setWebViewClient(null);
+        wv.destroy();
+        wv = null;
         unregisterReceiver(webviewActivityReceiver);
         if (launchScript != null && !launchScript.equals("")) {
             endWebSrv(launchScript);
         }
+        super.onDestroy();
     }
 
     protected void endWebSrv(String script) {

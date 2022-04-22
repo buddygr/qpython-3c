@@ -41,11 +41,13 @@ This repository is the QPython 3C project repository, you can follow the below s
 - [QPython 3x features](https://github.com/qpython-android/qpython.org/blob/master/qpython-docs/source/en/qpython_3x_featues.rst), [QPython Ox features](https://github.com/qpython-android/qpython.org/blob/master/qpython-docs/source/en/qpython_ox_featues.rst)
 - [QPySL4A APIs](https://github.com/qpython-android/qpysl4a/blob/master/doc/en/APIs.rst) and [test scripts](https://github.com/qpython-android/qpysl4a/issues/1)
 - [new SL4A Functions 拍照录音录像、截屏录屏、外置卡读写](https://www.bilibili.com/read/cv13418026)
-- [new SL4A Functions 电话、悬浮窗、网页等](https://www.bilibili.com/read/cv11197543)
+- [new SL4A Functions 电话、网页、系统等](https://www.bilibili.com/read/cv11197543)
+- [new SL4A Functions 可视化窗口、悬浮窗](https://www.bilibili.com/read/cv16138580)
 - [new SL4A Functions Javax.Crypto.Cipher 加解密](https://www.bilibili.com/read/cv11108237)
 - new SL4A Functions [Open File](https://www.bilibili.com/read/cv11037013) and [Video Play](https://www.bilibili.com/BV1xK4y1D7eV)
 - [play new SL4A game](https://www.bilibili.com/read/cv15206348)
 - 图形界面：[音乐播放器、文件选择器、列表选择器](https://www.bilibili.com/BV1Pz4y1C7ds)、[长文本框](https://www.bilibili.com/BV1d7411R7ic)
+- 网络监测：[基站和综合网络](https://www.bilibili.com/read/cv16061380)与[WiFi网络](https://www.bilibili.com/read/cv13278468)
 
 ## How to ask QPython related questions
 In order to benefit those guys who have the same issue with QPython, we suggest that you should ask the issue which is related with QPython within public techical communities.

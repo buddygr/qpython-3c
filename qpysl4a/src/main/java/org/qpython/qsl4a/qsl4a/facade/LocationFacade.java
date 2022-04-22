@@ -16,16 +16,22 @@
 
 package org.qpython.qsl4a.qsl4a.facade;
 
+import android.Manifest;
 import android.app.Service;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 
 import com.google.common.collect.Maps;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
 import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
@@ -33,7 +39,6 @@ import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
 import org.qpython.qsl4a.qsl4a.rpc.RpcStartEvent;
 import org.qpython.qsl4a.qsl4a.rpc.RpcStopEvent;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +57,7 @@ import java.util.Map.Entry;
  * 1297079709000L, u'latitude': 52.41076922416687, u'speed': 0, u'accuracy': 24}}<br>
  * If neither are available {} is returned. <br>
  * Example (python):<br>
- * 
+ *
  * <pre>
  * import android, time
  * droid = android.Android()
@@ -71,12 +76,12 @@ import java.util.Map.Entry;
  *   address = droid.geocode(la, lo).result
  * droid.stopLocating()
  * </pre>
- * 
+ *
  * The address format is:<br>
  * [{u'thoroughfare': u'Some Street', u'locality': u'Some Town', u'sub_admin_area': u'Some Borough',
  * u'admin_area': u'Some City', u'feature_name': u'House Numbers', u'country_code': u'GB',
  * u'country_name': u'United Kingdom', u'postal_code': u'ST1 1'}]
- * 
+ *
  * @author Damon Kohler (damonkohler@gmail.com)
  * @author Felix Arends (felix.arends@gmail.com)
  */
@@ -117,12 +122,18 @@ public class LocationFacade extends RpcReceiver {
     mEventFacade = manager.getReceiver(EventFacade.class);
     mGeocoder = new Geocoder(mService);
     mLocationManager = (LocationManager) mService.getSystemService(Context.LOCATION_SERVICE);
-    mLocationUpdates = new HashMap<String, Location>();
+    mLocationUpdates = new HashMap<>();
   }
 
   @Override
   public void shutdown() {
     stopLocating();
+  }
+
+  public void check_Access_Fine_Location_Permission() throws Exception {
+    if (ActivityCompat.checkSelfPermission(mService, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+      throw new Exception(Manifest.permission.ACCESS_FINE_LOCATION);
+    }
   }
 
   @Rpc(description = "Returns availables providers on the phone")
@@ -140,7 +151,8 @@ public class LocationFacade extends RpcReceiver {
   @RpcStartEvent("location")
   public void startLocating(
       @RpcParameter(name = "minDistance", description = "minimum time between updates in milliseconds") @RpcDefault("60000") Integer minUpdateTime,
-      @RpcParameter(name = "minUpdateDistance", description = "minimum distance between updates in meters") @RpcDefault("30") Integer minUpdateDistance) {
+      @RpcParameter(name = "minUpdateDistance", description = "minimum distance between updates in meters") @RpcDefault("30") Integer minUpdateDistance) throws Exception {
+    check_Access_Fine_Location_Permission();
     for (String provider : mLocationManager.getAllProviders()) {
       mLocationManager.requestLocationUpdates(provider, minUpdateTime, minUpdateDistance,
           mLocationListener, mService.getMainLooper());
@@ -148,8 +160,14 @@ public class LocationFacade extends RpcReceiver {
   }
 
   @Rpc(description = "Returns the current location as indicated by all available providers.", returns = "A map of location information by provider.")
-  public Map<String, Location> readLocation() {
-    return mLocationUpdates;
+  public Map<String, JSONObject> readLocation() throws JSONException {
+    Map<String,JSONObject> result = new HashMap<>();
+    for(String i: mLocationUpdates.keySet()){
+      Location l = mLocationUpdates.get(i);
+      if(l==null)continue;
+      result.put(i,buildJsonLocation(l));
+    }
+    return result;
   }
 
   @Rpc(description = "Stops collecting location data.")
@@ -160,20 +178,63 @@ public class LocationFacade extends RpcReceiver {
   }
 
   @Rpc(description = "Returns the last known location of the device.", returns = "A map of location information by provider.")
-  public Map<String, Location> getLastKnownLocation() {
-    Map<String, Location> location = new HashMap<String, Location>();
+  public Map<String, JSONObject> getLastKnownLocation() throws Exception {
+    check_Access_Fine_Location_Permission();
+    Map<String, JSONObject> location = new HashMap<>();
     for (String provider : mLocationManager.getAllProviders()) {
-      location.put(provider, mLocationManager.getLastKnownLocation(provider));
+      location.put(provider, buildJsonLocation(mLocationManager.getLastKnownLocation(provider)));
     }
     return location;
   }
 
   @Rpc(description = "Returns a list of addresses for the given latitude and longitude.", returns = "A list of addresses.")
-  public List<Address> geocode(
+  public JSONObject[] geocode(
       @RpcParameter(name = "latitude") Double latitude,
       @RpcParameter(name = "longitude") Double longitude,
       @RpcParameter(name = "maxResults", description = "maximum number of results") @RpcDefault("1") Integer maxResults)
-      throws IOException {
-    return mGeocoder.getFromLocation(latitude, longitude, maxResults);
+          throws Exception {
+    List<Address> addressList =  mGeocoder.getFromLocation(latitude, longitude, maxResults);
+    JSONObject[] address = new JSONObject[addressList.size()];
+    for(int i=0;i<addressList.size();i++)
+      address[i]=buildJsonAddress(addressList.get(i));
+    return address;
+  }
+
+  private static JSONObject buildJsonAddress(Address address) throws JSONException {
+    JSONObject result = new JSONObject();
+    result.put("admin_area", address.getAdminArea());
+    result.put("country_code", address.getCountryCode());
+    result.put("country_name", address.getCountryName());
+    result.put("feature_name", address.getFeatureName());
+    result.put("phone", address.getPhone());
+    result.put("locality", address.getLocality());
+    result.put("postal_code", address.getPostalCode());
+    result.put("sub_admin_area", address.getSubAdminArea());
+    result.put("thoroughfare", address.getThoroughfare());
+    result.put("url", address.getUrl());
+    return result;
+  }
+
+  private static Map<String,JSONObject> buildJsonLocations(Map<String, Location> source) throws JSONException {
+    Map<String,JSONObject> result = new HashMap<>();
+    for(String i: source.keySet()){
+      Location l = source.get(i);
+      if(l==null)continue;
+      result.put(i,buildJsonLocation(l));
+    }
+    return result;
+  }
+
+  private static JSONObject buildJsonLocation(Location location) throws JSONException {
+    JSONObject result = new JSONObject();
+    result.put("altitude", location.getAltitude());
+    result.put("latitude", location.getLatitude());
+    result.put("longitude", location.getLongitude());
+    result.put("time", location.getTime());
+    result.put("accuracy", location.getAccuracy());
+    result.put("speed", location.getSpeed());
+    result.put("provider", location.getProvider());
+    result.put("bearing", location.getBearing());
+    return result;
   }
 }

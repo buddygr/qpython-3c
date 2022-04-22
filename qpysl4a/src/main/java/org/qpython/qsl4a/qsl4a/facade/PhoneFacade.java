@@ -62,6 +62,7 @@ import org.qpython.qsl4a.qsl4a.rpc.RpcStopEvent;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -204,7 +205,11 @@ public class PhoneFacade extends RpcReceiver {
                 result.put("Mcc,Mnc",nrCellInfoIdetity.getMccString()+","+nrCellInfoIdetity.getMncString());
                 result.put("NrArfcn",nrCellInfoIdetity.getNrarfcn());
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    result.put("Bands",nrCellInfoIdetity.getBands());
+                    int[] bands = nrCellInfoIdetity.getBands();
+                    JSONArray Bands = new JSONArray();
+                    for (int band : bands)
+                        Bands.put(band);
+                    result.put("Bands", Bands);
                 }
             }
         }
@@ -220,7 +225,11 @@ public class PhoneFacade extends RpcReceiver {
                 result.put("Earfcn",lteCellInfoIdetity.getEarfcn());
                 //result.put("Bandwidth",lteCellInfoIdetity.getBandwidth()); //总是2147483647
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    result.put("Bands",lteCellInfoIdetity.getBands());
+                    int[] bands = lteCellInfoIdetity.getBands();
+                    JSONArray Bands = new JSONArray();
+                    for (int band : bands)
+                        Bands.put(band);
+                    result.put("Bands", Bands);
                 }
             }
         }
@@ -265,21 +274,8 @@ public class PhoneFacade extends RpcReceiver {
         check_Access_Fine_Location_Permission();
         //return mTelephonyManager.getCellLocation().toString();
         JSONObject result = new JSONObject();
-        CellLocation cellLocation = mTelephonyManager.getCellLocation();
+        //CellLocation cellLocation = mTelephonyManager.getCellLocation();
         try{
-            /*String detail = cellLocation.toString();
-        result.put("detail",detail);
-        if (cellLocation instanceof GsmCellLocation)
-         {
-            GsmCellLocation location = (GsmCellLocation) cellLocation;
-            result.put("Lac", location.getLac());
-            result.put("Cid", location.getCid());
-        } else {
-            CdmaCellLocation location = (CdmaCellLocation) cellLocation;
-            result.put("Sid", location.getSystemId());
-            result.put("Nid", location.getNetworkId());
-            result.put("Bid", location.getBaseStationId());
-        }*/
         List<CellInfo> cellInfos = mTelephonyManager.getAllCellInfo();
         result.put("CellCount",cellInfos.size());
         for (CellInfo cellInfo : cellInfos) {

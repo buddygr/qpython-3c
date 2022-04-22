@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.text.Layout;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -170,6 +171,7 @@ public class AdvancedEditText extends android.support.v7.widget.AppCompatEditTex
      */
     @Override
     public void onDraw(Canvas canvas) {
+        //乘着船：修复了自动换行行号显示错误的bug
         int count, padding, lineX, baseline;
 
         // padding
@@ -195,6 +197,13 @@ public class AdvancedEditText extends android.support.v7.widget.AppCompatEditTex
         lineX = (int) (mDrawingRect.left + padding - (Settings.TEXT_SIZE
                 * mScale * 0.5));
 
+        int k = 1;
+        Layout layout = getLayout();
+        String text = "";
+        if (Settings.WORDWRAP && Settings.SHOW_LINE_NUMBERS) {
+            text = String.valueOf(getText());
+        }
+
         for (int i = 0; i < count; i++) {
             baseline = getLineBounds(i, mLineBounds);
             if ((mMaxSize != null) && (mMaxSize.x < mLineBounds.right)) {
@@ -203,18 +212,27 @@ public class AdvancedEditText extends android.support.v7.widget.AppCompatEditTex
 
             if ((mLineBounds.bottom < mDrawingRect.top)
                     || (mLineBounds.top > mDrawingRect.bottom)) {
+                if (Settings.SHOW_LINE_NUMBERS && Settings.WORDWRAP && !text.substring(layout.getLineStart(i),layout.getLineEnd(i)).endsWith("\n"))
+                    k--;
                 continue;
             }
 
-            if ((i == mHighlightedLine) && (!Settings.WORDWRAP)) {
+            if(Settings.WORDWRAP) {
+                if (i == mHighlightedLine - k + 1) {
+                    canvas.drawRect(mLineBounds, mPaintHighlight);
+                }
+            }
+            else if (i == mHighlightedLine) {
                 canvas.drawRect(mLineBounds, mPaintHighlight);
             }
 
             if (Settings.SHOW_LINE_NUMBERS) {
-                canvas.drawText("" + (i + 1), mDrawingRect.left + mPadding,
-                        baseline, mPaintNumbers);
-            }
-            if (Settings.SHOW_LINE_NUMBERS) {
+                canvas.drawText(String.valueOf(i+k), mDrawingRect.left + mPadding,
+                    baseline, mPaintNumbers);
+                if(Settings.WORDWRAP && !text.substring(layout.getLineStart(i),layout.getLineEnd(i)).endsWith("\n"))
+                    k--;
+            //}
+            //if (Settings.SHOW_LINE_NUMBERS) {
                 canvas.drawLine(lineX, mDrawingRect.top, lineX,
                         mDrawingRect.bottom, mPaintNumbers);
             }
@@ -395,18 +413,9 @@ public class AdvancedEditText extends android.support.v7.widget.AppCompatEditTex
         }
 
 
-        if (true
-            /*
-                (this.fileType.equals("py") || this.fileType.equals("lua")) &&
-                        this.getLineCount() < Settings.MAX_LINES_NUM_WITH_SYNTAX*/) {
-            isWatch = true;
-            init();
-            refresh();
-        } else {
-            isWatch = false;
-            cancelUpdate();
-            unHightlight();
-        }
+        isWatch = true;
+        init();
+        refresh();
         //}
     }
 
@@ -424,7 +433,7 @@ public class AdvancedEditText extends android.support.v7.widget.AppCompatEditTex
 
         selStart = getSelectionStart();
         if (mHighlightStart != selStart) {
-            text = getText().toString();
+            text = String.valueOf(getText());
 
             line = i = 0;
             while (i < selStart) {
@@ -506,7 +515,7 @@ public class AdvancedEditText extends android.support.v7.widget.AppCompatEditTex
     }
 
     private void init() {
-        setHorizontallyScrolling(true);
+        setHorizontallyScrolling(!Settings.WORDWRAP);//乘着船：修复了不能自动换行的bug
 
         setFilters(new InputFilter[]{
                 (source, start, end, dest, dstart, dend) -> {
@@ -598,7 +607,6 @@ public class AdvancedEditText extends android.support.v7.widget.AppCompatEditTex
 
                 for (int n = errorLine;
                      n-- > 0 && m.find(); )
-                    ;
 
                 e.setSpan(
                         new BackgroundColorSpan(COLOR_ERROR),

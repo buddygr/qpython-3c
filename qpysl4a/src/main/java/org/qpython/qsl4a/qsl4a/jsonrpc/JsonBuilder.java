@@ -83,12 +83,12 @@ public class JsonBuilder {
         if (data instanceof List<?>) {
             return buildJsonList((List<?>) data);
         }
-        if (data instanceof Address) {
+        /*if (data instanceof Address) {
             return buildJsonAddress((Address) data);
         }
         if (data instanceof Location) {
             return buildJsonLocation((Location) data);
-        }
+        }*/
         if (data instanceof Bundle) {
             return buildJsonBundle((Bundle) data);
         }
@@ -150,7 +150,7 @@ public class JsonBuilder {
         return result;
     }
 
-    private static JSONObject buildJsonAddress(Address address) throws JSONException {
+    /*private static JSONObject buildJsonAddress(Address address) throws JSONException {
         JSONObject result = new JSONObject();
         result.put("admin_area", address.getAdminArea());
         result.put("country_code", address.getCountryCode());
@@ -176,7 +176,7 @@ public class JsonBuilder {
         result.put("provider", location.getProvider());
         result.put("bearing", location.getBearing());
         return result;
-    }
+    }*/
 
     private static JSONObject buildJsonBundle(Bundle bundle) throws JSONException {
         JSONObject result = new JSONObject();

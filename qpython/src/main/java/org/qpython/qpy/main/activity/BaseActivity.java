@@ -1,6 +1,5 @@
 package org.qpython.qpy.main.activity;
 
-import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -26,13 +25,9 @@ import com.quseit.util.NUtil;
 import org.qpython.qpy.R;
 import org.qpython.qpy.console.ShellTermSession;
 import org.qpython.qpy.console.util.TermSettings;
-import org.qpython.qpysdk.QPySDK;
-import org.renpy.android.ResourceManager;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;

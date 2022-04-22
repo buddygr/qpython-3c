@@ -518,5 +518,11 @@
     <string name="qr_goto">你想访问这个URL吗？</string>
     <string name="qpy_custom_dir">QPython自定义目录</string>
     <string name="download">下载</string>
-    <string name="float_view_out_range">悬浮窗索引超出范围。</string>
+    <string name="qpypi_up" translatable="false">扩展</string>
+    <string name="event_qpypi">打开扩展</string>
+    <string name="qpypi_manager">扩展</string>
+    <string name="float_view">悬浮窗</string>
+    <string name="video_player">视频播放器</string>
+    <string name="exit_after_close_progress">关闭进度条后，方可按返回键退出</string>
+    <string name="download_progress_need_sometime">这需要些时间，请检查通知栏进度条</string>
 </resources>

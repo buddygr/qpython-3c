@@ -121,6 +121,7 @@ public class AndroidFacade extends RpcReceiver {
     mNotificationManager =
             (NotificationManager) mService.getSystemService(Context.NOTIFICATION_SERVICE);
     mResources = manager.getAndroidFacadeResources();
+    //乘着船 修改
     context = mService.getApplicationContext();
     qpyProvider = context.getPackageName() + ".provider";
   }
@@ -397,12 +398,12 @@ public class AndroidFacade extends RpcReceiver {
     }
   }
 
-  void startActivity(final Intent intent) {
+  void startActivity(final Intent intent) throws Exception {
     try {
-      intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION  | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+      intent.setFlags(intent.getFlags() | intentFlags);
       context.startActivity(intent);
     } catch (Exception e) {
-      LogUtil.e("Failed to launch intent.", e);
+      throw new Exception("Failed to launch intent : "+ e);
     }
   }
 
@@ -449,8 +450,7 @@ public class AndroidFacade extends RpcReceiver {
   }
 
   public void doStartActivity(final Intent intent, Boolean wait) throws Exception {
-    intent.setFlags(intent.getFlags() | intentFlags);
-    if (wait == null || wait == false) {
+    if (wait == null || !wait) {
       startActivity(intent);
     } else {
       FutureActivityTask<Intent> task = new FutureActivityTask<Intent>() {
@@ -459,6 +459,7 @@ public class AndroidFacade extends RpcReceiver {
         @Override
         public void onCreate() {
           super.onCreate();
+          intent.setFlags(intent.getFlags() | intentFlags);
           startActivity(intent);
         }
 
@@ -477,6 +478,44 @@ public class AndroidFacade extends RpcReceiver {
 
       };
       mTaskQueue.execute(task);
+
+      try {
+        task.getResult();
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+
+  public void doStartActivity(final Intent intent, Boolean wait,int flags) throws Exception {
+    if (wait == null || !wait) {
+      startActivity(intent);
+    } else {
+      FutureActivityTask<Intent> task = new FutureActivityTask<Intent>() {
+        private boolean mSecondResume = false;
+
+        @Override
+        public void onCreate() {
+          super.onCreate();
+          intent.setFlags(intent.getFlags() | intentFlags);
+          startActivity(intent);
+        }
+
+        @Override
+        public void onResume() {
+          if (mSecondResume) {
+            finish();
+          }
+          mSecondResume = true;
+        }
+
+        @Override
+        public void onDestroy() {
+          setResult(null);
+        }
+
+      };
+      mTaskQueue.execute(task,flags);
 
       try {
         task.getResult();
@@ -690,7 +729,7 @@ public class AndroidFacade extends RpcReceiver {
           @RpcParameter(name = "to", description = "A comma separated list of recipients.") final String to,
           @RpcParameter(name = "subject") final String subject,
           @RpcParameter(name = "body") final String body,
-          @RpcParameter(name = "attachmentUri") @RpcOptional final String attachmentUri) {
+          @RpcParameter(name = "attachmentUri") @RpcOptional final String attachmentUri) throws Exception {
     final Intent intent = new Intent(android.content.Intent.ACTION_SEND);
     intent.setType("plain/text");
     intent.putExtra(android.content.Intent.EXTRA_EMAIL, to.split(","));

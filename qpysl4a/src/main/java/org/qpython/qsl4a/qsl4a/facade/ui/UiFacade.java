@@ -679,7 +679,7 @@ public class UiFacade extends RpcReceiver {
     return "OK";
   }
 
-    @Rpc(description = "Attach a list to a fullscreen widget")
+    @Rpc(description = "Attach a text list to a fullscreen widget")
   public String fullSetList(
           @RpcParameter(name = "id", description = "id of layout widget") String id,
           @RpcParameter(name = "list", description = "List to set") JSONArray items) {
@@ -687,6 +687,16 @@ public class UiFacade extends RpcReceiver {
       throw new RuntimeException("No screen displayed.");
     }
     return mFullScreenTask.setList(id, items);
+  }
+
+  @Rpc(description = "Attach a html list to a fullscreen widget")
+  public String fullSetListHtml(
+          @RpcParameter(name = "id", description = "id of layout widget") String id,
+          @RpcParameter(name = "list", description = "List to set") JSONArray items) {
+    if (mFullScreenTask == null) {
+      throw new RuntimeException("No screen displayed.");
+    }
+    return mFullScreenTask.setListHtml(id, items);
   }
 
   @Rpc(description = "Attach a 2-line list to a fullscreen widget")

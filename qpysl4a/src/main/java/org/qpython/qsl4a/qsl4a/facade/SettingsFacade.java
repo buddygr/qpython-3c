@@ -26,6 +26,7 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.Environment;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.support.annotation.RequiresApi;
@@ -298,6 +299,12 @@ public class SettingsFacade extends RpcReceiver {
     s.put("scaledDensity",dm.scaledDensity);
     return s;
   }
+
+  @Rpc(description = "Nanoseconds after system startup")
+  public Long elapsedRealtimeNanos(){
+    return SystemClock.elapsedRealtimeNanos();
+  }
+
 
   @Override
   public void shutdown() {

@@ -194,7 +194,7 @@ public class CommonIntentsFacade extends RpcReceiver {
           //}
           intent.setDataAndType(uri, type);
           try {
-              mAndroidFacade.doStartActivity(intent,wait);
+              mAndroidFacade.doStartActivity(intent,wait,Intent.FLAG_ACTIVITY_NEW_TASK);
           } catch (Exception e) {
               e.printStackTrace();
     }
@@ -215,7 +215,7 @@ public class CommonIntentsFacade extends RpcReceiver {
   }
 
   @Rpc(description = "Starts a search for the given query.")
-  public void search(@RpcParameter(name = "query") String query) {
+  public void search(@RpcParameter(name = "query") String query) throws Exception {
     Intent intent = new Intent(Intent.ACTION_SEARCH);
     intent.putExtra(SearchManager.QUERY, query);
     mAndroidFacade.startActivity(intent);
@@ -236,11 +236,11 @@ public class CommonIntentsFacade extends RpcReceiver {
             uri=Uri.fromFile(new File(path));
             intent.putExtra("LOG_PATH",path);
         }
-        intent.setClassName(this.mAndroidFacade.getmService().getApplicationContext(),"org.qpython.qpy.main.activity.QWebViewActivity");
+        intent.setClassName(context,"org.qpython.qpy.main.activity.QWebViewActivity");
         intent.setDataAndType(uri, "text/html");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT|Intent.FLAG_ACTIVITY_MULTIPLE_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("title",title);
-        mAndroidFacade.doStartActivity(intent,wait);
+        mAndroidFacade.doStartActivity(intent,wait,Intent.FLAG_ACTIVITY_NEW_TASK);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)

@@ -3,8 +3,8 @@
     <string name="privacy_html" translatable="false">https://www.qpython.org/privacy.html</string>
     <string name="thanks_link" translatable="false">https://www.qpython.org/contributors.html</string>
     <string name="lower_project" translatable="false">projects</string>
-    <string name="lib_manager" translatable="false">QPYPI</string>
-    <string name="qpypi_up" translatable="false">QPYPI</string>
+    <string name="qpypi_manager">QPYPI</string>
+    <string name="qpypi_up">QPYPI</string>
     <!-- ColorValue.java -->
     <string name="colorvalue_letter_alpha" translatable="false">α</string>
     <string name="colorvalue_letter_red" translatable="false">R</string>
@@ -570,7 +570,7 @@
     <string name="event_me" translatable="false">Open_Me</string>
     <string name="event_term" translatable="false">Open_terminal</string>
     <string name="event_editor" translatable="false">Open_editor</string>
-    <string name="event_qpypi" translatable="false">Open_QPYPI</string>
+    <string name="event_qpypi">Open_QPYPI</string>
     <string name="event_commu" translatable="false">Open_community</string>
     <string name="event_setting" translatable="false">Open_setting</string>
     <string name="event_file" translatable="false">Open_explorer</string>
@@ -666,7 +666,7 @@
     <string name="fork_from_title">Forked From</string>
     <string name="origin_author">OriginAuthor:北京优趣天下</string>
     <string name="modify_author">ModifyAuthor:乘着船</string>
-    <string name="bilibili_website">https://www.bilibili.com/read/readlist/rl321663</string>
+    <string name="bilibili_website" translatable="false">https://www.bilibili.com/read/readlist/rl321663</string>
     <string name="community_website">https://tieba.baidu.com/f?kw=qpython</string>
     <string name="ipython_interactive">IPython Interactive Interpreter</string>
     <string name="can_long_press">can long press</string>
@@ -714,8 +714,8 @@
     <string name="course_official">Course Official</string>
     <string name="edu_qpy_org">edu.qpython.org</string>
     <string name="video_account_wechat">Official Video Account (WeChat)</string>
-    <string name="bili_com">bilibili.com</string>
-    <string name="wechat_video_website">https://mp.weixin.qq.com/s/gWbEIxaux7BewTMNtRTKJw</string>
+    <string name="bili_com" translatable="false">bilibili.com</string>
+    <string name="wechat_video_website" translatable="false">https://mp.weixin.qq.com/s/gWbEIxaux7BewTMNtRTKJw</string>
     <string name="sl4a_gui_console">Python SL4A GUI Console</string>
     <string name="color_python_interpreter">Color Python Interpreter</string>
     <string name="tradition_bug">There are too many bugs in the traditional terminal. It is recommended to use it only for testing.</string>
@@ -725,6 +725,8 @@
     <string name="qpython_gitee">https://gitee.com/qpython-android</string>
     <string name="download">Download</string>
     <string name="security_version">20220416</string>
-    <string name="float_view_out_range">Float View Index Out of Range .</string>
+    <string name="float_view">Float View</string>
+    <string name="video_player">Video Player</string>
+    <string name="exit_after_close_progress">Press the back key to exit after close the progress bar</string>
 
 </resources>

@@ -37,6 +37,7 @@ public class SignalStrengthFacade extends RpcReceiver {
     mEventFacade = manager.getReceiver(EventFacade.class);
     mTelephonyManager =
             (TelephonyManager) manager.getService().getSystemService(Context.TELEPHONY_SERVICE);
+    //旧版信号强度获取方式
     mPhoneStateListener = MainThread.run(mService, (Callable<PhoneStateListener>) () -> new PhoneStateListener() {
       @Override
       public void onSignalStrengthsChanged(SignalStrength signalStrength) {

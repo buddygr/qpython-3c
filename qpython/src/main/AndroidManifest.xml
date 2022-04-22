@@ -19,8 +19,10 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT" />
     <uses-permission android:name="com.android.vending.BILLING"/>
-    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
-    <uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT" />
+    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" /><!-- 添加快捷方式 -->
+    <uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT" /><!-- 移除快捷方式 -->
+    <uses-permission android:name="android.permission.INSTALL_SHORTCUT" />
+    <uses-permission android:name="android.permission.UNINSTALL_SHORTCUT" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_STORAGE" />
@@ -40,6 +42,7 @@
     <uses-permission android:name="net.dinglisch.android.tasker.PERMISSION_RUN_TASKS" />
     <uses-permission android:name="android.permission.REORDER_TASKS" />
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
 
     <uses-feature android:name="android.hardware.microphone" android:required="false"/>
     <uses-feature android:name="android.hardware.telephony" android:required="false"/>
@@ -52,6 +55,8 @@
     <uses-feature android:name="android.hardware.location.gps" android:required="false"/>
     <uses-feature android:name="android.hardware.location.network" android:required="false"/>
     <uses-feature android:name="android.hardware.bluetooth" android:required="false"/>
+    <uses-feature android:name="android.hardware.sensor.stepcounter"/>
+    <uses-feature android:name="feature:android.hardware.stepdetector"/>
 
     <uses-feature android:glEsVersion="0x00020000" android:required="false"/>
 
@@ -104,7 +109,7 @@
             android:documentLaunchMode="intoExisting"
             android:launchMode="singleTask"
             android:maxRecents="1"
-            >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -371,7 +376,7 @@
             android:name=".main.activity.NotebookListActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"/>-->
         <activity
-            android:label="视频播放器"
+        android:label="@string/video_player"
             android:name=".main.activity.VideoActivity"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
             <intent-filter>
@@ -379,10 +384,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:label="悬浮窗"
+            android:label="@string/float_view"
             android:name=".main.activity.FloatViewActivity"
             android:theme="@android:style/Theme.NoDisplay"
-            android:launchMode="singleTask" >
+            android:launchMode="singleTask"
+            android:documentLaunchMode="intoExisting"
+            android:maxRecents="1">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>

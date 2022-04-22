@@ -17,6 +17,9 @@
 package org.qpython.qsl4a.qsl4a.jsonrpc;
 
 //import org.qpython.qsl4a.qsl4a.LogUtil;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.qpython.qsl4a.qsl4a.SimpleServer;
 import org.qpython.qsl4a.qsl4a.rpc.MethodDescriptor;
 import org.qpython.qsl4a.qsl4a.rpc.RpcError;
@@ -25,10 +28,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * A JSON RPC server that forwards RPC calls to a specified receiver object.

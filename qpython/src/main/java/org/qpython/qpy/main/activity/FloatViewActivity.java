@@ -7,8 +7,10 @@ import android.graphics.PixelFormat;
 import android.icu.text.SimpleDateFormat;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.RequiresApi;
-import android.text.Html;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -17,127 +19,101 @@ import android.widget.Toast;
 
 import org.qpython.qpy.R;
 import org.qpython.qpy.console.ScriptExec;
+import org.qpython.qsl4a.qsl4a.facade.FloatViewFacade;
+import org.qpython.qsl4a.qsl4a.util.HtmlUtil;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 
 public class FloatViewActivity extends Activity
     {
         //按钮数组
-        static final ArrayList<Button> buttons = new ArrayList<>();
-        //x数组
-        static final ArrayList<Integer> xs = new ArrayList<>();
-        //y数组
-        static final ArrayList<Integer> ys = new ArrayList<>();
+        static final ArrayList<Button> buttons = FloatViewFacade.buttons;
+        //参数数组
+        static final ArrayList<WindowManager.LayoutParams> params = FloatViewFacade.params;
         //时间数组
-        static final ArrayList<String> times = new ArrayList<>();
+        static final ArrayList<String> times = FloatViewFacade.times;
         //操作类型数组
-        static final ArrayList<String> operations = new ArrayList<>();
+        static final ArrayList<String> operations = FloatViewFacade.operations;
         static WindowManager windowManager;
+        static DisplayMetrics displayMetrics;
+        //public static Handler handler;
 
-        @SuppressLint({"ClickableViewAccessibility", "SimpleDateFormat"})
+        @SuppressLint({"SimpleDateFormat", "HandlerLeak"})
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            if (Build.VERSION.SDK_INT<26){
+            if (Build.VERSION.SDK_INT < 26) {
                 Toast.makeText(this,
                         getString(R.string.float_view_android),
                         Toast.LENGTH_LONG).show();
                 finish();
                 return;
             }
-        Intent intent = getIntent();
+            windowManager = (WindowManager) this.getSystemService(WINDOW_SERVICE);
+            FloatViewFacade.windowManager = windowManager;
+            displayMetrics = this.getResources().getDisplayMetrics();
+            FloatViewFacade.handler = new Handler(){
+                @Override
+                public void handleMessage(Message msg){
+                    super.handleMessage(msg);
+                    floatView((Intent) msg.obj);
+                }
+            };
+            floatView(getIntent());
+        }
+
+    @SuppressLint("ClickableViewAccessibility")
+    public void floatView(Intent intent){
+        //Intent intent = getIntent();
         if (intent==null) intent = new Intent();
+        WindowManager.LayoutParams layoutParams = null;
         int index;
-        //返回结果
-        index=intent.getIntExtra("result",-2);
-        if (index>-2){
-            if(index<0) index=buttons.size()-1;
-            if(index<0 || index>=buttons.size()){
-                Toast.makeText(this,R.string.float_view_out_range,Toast.LENGTH_LONG).show();
-                finish();
-                return;
-            }
-            Intent intentR = new Intent();
-            //返回横坐标，原点为屏幕中心
-            intentR.putExtra("x", xs.get(index));
-            //返回纵坐标，原点为屏幕中心
-            intentR.putExtra("y",ys.get(index));
-            intentR.putExtra("time",times.get(index));
-            intentR.putExtra("operation",operations.get(index));
-            intentR.putExtra("index",index);
-            setResult(RESULT_OK,intentR);
-            finish();
-            return;
+        //悬浮按钮
+        Button floatButton = null;
+        //悬浮窗文本
+        String text=intent.getStringExtra("text");
+        //是否彩色文本
+        boolean isHtml = false;
+        if (text == null) {
+            text = intent.getStringExtra("html");
+            if (text == null)
+                text = "drag move\nlong click close";
+            else isHtml = true;
         }
-        windowManager = (WindowManager) this.getSystemService(WINDOW_SERVICE);
-        //删除悬浮窗
-        index=intent.getIntExtra("remove",-2);
-        if (index>-2){
-        if(index==-1){//删除所有悬浮窗
-            for(Button button : buttons)
-                windowManager.removeView(button);
-            buttons.clear();
-            xs.clear();
-            ys.clear();
-            times.clear();
-            operations.clear();
-        } else {//删除一个悬浮窗
-            try {
-                removeButton(index);
-            } catch (Exception e){
-                Toast.makeText(this,e.toString(),Toast.LENGTH_LONG).show();
-            }
-        }
-          finish();
-          return;
-        }
-            //悬浮按钮
-            Button floatButton = null;
-            //悬浮窗文本
-            String text=intent.getStringExtra("text");
-            //是否彩色文本
-            boolean isHtml = false;
-            if (text == null) {
-                text = intent.getStringExtra("html");
-                if (text == null)
-                    text = "drag move\nlong click close";
-                else isHtml = true;
-            }
-            //悬浮窗宽度
-            int width=intent.getIntExtra("width",300);
-            //悬浮窗高度
-            int height=intent.getIntExtra("height",150);
-            //悬浮窗背景色 格式:aarrggbb或rrggbb
-            int backColor=colorToInt(intent.getStringExtra("backColor"),"7f7f7f7f");
-            //悬浮窗文字颜色 格式:aarrggbb或rrggbb
-            int textColor=colorToInt(intent.getStringExtra("textColor"),"ff000000");
-            //字体大小
-            int textSize=intent.getIntExtra("textSize",10);
-            //脚本路径
-            final String script=intent.getStringExtra("script");
-            //脚本参数
-            final String arg=intent.getStringExtra("arg");
+        //悬浮窗背景色 格式:aarrggbb或rrggbb
+        int backColor=colorToInt(intent.getStringExtra("backColor"),"7f7f7f7f");
+        //悬浮窗文字颜色 格式:aarrggbb或rrggbb
+        int textColor=colorToInt(intent.getStringExtra("textColor"),"ff000000");
+        //字体大小
+        int textSize=intent.getIntExtra("textSize",10);
+        //脚本路径
+        final String script=intent.getStringExtra("script");
+        //脚本参数
+        final String arg=intent.getStringExtra("arg");
+        final boolean clickRemove = intent.getBooleanExtra("clickRemove",true);
         //moveTaskToBack(true);
         //索引参数
         index = intent.getIntExtra("index",-1);
         if (index>=0) {
             try {
                 floatButton = buttons.get(index);
+                layoutParams = params.get(index);
             } catch (Exception e){
                 index=-1;
             }
         }
         if(index<0){
             floatButton = new Button(this);
+            layoutParams = new WindowManager.LayoutParams();
             index = buttons.size();
         }
-        final WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+            WindowManager.LayoutParams finalLayoutParams = layoutParams;
             floatButton.setOnTouchListener(new View.OnTouchListener() {
             private int x;
             private int y;
 
+            @SuppressLint("ClickableViewAccessibility")
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public boolean onTouch(View view, MotionEvent event) {
@@ -154,30 +130,26 @@ public class FloatViewActivity extends Activity
                     case MotionEvent.ACTION_MOVE:
                         int nowX = (int) event.getRawX();
                         int nowY = (int) event.getRawY();
-                        int movedX = nowX - x;
-                        int movedY = nowY - y;
+                        boolean moved = nowX != x || nowY != y;
                         x = nowX;
                         y = nowY;
-                        layoutParams.x = layoutParams.x + movedX;
-                        layoutParams.y = layoutParams.y + movedY;
+                        finalLayoutParams.x = nowX - displayMetrics.widthPixels/2;
+                        finalLayoutParams.y = nowY - displayMetrics.heightPixels/2;
                         // 更新悬浮窗控件布局
-                        if (movedX!=0 || movedY!=0){
-                            windowManager.updateViewLayout(view, layoutParams);
+                        if (moved) {
+                            windowManager.updateViewLayout(view, finalLayoutParams);
                             operations.set(index, "move");
                         } else {
                             operations.set(index, "click");
                         }
-                        //记录结果
-                        xs.set(index, layoutParams.x);
-                        ys.set(index, layoutParams.y);
                         times.set(index, getTime());
                         break;
                     case MotionEvent.ACTION_UP:
-                        if (operations.get(index).equals("click")) {
+                    if (operations.get(index).equals("click")) {
                             if(script!=null)
                                 ScriptExec.getInstance().playScript(FloatViewActivity.this,
                                         script, arg,false);
-                            removeButton(index);
+                            if (clickRemove) FloatViewFacade.removeButton(index);
                             FloatViewActivity.this.finish();
                         }
                     default:
@@ -187,7 +159,7 @@ public class FloatViewActivity extends Activity
             }
         });
         if(isHtml)
-            floatButton.setText(Html.fromHtml(text));
+            floatButton.setText(HtmlUtil.textToHtml(text));
         else
             floatButton.setText(text);
         floatButton.setBackgroundColor(backColor);
@@ -198,31 +170,39 @@ public class FloatViewActivity extends Activity
         layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
                 | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         layoutParams.format = PixelFormat.RGBA_8888; // 设置图片格式，效果为背景透明
-        // 设置悬浮窗的长得宽
-        layoutParams.width = width;
-        layoutParams.height = height;
+        //悬浮窗宽度
+        int width = intent.getIntExtra("width",300);
+        if(width!=Integer.MIN_VALUE)
+            layoutParams.width = width;
+        //悬浮窗高度
+        int height = intent.getIntExtra("height",150);
+        if (height!=Integer.MIN_VALUE)
+            layoutParams.height = height;
         //起始横坐标，原点为屏幕中心
-        layoutParams.x=intent.getIntExtra("x",0);
+        int x = intent.getIntExtra("x",0);
+        if (x!=Integer.MIN_VALUE)
+            layoutParams.x=x;
         //起始纵坐标，原点为屏幕中心
-        layoutParams.y=intent.getIntExtra("y",0);
+        int y = intent.getIntExtra("y",0);
+        if (y!=Integer.MIN_VALUE)
+            layoutParams.y=y;
         //记录结果
         try {
             if(index>=buttons.size()){
                 windowManager.addView(floatButton, layoutParams);
                 buttons.add(floatButton);
-                xs.add(layoutParams.x);
-                ys.add(layoutParams.y);
+                params.add(layoutParams);
                 times.add(getTime());
                 operations.add("initial");
             } else {
-                xs.set(index,layoutParams.x);
-                ys.set(index,layoutParams.y);
+                params.set(index,layoutParams);
                 times.set(index,getTime());
                 windowManager.updateViewLayout(floatButton, layoutParams);
                 operations.set(index,"modify");
             }
         } catch (Exception e) {
             Toast.makeText(this,getString(R.string.float_view_permission)+"\n"+ e,Toast.LENGTH_LONG).show();
+            return;
         }
         finish();
         }
@@ -247,17 +227,8 @@ public class FloatViewActivity extends Activity
         }
     }
 
-    private void removeButton(int index){
-        windowManager.removeView(buttons.get(index));
-        buttons.remove(index);
-        xs.remove(index);
-        ys.remove(index);
-        times.remove(index);
-        operations.remove(index);
-    }
-
-    @SuppressLint("NewApi")
+    @SuppressLint({"SimpleDateFormat", "NewApi"})
     private String getTime(){
-            return new SimpleDateFormat("yyyyMMdd-HHmmss-SSS").format(new Date(System.currentTimeMillis()));
+        return new SimpleDateFormat("yyyyMMdd-HHmmss-SSS").format(new Date(System.currentTimeMillis()));
     }
 }
