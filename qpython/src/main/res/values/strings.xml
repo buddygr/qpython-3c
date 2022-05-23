@@ -478,7 +478,6 @@
     <string name="new_file">New file</string>
     <string name="tools">Tools</string>
     <string name="aipy_not_install"><![CDATA[Please <font color="#4BAC07">enable AIPY from setting</font>]]></string>
-    <string name="jupyter_not_install"><![CDATA[Please <font color="#4BAC07">install base packages</font> \n before install related Jupyter packages.]]></string>
 
 
     <string name="update_time_hint">Update: %s</string>
@@ -489,7 +488,6 @@
     <string name="aipy_not_release">Please Install AIPY Packages</string>
     <string name="newest_resource">You have downloaded the newest resource</string>
 
-    <string name="jupyter_not_release">Please Install and run setup from QPyNotebook App</string>
     <string name="aipy_not_support">AIPY does not support QPY3 yet</string>
 
     <string name="aipy_lib_hint">You can install or upgrade AIPY App to get more features</string>
@@ -648,7 +646,7 @@
     <string name="project_main_error"> Project\'s main.py does not exit</string>
 
     <string name="key_root" translatable="false">root</string>
-    <string name="key_sl4a" translatable="false">sl4a</string>
+    <string name="key_sl4a" translatable="false">SL4A</string>
     <string name="key_qpypi" translatable="false">qpypi</string>
     <string name="key_update_qpy3" translatable="false">update_py3</string>
     <string name="key_update_qpy2compatible" translatable="false">update_py2compatible</string>
@@ -664,8 +662,8 @@
     <string name="package_name_title">Package Name</string>
     <string name="qpython_android">qpython-android</string>
     <string name="fork_from_title">Forked From</string>
-    <string name="origin_author">OriginAuthor:北京优趣天下</string>
-    <string name="modify_author">ModifyAuthor:乘着船</string>
+    <string name="qpthon_author_key">QPython Author</string>
+    <string name="qpython_author_name" translatable="false">北京优趣天下 x 乘着船</string>
     <string name="bilibili_website" translatable="false">https://www.bilibili.com/read/readlist/rl321663</string>
     <string name="community_website">https://tieba.baidu.com/f?kw=qpython</string>
     <string name="ipython_interactive">IPython Interactive Interpreter</string>
@@ -703,9 +701,10 @@
     <string name="main_window">QPython Main Window</string>
     <string name="aux_window">QPython Aux Window</string>
     <string name="restart_valid">Takes effect after restarting the QPython .</string>
+    <string name="git_source_title">Git Source</string>
     <string name="fork_to_title">Forked To</string>
-    <string name="qpython_3c_text">gitee: qpython-3c</string>
-    <string name="qpython_3c_gitee">https://gitee.com/buddygr/qpython-3c</string>
+    <string name="qpython_3c_text" translatable="false">gitee: qpython-3c</string>
+    <string name="qpython_3c_gitee" translatable="false">https://gitee.com/buddygr/qpython-3c</string>
     <string name="qpython_protect_run">QPython Background Protect Hide Suspended Window is running</string>
     <string name="agree">Agree</string>
     <string name="disagree">Disagree</string>
@@ -722,11 +721,19 @@
     <string name="python_shell_terminal">Python Color Shell Terminal</string>
     <string name="wechat_com">mp.weixin.qq.com</string>
     <string name="qpy_custom_dir">QPython Custom Directory</string>
-    <string name="qpython_gitee">https://gitee.com/qpython-android</string>
+    <string name="qpython_gitee" translatable="false">https://gitee.com/qpython-android</string>
     <string name="download">Download</string>
     <string name="security_version">20220416</string>
     <string name="float_view">Float View</string>
     <string name="video_player">Video Player</string>
     <string name="exit_after_close_progress">Press the back key to exit after close the progress bar</string>
-
+    <string name="jupyter_notebook" translatable="false">Jupyter Notebook</string>
+    <string name="last_modify_time">Last Modify Time</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="old_qpypi_invalid">Old QPypi is invalid, Press OK to view new QPython Extension .</string>
+    <string name="qpython_sl4a_gui_gitee" translatable="false">https://gitee.com/buddygr/qpython-sl4a-gui</string>
+    <string name="key_expansion">Expansion</string>
+    <string name="qpython_3c_release_gitee" translatable="false">https://gitee.com/buddygr/qpython-3c/releases</string>
+    <string name="key_default">Default</string>
 </resources>

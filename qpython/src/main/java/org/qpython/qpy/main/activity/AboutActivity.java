@@ -137,7 +137,7 @@ public class AboutActivity extends BaseActivity {
         switch (item.getItemId()) {
             case R.id.menu_mail:
 //                MiscUtils.sendEMailTo(getString(R.string.ui_mail), getPackageManager().getApplicationLabel(getApplicationInfo()).toString());
-                //onFeedback("");
+                onFeedback("");
                 break;
             case R.id.menu_share:
                 MiscUtils.share(this,

@@ -94,7 +94,7 @@ public class LibAIPyFragment extends RefreshFragment {
         binding.netError.setVisibility(View.GONE);
         dataList.clear();
         adapter.notifyDataSetChanged();
-        binding.progressBar.setVisibility(View.VISIBLE);
+        binding.progressBar.setVisibility(View.GONE);
         App.getService().getAIPyList(NAction.isQPy3(getActivity()),forceRefresh, new Subscriber<List<BaseLibModel>>() {
             @Override
             public void onCompleted() {

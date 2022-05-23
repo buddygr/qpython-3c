@@ -104,7 +104,7 @@ public class LibProjectFragment extends RefreshFragment {
         dataList.clear();
         adapter.notifyDataSetChanged();
         binding.netError.setVisibility(View.GONE);
-        binding.progressBar.setVisibility(View.VISIBLE);
+        binding.progressBar.setVisibility(View.GONE);
         App.getService().getLibs(forceRefresh, new MySubscriber<List<LibModel>>() {
             @Override
             public void onCompleted() {

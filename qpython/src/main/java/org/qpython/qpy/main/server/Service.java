@@ -13,7 +13,6 @@ import com.quseit.util.DateTimeHelper;
 import com.quseit.util.NAction;
 
 import org.greenrobot.eventbus.EventBus;
-import org.qpython.qpy.BuildConfig;
 import org.qpython.qpy.main.activity.LibActivity;
 import org.qpython.qpy.main.app.App;
 import org.qpython.qpy.main.server.model.BaseLibModel;
@@ -62,25 +61,25 @@ public class Service extends CacheKey {
     }
 
     public void getLibs(boolean forceRefresh, Subscriber<List<LibModel>> subscriber) {
-        List<LibModel> libList = getObject(new TypeToken<ArrayList<LibModel>>() {
+        /*List<LibModel> libList = getObject(new TypeToken<ArrayList<LibModel>>() {
         }.getType(), LIB);
         if (libList == null || forceRefresh) {
             toSubscribe(NAction.isQPy3(App.getContext()) ? request.getLibs3() : request.getLibs(), subscriber);
             ACache.get(App.getContext()).put(CacheKey.LIB_LAST_REFRESH, DateTimeHelper.getDate());
         } else {
             toSubscribe(Observable.just(libList), subscriber);
-        }
+        }*/
     }
 
     public void getQPyPi(boolean forceRefresh, Subscriber<List<QpypiModel>> subscriber) {
-        List<QpypiModel> qpypiList = getObject(new TypeToken<ArrayList<QpypiModel>>() {
+        /*List<QpypiModel> qpypiList = getObject(new TypeToken<ArrayList<QpypiModel>>() {
         }.getType(), QPYPI);
         if (qpypiList == null || forceRefresh) {
             toSubscribe(NAction.isQPy3(App.getContext()) ? request.getQPyPi3() : request.getQPyPi(), subscriber);
             ACache.get(App.getContext()).put(CacheKey.QPYPI_LAST_REFRESH, DateTimeHelper.getDate());
         } else {
             toSubscribe(Observable.just(qpypiList), subscriber);
-        }
+        }*/
     }
 
     public void checkUpdate(Subscriber<UpdateModel> subscriber) {
@@ -125,14 +124,14 @@ public class Service extends CacheKey {
     }
 
     public void getAIPyList(boolean isQpy3, boolean forceRefresh, Subscriber<List<BaseLibModel>> subscriber) {
-        List<BaseLibModel> aipyList = getObject(new TypeToken<ArrayList<BaseLibModel>>() {
+        /*List<BaseLibModel> aipyList = getObject(new TypeToken<ArrayList<BaseLibModel>>() {
         }.getType(), AIPY);
         if (aipyList == null || forceRefresh) {
             toSubscribe(isQpy3?request.getAIPy3():request.getAIPy(), subscriber);
             ACache.get(App.getContext()).put(CacheKey.AIPY_LAST_REFRESH, DateTimeHelper.getDate());
         } else {
             toSubscribe(Observable.just(aipyList), subscriber);
-        }
+        }*/
     }
 
     public void downloadLib(String url, String fileName, String description) {

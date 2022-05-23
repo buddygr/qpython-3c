@@ -1,16 +1,22 @@
 package org.qpython.qpy.main.activity;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.icu.text.SimpleDateFormat;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.quseit.util.FileHelper;
 
 import org.qpython.qpy.R;
-import org.qpython.qpy.databinding.AboutBinding;
-import org.qpython.qpysdk.utils.DateTimeHelper;
+import org.qpython.qpy.databinding.ActivityLogBinding;
+
+import java.io.File;
 
 /**
  * LogUtil Activity
@@ -22,21 +28,26 @@ public class LogActivity extends BaseActivity {
     public static final String LOG_TITLE = "title";
     public static final String LOG_PATH = "path";
 
-    AboutBinding binding;
+    ActivityLogBinding binding;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = DataBindingUtil.setContentView(this, R.layout.about);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_log);
         setSupportActionBar(binding.lt.toolbar);
         setTitle(R.string.log_title);
         binding.lt.toolbar.setNavigationIcon(R.drawable.ic_back);
         binding.lt.toolbar.setNavigationOnClickListener(view -> finish());
 
-        binding.title.setText(getIntent().getStringExtra(LOG_TITLE));
-        binding.path.setText(getIntent().getStringExtra(LOG_PATH));
-        //binding.time.setText(getString(R.string.date_format, DateTimeHelper.getDate()));
-        String content = FileHelper.getFileContents(getIntent().getStringExtra(LOG_PATH));
+        Intent intent = getIntent();
+        String logPath = intent.getStringExtra(LOG_PATH);
+        File logFile = new File(logPath);
+        @SuppressLint("SimpleDateFormat") String modifyTime = new SimpleDateFormat("yyyy-MM-dd,HH:mm:ss").format(logFile.lastModified());;
+        binding.title.setText(getString(R.string.last_modify_time));
+        binding.path.setText(logPath);
+        binding.time.setText(modifyTime);
+        String content = FileHelper.getFileContents(intent.getStringExtra(LOG_PATH));
         binding.content.setText(content);
 
 //        binding.ibMail.setOnClickListener(v -> {

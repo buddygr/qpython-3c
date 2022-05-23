@@ -170,7 +170,7 @@ public class FileHelper {
     public static String getFileContents(String filename, int pos) {
 
         File scriptFile = new File(filename);
-        String tContent = "";
+        StringBuilder tContent = new StringBuilder();
         if (scriptFile.exists()) {
             BufferedReader in;
             try {
@@ -178,28 +178,25 @@ public class FileHelper {
                 String line;
 
                 while ((line = in.readLine()) != null) {
-                    tContent += line + "\n";
+                    tContent.append(line).append("\n");
                     if (tContent.length() >= pos) {
                         in.close();
-                        return tContent;
+                        return tContent.toString();
                     }
                 }
                 in.close();
-            } catch (FileNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
 
         }
-        return tContent;
+        return tContent.toString();
     }
 
     public static String getFileContents(String filename) {
         File scriptFile = new File(filename);
-        String tContent = "";
+        StringBuilder tContent = new StringBuilder();
         if (scriptFile.exists()) {
             BufferedReader in;
             try {
@@ -207,24 +204,20 @@ public class FileHelper {
                 String line;
 
                 while ((line = in.readLine()) != null) {
-                    tContent += line + "\n";
+                    tContent.append(line).append("\n");
                 }
                 in.close();
-            } catch (FileNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
 
         }
-        return tContent;
+        return tContent.toString();
     }
 
-    /*public static String getFileContents(String filename, String split) {
-        File scriptFile = new File(filename);
-        String tContent = "";
+    public static String getFileContents(File scriptFile) {
+        StringBuilder tContent = new StringBuilder();
         if (scriptFile.exists()) {
             BufferedReader in;
             try {
@@ -232,20 +225,17 @@ public class FileHelper {
                 String line;
 
                 while ((line = in.readLine()) != null) {
-                    tContent += line + split;
+                    tContent.append(line).append("\n");
                 }
                 in.close();
-            } catch (FileNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
 
         }
-        return tContent;
-    }*/
+        return tContent.toString();
+    }
 
     public static void clearDir(String dir, int level, boolean deleteS) {
         //Log.d(TAG, "clearDir:"+dir);

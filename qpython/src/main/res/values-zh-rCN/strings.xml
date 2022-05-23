@@ -394,7 +394,6 @@
     <string name="basics">基础</string>
     <string name="rmb">¥ %s </string>
     <string name="thank">致谢</string>
-    <string name="jupyter_not_release">请先安装并运行Jupyter</string>
     <string name="aipy_install">安装AIPY</string>
     <string name="aipy_installed">AIPY已安装</string>
     <string name="install_aipy">启用AIPY</string>
@@ -405,7 +404,6 @@
     <string name="funny">有趣</string>
     <string name="dialog_alert">提示</string>
     <string name="conn_error">无法连接服务器</string>
-    <string name="jupyter_not_install"><![CDATA[请<font color="#4BAC07">安装基础库</font> ]]></string>
     <string name="goto_setting">去设置</string>
     <string name="qpy_browser">QPython 浏览器</string>
     <string name="retry_hint">请重试</string>
@@ -453,8 +451,7 @@
     <string name="package_name_title">软件包名</string>
     <string name="bili_web_tip">教程/下载/检查更新：</string>
     <string name="fork_from_title">来源自</string>
-    <string name="origin_author">原始作者:北京优趣天下</string>
-    <string name="modify_author">修改作者:乘着船</string>
+    <string name="qpthon_author_key">QPython 开发者</string>
     <string name="ipython_interactive">IPython交互解释器</string>
     <string name="can_long_press">可长按</string>
     <string name="proj_scri">项目和脚本</string>
@@ -502,6 +499,7 @@
     <string name="toast_search_no_input">在搜索栏中键入要搜索的文本</string>
     <string name="restart_valid">重启 QPython 后生效。</string>
     <string name="fork_to_title">修改至</string>
+    <string name="git_source_title">Git源</string>
     <string name="qpython_protect_run">QPython 后台保护 隐藏悬浮窗 正在运行</string>
     <string name="agree">同意</string>
     <string name="disagree">不同意</string>
@@ -525,4 +523,8 @@
     <string name="video_player">视频播放器</string>
     <string name="exit_after_close_progress">关闭进度条后，方可按返回键退出</string>
     <string name="download_progress_need_sometime">这需要些时间，请检查通知栏进度条</string>
+    <string name="last_modify_time">上次修改时间</string>
+    <string name="old_qpypi_invalid">旧的QPypi无效，请按“确定”查看新的QPython扩展。</string>
+    <string name="key_expansion">扩展</string>
+    <string name="key_default">默认</string>
 </resources>

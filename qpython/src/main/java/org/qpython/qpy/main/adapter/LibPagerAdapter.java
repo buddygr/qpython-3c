@@ -11,9 +11,9 @@ import org.qpython.qpy.main.fragment.LibProjectFragment;
 
 public class LibPagerAdapter extends FragmentStatePagerAdapter {
     private int mNumOfTabs;
-    private LibProjectFragment programFragment = new LibProjectFragment();
-    private LibQPyPiFragment   qPyPiFragment   = new LibQPyPiFragment();
-    private LibAIPyFragment    aiPyFragment    = new LibAIPyFragment();
+    private final LibProjectFragment programFragment = new LibProjectFragment();
+    private final LibQPyPiFragment   qPyPiFragment   = new LibQPyPiFragment();
+    private final LibAIPyFragment    aiPyFragment    = new LibAIPyFragment();
 
     public LibPagerAdapter(FragmentManager fm) {
         super(fm);

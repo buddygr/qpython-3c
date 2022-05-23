@@ -179,6 +179,7 @@ public class HomeMainActivity extends BaseActivity {
                     this.getString(R.string.browser_console),
                     this.getString(R.string.shell_terminal),
                     this.getString(R.string.python_shell_terminal),
+                    this.getString(R.string.jupyter_notebook),
             };
             new AlertDialog.Builder(this, R.style.MyDialog)
                     .setTitle(R.string.choose_action)
@@ -204,6 +205,9 @@ public class HomeMainActivity extends BaseActivity {
                                 break;
                             case 6:
                                 startShell("shell.py");
+                                break;
+                            case 7:
+                                playPy("open_notebook");
                                 break;
                         }
                     }).setNegativeButton(getString(R.string.close), (dialogInterface, i) -> dialogInterface.dismiss())

@@ -227,7 +227,8 @@ public class FloatViewActivity extends Activity
         }
     }
 
-    @SuppressLint({"SimpleDateFormat", "NewApi"})
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @SuppressLint({"SimpleDateFormat"})
     private String getTime(){
         return new SimpleDateFormat("yyyyMMdd-HHmmss-SSS").format(new Date(System.currentTimeMillis()));
     }

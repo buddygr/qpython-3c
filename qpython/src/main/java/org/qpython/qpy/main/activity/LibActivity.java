@@ -21,6 +21,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.qpython.qpy.R;
 import org.qpython.qpy.databinding.ActivityLibBinding;
 import org.qpython.qpy.main.adapter.LibPagerAdapter;
+import org.qpython.qpy.main.fragment.QPyExtFragment;
 import org.qpython.qpy.main.fragment.RefreshFragment;
 import org.qpython.qpy.main.receiver.DownloadReceiver;
 
@@ -74,10 +75,8 @@ public class LibActivity extends AppCompatActivity {
     private void handleIntent() {
         Intent intent = getIntent();
         String action = intent.getAction() == null ? "" : intent.getAction();
-        switch (action) {
-            case OPEN_AIPY_ACTION:
-                binding.vp.setCurrentItem(2);
-                break;
+        if (OPEN_AIPY_ACTION.equals(action)) {
+            binding.vp.setCurrentItem(2);
         }
     }
 
@@ -112,9 +111,9 @@ public class LibActivity extends AppCompatActivity {
     }
 
     private void initTabs() {
-        binding.tabs.addTab(binding.tabs.newTab().setText(R.string.tools));
-        binding.tabs.addTab(binding.tabs.newTab().setText(R.string.qpypi));
-        binding.tabs.addTab(binding.tabs.newTab().setText(R.string.aipy));
+        binding.tabs.addTab(binding.tabs.newTab().setText(R.string.key_default));
+        binding.tabs.addTab(binding.tabs.newTab().setText(R.string.key_sl4a));
+        binding.tabs.addTab(binding.tabs.newTab().setText(R.string.other));
         binding.tabs.setTabGravity(TabLayout.GRAVITY_FILL);
         binding.tabs.setTabTextColors(getResources().getColor(R.color.white), getResources().getColor(R.color.colorAccent));
         binding.tabs.setSelectedTabIndicatorColor(getResources().getColor(R.color.colorAccent));
@@ -127,6 +126,7 @@ public class LibActivity extends AppCompatActivity {
             public void onTabSelected(TabLayout.Tab tab) {
                 binding.vp.setCurrentItem(tab.getPosition());
                 position = tab.getPosition();
+                QPyExtFragment.viewPage(LibActivity.this,position);
             }
 
             @Override
