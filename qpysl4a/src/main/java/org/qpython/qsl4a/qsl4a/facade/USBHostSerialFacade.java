@@ -49,6 +49,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.qpython.qsl4a.qsl4a.facade.deviceids.CH34xIds;
+import org.qpython.qsl4a.qsl4a.facade.deviceids.CP210xIds;
+import org.qpython.qsl4a.qsl4a.facade.deviceids.CP2130Ids;
+import org.qpython.qsl4a.qsl4a.facade.deviceids.FTDISioIds;
+import org.qpython.qsl4a.qsl4a.facade.deviceids.PL2303Ids;
+import org.qpython.qsl4a.qsl4a.facade.deviceids.XdcVcpIds;
+
 
 /**
  * USBHostSerialFacade functions. {{{1
@@ -98,6 +105,18 @@ public class USBHostSerialFacade extends RpcReceiver {
     mService.registerReceiver(mReceiver, filter);
   }
 
+  public static boolean isCdcDevice(UsbDevice device)
+  {
+    int iIndex = device.getInterfaceCount();
+    for(int i=0;i<=iIndex-1;i++)
+    {
+      UsbInterface iface = device.getInterface(i);
+      if(iface.getInterfaceClass() == UsbConstants.USB_CLASS_CDC_DATA)
+        return true;
+    }
+    return false;
+  }
+
   /**
    * usbserialGetDeviceList: {{{1
    */
@@ -114,6 +133,7 @@ public class USBHostSerialFacade extends RpcReceiver {
       v += dev.getDeviceName();
       v += String.format("\",\"%04X", dev.getVendorId());
       v += String.format("\",\"%04X", dev.getProductId());
+      v += "\",\"" + getUsbDeviceType(dev);
       v += "\",\"" + dev.hashCode();
       v += "\"]";
       ret.put(entry.getKey(), v);
@@ -159,7 +179,7 @@ public class USBHostSerialFacade extends RpcReceiver {
       conn.options = new String(options);
       addConnection(conn);
 
-      mUsbManager.requestPermission(device, mPermissionIntent);
+      mUsbManager.requestPermission(conn.mDevice, mPermissionIntent);
       deviceFound = true;
       ret += ",\"" + conn.getUUID() + "\"";
     }
@@ -200,6 +220,30 @@ public class USBHostSerialFacade extends RpcReceiver {
         }
       }
     }
+  }
+
+  private void configUsb(UsbDeviceConnection connection,int baud,byte stopbit,byte parity,byte data_size)
+  {
+    int ret;
+    byte slReq = 0x20;
+    byte slReqType = (byte) 0x21;
+//    int baud = 9600;
+    byte[] data = new byte[8];
+    data[0] = (byte) (baud & 0xFF);
+    data[1] = (byte) ((baud >> 8) & 0xFF);
+    data[2] = (byte) ((baud >> 16) & 0xFF);
+    data[3] = (byte) ((baud >> 24) & 0xFF);
+    data[4] = stopbit; // stopbit: 1bit, 1: 1.5bits, 2: 2bits
+    data[5] = parity; // parity: None, 1:odd, 2:even, 3:mark, 4:space
+    data[6] = data_size; // data size: 8, 5, 6, 7
+    data[7] = 0x00;
+    ret = connection.controlTransfer(slReqType,slReq, 0x0000, 0x00, data, 7, 100);
+    LogUtil.d(String.format("configusb: SetLineRequest: %x", ret));
+  }
+
+  //配置波特率 默认 9600
+  private void configUsb(UsbDeviceConnection connection){
+    configUsb(connection,9600,(byte)0,(byte)0,(byte)8);
   }
 
   /**
@@ -257,8 +301,13 @@ public class USBHostSerialFacade extends RpcReceiver {
       byte[] data = { (byte) 0x03, (byte) 0x01 };
       conn.mConnection.controlTransfer(0x40, 0x00, 0x00, 0, null, 0, 0);
       conn.mConnection.controlTransfer(0x40, 0x0b, 0x00, 0, data, 2, 300);
+//
     }
-
+    //如果usb类型识别结果不是空，则配置波特率。
+    //不配置波特率，qpython是无法从usb serial读取和写入数据
+    if(getUsbDeviceType(conn.mDevice)!=null) {
+      configUsb(conn.mConnection);
+    }
     for (i = 0; i < device.getInterfaceCount(); i++) {
       UsbInterface ui = device.getInterface(i);
       for (j = 0; j < ui.getEndpointCount(); j++) {
@@ -558,6 +607,71 @@ public class USBHostSerialFacade extends RpcReceiver {
       return false;
     }
     return true;
+  }
+
+  private String getUsbDeviceType(UsbDevice device){
+
+    int vid = device.getVendorId();
+    int pid = device.getProductId();
+
+    if(FTDISioIds.isDeviceSupported(device))
+      return "FTDI";
+    else if(CP210xIds.isDeviceSupported(vid, pid))
+      return "CP210x";
+    else if(PL2303Ids.isDeviceSupported(vid, pid))
+      return "PL2303";
+    else if(CH34xIds.isDeviceSupported(vid, pid))
+      return "CH34x";
+    else if(isCdcDevice(device))
+      return "Cdc";
+    else
+      return null;
+  }
+
+  /**
+   * getUsbSupportType: {{{1
+   */
+  @Rpc(description = "Requests that the type of the device.",
+          returns = "The String of the type of the device."
+  )
+  public String getUsbDeviceType(
+          @RpcParameter(name = "hashCode", description = "The hash-code passed here must match with USB Host API.") @RpcDefault(DEFAULT_HASHCODE) String hash)
+          throws IOException {
+      /*
+       * It checks given vid and pid and will return a custom driver or a CDC serial driver.
+       * When CDC is returned open() method is even more important, its response will inform about if it can be really
+       * opened as a serial device with a generic CDC serial driver
+       */
+      int nHash;
+      Map<String, UsbDevice> map = mUsbManager.getDeviceList();
+      if (hash.equals("")) {
+        return null;
+      } else {
+        nHash = Integer.parseInt(hash);
+      }
+      for (UsbDevice device : map.values()) {
+        if (nHash == device.hashCode()) {
+          int vid = device.getVendorId();
+          int pid = device.getProductId();
+
+          if(FTDISioIds.isDeviceSupported(device))
+            return "FTDI";
+          else if(CP210xIds.isDeviceSupported(vid, pid))
+            return "CP210x";
+          else if(PL2303Ids.isDeviceSupported(vid, pid))
+            return "PL2303";
+          else if(CH34xIds.isDeviceSupported(vid, pid))
+            return "CH34x";
+          else if(isCdcDevice(device))
+            return "Cdc";
+          else
+            return null;
+        }
+        else{
+          continue;
+        }
+      }
+      return null;
   }
 
   /**
