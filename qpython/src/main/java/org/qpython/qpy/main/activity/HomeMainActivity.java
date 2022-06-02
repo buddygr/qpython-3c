@@ -3,6 +3,7 @@ package org.qpython.qpy.main.activity;
 //Edit by 乘着船 2022
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +12,8 @@ import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
@@ -32,16 +35,15 @@ import org.qpython.qpy.main.auxActivity.ScreenRecordActivity;
 import org.qpython.qpy.main.utils.Bus;
 import org.qpython.qpy.texteditor.EditorActivity;
 import org.qpython.qpy.texteditor.TedLocalActivity;
-import org.qpython.qpysdk.QPyConstants;
 import org.qpython.qpysdk.QPySDK;
 import org.qpython.qsl4a.QPyScriptService;
+import org.qpython.qsl4a.qsl4a.facade.QPyInterfaceFacade;
 
 import java.io.File;
 
 public class HomeMainActivity extends BaseActivity {
 
     private QPySDK qpysdk;
-
     private ActivityMainBinding binding;
 
     public static void start(Context context) {
@@ -60,6 +62,7 @@ public class HomeMainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         //App.setActivity(this);
+        setHandler();
         startMain();
         //handlePython3(getIntent());
         handleNotification(savedInstanceState);
@@ -495,4 +498,21 @@ public class HomeMainActivity extends BaseActivity {
     private void sendEvent(String evenName) {
 
     }
+
+    @SuppressLint("HandlerLeak")
+    private void setHandler(){
+        QPyInterfaceFacade.handler = new Handler(){
+            @Override
+            public void handleMessage(Message msg){
+                super.handleMessage(msg);
+                Object[] object = (Object[]) msg.obj;
+                ScriptExec.getInstance().playScript(
+                        HomeMainActivity.this,
+                        (String) object[0],
+                        (String) object[1],
+                        false);
+            }
+        };
+    }
+
 }

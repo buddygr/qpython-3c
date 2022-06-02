@@ -53,7 +53,7 @@ public class ScriptExec {
     private OutputStream mOut;
     private String logFile = CONF.ABSOLUTE_LOG;
 
-    private ScriptExec() { }
+    private ScriptExec() {  }
 
     public static ScriptExec getInstance() {
         return ScriptExecHolder.INSTANCE;

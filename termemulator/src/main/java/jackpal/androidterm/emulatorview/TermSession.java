@@ -30,7 +30,6 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CodingErrorAction;
-import java.util.Arrays;
 
 /**
  * A terminal session, consisting of a VT100 terminal emulator and its

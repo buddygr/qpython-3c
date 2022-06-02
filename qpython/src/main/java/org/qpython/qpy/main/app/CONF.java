@@ -42,4 +42,5 @@ public class CONF implements QPyConstants {
             return new String[]{CONF.SCOPE_STORAGE_PATH, QPyConstants.LEGACY_PATH};
         else return new String[]{CONF.SCOPE_STORAGE_PATH, QPyConstants.LEGACY_PATH, CONF.CUSTOM_PATH};
     }
+
 }

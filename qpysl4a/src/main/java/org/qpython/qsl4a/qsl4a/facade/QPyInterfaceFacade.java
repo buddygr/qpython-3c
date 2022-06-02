@@ -4,7 +4,8 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 
 import org.qpython.qsl4a.qsl4a.FileUtils;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
@@ -24,6 +25,7 @@ public class QPyInterfaceFacade extends RpcReceiver {
     private final Service mService;
     private final AndroidFacade mAndroidFacade;
     private final Context context;
+    public static Handler handler;
 
     public QPyInterfaceFacade(FacadeManager manager) {
         super(manager);
@@ -45,7 +47,7 @@ public class QPyInterfaceFacade extends RpcReceiver {
         intent.setAction("org.qpython.qpylib.action.MPyApi");
 
         Bundle mBundle = new Bundle();
-        mBundle.putString("app", SPFUtils.getCode(mService.getApplicationContext()));
+        mBundle.putString("app", SPFUtils.getCode(context));
         mBundle.putString("act", "onPyApi");
         mBundle.putString("flag", "api");
         mBundle.putString("param", "fileapi");
@@ -53,7 +55,7 @@ public class QPyInterfaceFacade extends RpcReceiver {
 
         intent.putExtras(mBundle);
 
-        mService.getApplicationContext().startService(intent);
+        context.startService(intent);
 
         return true;
     }
@@ -64,22 +66,27 @@ public class QPyInterfaceFacade extends RpcReceiver {
             @RpcParameter(name = "QPython script path") @RpcDefault("") String path,
             @RpcParameter(name = "QPython script arguments") @RpcOptional String arg
                               ) {
-        Intent intent = new Intent();
-        intent.setClassName(mService.getPackageName(), "org.qpython.qpylib.MPyApi");
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setAction("org.qpython.qpylib.action.MPyApi");
+        try {
+            Message msg = new Message();
+            msg.obj = new Object[]{path,arg};
+            handler.sendMessage(msg);
+        } catch (Exception e) {
+            Intent intent = new Intent();
+            intent.setClassName(mService.getPackageName(), "org.qpython.qpylib.MPyApi");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setAction("org.qpython.qpylib.action.MPyApi");
 
-        Bundle mBundle = new Bundle();
-        mBundle.putString("app", SPFUtils.getCode(mService.getApplicationContext()));
-        mBundle.putString("act", "onPyApi");
-        mBundle.putString("flag", "api");
-        mBundle.putString("param", "fileapi");
-        mBundle.putString("pyfile", path);
-        mBundle.putString("pyarg",arg);
+            Bundle mBundle = new Bundle();
+            mBundle.putString("app", SPFUtils.getCode(context));
+            mBundle.putString("act", "onPyApi");
+            mBundle.putString("flag", "api");
+            mBundle.putString("param", "fileapi");
+            mBundle.putString("pyfile", path);
+            mBundle.putString("pyarg",arg);
 
-        intent.putExtras(mBundle);
-
-        mService.getApplicationContext().startActivity(intent);
+            intent.putExtras(mBundle);
+            context.startActivity(intent);
+        }
 
         return true;
     }
@@ -92,7 +99,7 @@ public class QPyInterfaceFacade extends RpcReceiver {
         intent.setAction("org.qpython.qpylib.action.MPyService");
 
         Bundle mBundle = new Bundle();
-        mBundle.putString("app", SPFUtils.getCode(mService.getApplicationContext()));
+        mBundle.putString("app", SPFUtils.getCode(context));
         mBundle.putString("act", "onPyApi");
         mBundle.putString("flag", "api");
         mBundle.putString("param", "codeapi");
@@ -100,7 +107,7 @@ public class QPyInterfaceFacade extends RpcReceiver {
 
         intent.putExtras(mBundle);
 
-        mService.getApplicationContext().startService(intent);
+        context.startService(intent);
 
         return true;
     }
@@ -113,7 +120,7 @@ public class QPyInterfaceFacade extends RpcReceiver {
         intent.setAction("org.qpython.qpylib.action.MPyApi");
 
         Bundle mBundle = new Bundle();
-        mBundle.putString("app", SPFUtils.getCode(mService.getApplicationContext()));
+        mBundle.putString("app", SPFUtils.getCode(context));
         mBundle.putString("act", "onPyApi");
         mBundle.putString("flag", "api");
         mBundle.putString("param", "codeapi");
@@ -121,7 +128,7 @@ public class QPyInterfaceFacade extends RpcReceiver {
 
         intent.putExtras(mBundle);
 
-        mService.getApplicationContext().startActivity(intent);
+        context.startActivity(intent);
 
         return true;
     }

@@ -26,6 +26,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
@@ -430,7 +431,8 @@ public class SensorManagerFacade extends RpcReceiver {
             }
             if (mThreshing == 0) {
               mSensorReadings.putInt("stepCounter", mStepCounter);
-              if ((mSensorNumber == 5) && (System.currentTimeMillis() > (mDelayTime + mLastTime))) {
+              //mSensorReadings.putLong("elapsedRealtimeNanos", SystemClock.elapsedRealtimeNanos());
+              if ((mSensorNumber == 5) /*&& (System.currentTimeMillis() > (mDelayTime + mLastTime))*/) {
                 mLastTime = System.currentTimeMillis();
                 postEvent();
               }
