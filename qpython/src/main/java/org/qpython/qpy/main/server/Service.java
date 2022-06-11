@@ -61,14 +61,14 @@ public class Service extends CacheKey {
     }
 
     public void getLibs(boolean forceRefresh, Subscriber<List<LibModel>> subscriber) {
-        /*List<LibModel> libList = getObject(new TypeToken<ArrayList<LibModel>>() {
+        List<LibModel> libList = getObject(new TypeToken<ArrayList<LibModel>>() {
         }.getType(), LIB);
         if (libList == null || forceRefresh) {
             toSubscribe(NAction.isQPy3(App.getContext()) ? request.getLibs3() : request.getLibs(), subscriber);
             ACache.get(App.getContext()).put(CacheKey.LIB_LAST_REFRESH, DateTimeHelper.getDate());
         } else {
             toSubscribe(Observable.just(libList), subscriber);
-        }*/
+        }
     }
 
     public void getQPyPi(boolean forceRefresh, Subscriber<List<QpypiModel>> subscriber) {
