@@ -1,8 +1,8 @@
-package org.qpython.qsl4a.qsl4a.facade.deviceids;
+package org.qpython.qsl4a.qsl4a.facade.usb.deviceids;
 
 
-import static org.qpython.qsl4a.qsl4a.facade.deviceids.Helpers.createTable;
-import static org.qpython.qsl4a.qsl4a.facade.deviceids.Helpers.createDevice;
+import static org.qpython.qsl4a.qsl4a.facade.usb.deviceids.Helpers.createTable;
+import static org.qpython.qsl4a.qsl4a.facade.usb.deviceids.Helpers.createDevice;
 
 public class XdcVcpIds
 {

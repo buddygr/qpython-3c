@@ -28,6 +28,8 @@ import org.qpython.qsl4a.qsl4a.rpc.RpcMinSdk;
 import org.qpython.qsl4a.qsl4a.rpc.RpcStartEvent;
 import org.qpython.qsl4a.qsl4a.rpc.RpcStopEvent;
 
+import org.qpython.qsl4a.qsl4a.facade.usb.USBHostSerialFacade;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;

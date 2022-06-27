@@ -1,9 +1,5 @@
-package org.qpython.qsl4a.qsl4a.facade.deviceids;
+package org.qpython.qsl4a.qsl4a.facade.usb.deviceids;
 
-
-import android.hardware.usb.UsbConstants;
-import android.hardware.usb.UsbDevice;
-import android.hardware.usb.UsbInterface;
 
 import java.util.Arrays;
 

@@ -15,7 +15,7 @@
  * the License.
  */
 
-package org.qpython.qsl4a.qsl4a.facade;
+package org.qpython.qsl4a.qsl4a.facade.usb;
 
 import android.annotation.TargetApi;
 import android.app.PendingIntent;
@@ -42,6 +42,9 @@ import org.qpython.qsl4a.qsl4a.rpc.RpcMinSdk;
 import org.qpython.qsl4a.qsl4a.rpc.RpcOptional;
 import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
 
+import org.qpython.qsl4a.qsl4a.facade.AndroidFacade;
+import org.qpython.qsl4a.qsl4a.facade.FacadeManager;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -49,12 +52,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.qpython.qsl4a.qsl4a.facade.deviceids.CH34xIds;
-import org.qpython.qsl4a.qsl4a.facade.deviceids.CP210xIds;
-import org.qpython.qsl4a.qsl4a.facade.deviceids.CP2130Ids;
-import org.qpython.qsl4a.qsl4a.facade.deviceids.FTDISioIds;
-import org.qpython.qsl4a.qsl4a.facade.deviceids.PL2303Ids;
-import org.qpython.qsl4a.qsl4a.facade.deviceids.XdcVcpIds;
+import org.qpython.qsl4a.qsl4a.facade.usb.deviceids.CH34xIds;
+import org.qpython.qsl4a.qsl4a.facade.usb.deviceids.CP210xIds;
+import org.qpython.qsl4a.qsl4a.facade.usb.deviceids.CP2130Ids;
+import org.qpython.qsl4a.qsl4a.facade.usb.deviceids.FTDISioIds;
+import org.qpython.qsl4a.qsl4a.facade.usb.deviceids.PL2303Ids;
+import org.qpython.qsl4a.qsl4a.facade.usb.deviceids.XdcVcpIds;
 
 
 /**
