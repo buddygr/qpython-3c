@@ -442,7 +442,7 @@ public class USBHostSerialFacade extends RpcReceiver {
   ) {
     for (Map.Entry<String, UsbSerialConnection> entry : connections.entrySet()) {
       UsbSerialConnection conn = entry.getValue();
-      if (connID != "" && !conn.getUUID().equals(connID)) {
+      if (!connID.equals("") && !conn.getUUID().equals(connID)) {
         continue;
       }
       removeConnection(conn);

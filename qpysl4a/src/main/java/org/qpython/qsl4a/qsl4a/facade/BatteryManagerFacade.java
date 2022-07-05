@@ -45,11 +45,13 @@ public class BatteryManagerFacade extends RpcReceiver {
 
   private final Service mService;
   private final EventFacade mEventFacade;
-  private final int mSdkVersion;
+  private final AndroidFacade mAndroidFacade;
+  private final Context context;
 
   private BatteryStateListener mReceiver;
+  private BatteryManager mBatteryManager;
 
-  private volatile Bundle mBatteryData = null;
+  private volatile Bundle mBatteryData;
   private volatile Integer mBatteryStatus = null;
   private volatile Integer mBatteryHealth = null;
   private volatile Integer mPlugType = null;
@@ -64,8 +66,10 @@ public class BatteryManagerFacade extends RpcReceiver {
   public BatteryManagerFacade(FacadeManager manager) {
     super(manager);
     mService = manager.getService();
-    mSdkVersion = manager.getSdkLevel();
     mEventFacade = manager.getReceiver(EventFacade.class);
+    mAndroidFacade = manager.getReceiver(AndroidFacade.class);
+    context = mAndroidFacade.context;
+    mBatteryManager = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
     mReceiver = null;
     mBatteryData = null;
   }
@@ -83,31 +87,25 @@ public class BatteryManagerFacade extends RpcReceiver {
       mBatteryStatus = intent.getIntExtra("status", 1);
       mBatteryHealth = intent.getIntExtra("health", 1);
       mPlugType = intent.getIntExtra("plugged", -1);
-      if (mSdkVersion >= 5) {
-        mBatteryPresent =
-            intent.getBooleanExtra(getBatteryManagerFieldValue("EXTRA_PRESENT"), false);
-        mBatteryLevel = intent.getIntExtra(getBatteryManagerFieldValue("EXTRA_LEVEL"), -1);
-        mBatteryMaxLevel = intent.getIntExtra(getBatteryManagerFieldValue("EXTRA_SCALE"), 0);
-        mBatteryVoltage = intent.getIntExtra(getBatteryManagerFieldValue("EXTRA_VOLTAGE"), -1);
-        mBatteryTemperature =
-            intent.getIntExtra(getBatteryManagerFieldValue("EXTRA_TEMPERATURE"), -1);
-        mBatteryTechnology = intent.getStringExtra(getBatteryManagerFieldValue("EXTRA_TECHNOLOGY"));
-      }
+      mBatteryPresent = intent.getBooleanExtra(getBatteryManagerFieldValue("EXTRA_PRESENT"), false);
+      mBatteryLevel = intent.getIntExtra(getBatteryManagerFieldValue("EXTRA_LEVEL"), -1);
+      mBatteryMaxLevel = intent.getIntExtra(getBatteryManagerFieldValue("EXTRA_SCALE"), 0);
+      mBatteryVoltage = intent.getIntExtra(getBatteryManagerFieldValue("EXTRA_VOLTAGE"), -1);
+      mBatteryTemperature = intent.getIntExtra(getBatteryManagerFieldValue("EXTRA_TEMPERATURE"), -1);
+      mBatteryTechnology = intent.getStringExtra(getBatteryManagerFieldValue("EXTRA_TECHNOLOGY"));
       Bundle data = new Bundle();
       data.putInt("status", mBatteryStatus);
       data.putInt("health", mBatteryHealth);
       data.putInt("plugged", mPlugType);
-      if (mSdkVersion >= 5) {
         data.putBoolean("battery_present", mBatteryPresent);
         if (mBatteryMaxLevel == null || mBatteryMaxLevel == 100 || mBatteryMaxLevel == 0) {
           data.putInt("level", mBatteryLevel);
         } else {
-          data.putInt("level", (int) (mBatteryLevel * 100.0 / mBatteryMaxLevel));
+        data.putFloat("level", getBatteryLevel());
         }
         data.putInt("voltage", mBatteryVoltage);
         data.putInt("temperature", mBatteryTemperature);
         data.putString("technology", mBatteryTechnology);
-      }
       mBatteryData = data;
       mmEventFacade.postEvent("battery", mBatteryData.clone());
     }
@@ -123,8 +121,17 @@ public class BatteryManagerFacade extends RpcReceiver {
     return null;
   }
 
+  private int getBatteryCurrent(){
+    return mBatteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW);
+  }
+
+  private float getBatteryLevel(){
+    return ((int) (mBatteryLevel * 10000 / mBatteryMaxLevel))/100;
+  }
+
   @Rpc(description = "Returns the most recently recorded battery data.")
   public Bundle readBatteryData() {
+    mBatteryData.putInt("current", getBatteryCurrent());
     return mBatteryData;
   }
 
@@ -183,35 +190,38 @@ public class BatteryManagerFacade extends RpcReceiver {
   }
 
   @Rpc(description = "Returns the most recently received battery presence data.")
-  @RpcMinSdk(5)
+  
   public Boolean batteryCheckPresent() {
     return mBatteryPresent;
   }
 
   @Rpc(description = "Returns the most recently received battery level (percentage).")
-  @RpcMinSdk(5)
-  public Integer batteryGetLevel() {
+  public Float batteryGetLevel() {
     if (mBatteryMaxLevel == null || mBatteryMaxLevel == 100 || mBatteryMaxLevel == 0) {
-      return mBatteryLevel;
+      return (float) mBatteryLevel;
     } else {
-      return (int) (mBatteryLevel * 100.0 / mBatteryMaxLevel);
+      return getBatteryLevel();
     }
   }
 
   @Rpc(description = "Returns the most recently received battery voltage.")
-  @RpcMinSdk(5)
   public Integer batteryGetVoltage() {
     return mBatteryVoltage;
   }
 
+  @Rpc(description = "Returns the most recently received battery Now Current.")
+  public Integer batteryGetCurrent() {
+    return getBatteryCurrent();
+  }
+
   @Rpc(description = "Returns the most recently received battery temperature.")
-  @RpcMinSdk(5)
+  
   public Integer batteryGetTemperature() {
     return mBatteryTemperature;
   }
 
   @Rpc(description = "Returns the most recently received battery technology data.")
-  @RpcMinSdk(5)
+  
   public String batteryGetTechnology() {
     return mBatteryTechnology;
   }
