@@ -736,4 +736,5 @@
     <string name="key_expansion">Expansion</string>
     <string name="qpython_3c_release_gitee" translatable="false">https://gitee.com/buddygr/qpython-3c/releases</string>
     <string name="key_default">Default</string>
+    <string name="click_light">Tap the center of the screen to turn on/off the flash light .</string>
 </resources>

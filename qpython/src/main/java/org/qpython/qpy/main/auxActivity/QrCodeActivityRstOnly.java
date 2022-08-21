@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
 
 import com.google.zxing.Result;
 
@@ -47,6 +48,9 @@ public class QrCodeActivityRstOnly extends AppCompatActivity implements ZXingSca
         toolbar.setNavigationIcon(R.drawable.ic_back);
         toolbar.setNavigationOnClickListener(v -> finish());
         mScannerView = (ZXingScannerView) findViewById(R.id.scanner);
+        //闪光灯
+        mScannerView.setOnClickListener(view -> mScannerView.setFlash(!mScannerView.getFlash()));
+        Toast.makeText(this,R.string.click_light,Toast.LENGTH_LONG).show();
     }
 
     @Override
