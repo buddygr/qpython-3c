@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.qpython.qsl4a.qsl4a.FileUtils;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
@@ -26,6 +28,7 @@ public class QPyInterfaceFacade extends RpcReceiver {
     private final AndroidFacade mAndroidFacade;
     private final Context context;
     public static Handler handler;
+    private static JSONObject SharedVariable;
 
     public QPyInterfaceFacade(FacadeManager manager) {
         super(manager);
@@ -179,4 +182,30 @@ public class QPyInterfaceFacade extends RpcReceiver {
             return "";
 
         }*/
+
+    @Rpc(description = "set Java Shared Variable .")
+    public void sharedVariableSet(
+            @RpcParameter(name = "key") String key,
+            @RpcParameter(name = "value") String value
+    ) throws JSONException {
+        if(SharedVariable==null)
+            SharedVariable=new JSONObject();
+        SharedVariable.put(key,value);
+    }
+
+    @Rpc(description = "get Java Shared Variable .")
+    public String sharedVariableGet(
+            @RpcParameter(name = "key") String key
+    ) throws JSONException {
+        return SharedVariable.getString(key);
+    }
+
+    @Rpc(description = "remove Java Shared Variable .")
+    public void sharedVariableRemove(
+            @RpcParameter(name = "key") String key
+    ) throws JSONException {
+        SharedVariable.remove(key);
+        if(SharedVariable.length()==0)
+            SharedVariable=null;
+    }
 }

@@ -86,7 +86,7 @@ public class AndroidFacade extends RpcReceiver {
     int getLogo48();
   }
 
-  private final Service mService;
+  public final Service mService;
   public final Handler mHandler;
   private final Intent mIntent;
   private final FutureActivityTaskExecutor mTaskQueue;

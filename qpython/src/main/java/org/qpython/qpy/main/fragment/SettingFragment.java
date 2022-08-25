@@ -1,5 +1,6 @@
 package org.qpython.qpy.main.fragment;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -12,6 +13,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.PowerManager;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -60,11 +62,15 @@ public class SettingFragment extends PreferenceFragment {
     private SharedPreferences settings;
     private Resources         resources;
     private Preference        mPassWordPref, username_pref, portnum_pref, chroot_pref, lastlog, ipaddress, qpyCustom;
-    private CheckBoxPreference sl4a, running_state, root, display_pwd, qpy_protect;//, notebook_run;
-
+    private CheckBoxPreference sl4a, running_state, root, display_pwd, qpy_protect, screen_on;//, notebook_run;
+    private PowerManager.WakeLock wakeLock;
     //private PreferenceScreen py_inter,notebook_page;
     //private Preference py3,py2; //notebook_res, py2compatible
     //private Preference update_qpy3,update_qpy2compatible;
+
+    private final Context context = getActivity();
+    private final String QPY_PROTECT = "qpython_protect";
+    private final String SCREEN_ON = "screen_on";
 
     private void viewWebSite(int resId) {
         startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(getString(resId))));
@@ -179,7 +185,8 @@ public class SettingFragment extends PreferenceFragment {
         root = (CheckBoxPreference) findPreference(resources.getString(R.string.key_root));
         qpyCustom = findPreference(resources.getString(R.string.qpy_custom_dir));
         sl4a = (CheckBoxPreference) findPreference(resources.getString(R.string.key_sl4a));
-        qpy_protect = (CheckBoxPreference) findPreference("qpython_protect");
+        qpy_protect = (CheckBoxPreference) findPreference(QPY_PROTECT);
+        screen_on = (CheckBoxPreference) findPreference(SCREEN_ON);
         app = (SwitchPreference) findPreference(getString(R.string.key_hide_push));
         log = (SwitchPreference) findPreference(resources.getString(R.string.key_hide_noti));
         username_pref = findPreference(resources.getString(R.string.key_username));
@@ -198,7 +205,8 @@ public class SettingFragment extends PreferenceFragment {
         sl4a.setChecked(isRunning);
         sl4a.setSummary(isRunning ? R.string.sl4a_running : R.string.sl4a_un_running);
 
-        qpy_protect.setChecked(settings.getBoolean("qpython_protect",false));
+        qpy_protect.setChecked(settings.getBoolean(QPY_PROTECT,false));
+        screen_on.setChecked(settings.getBoolean(SCREEN_ON,false));
 
         app.setChecked(settings.getBoolean(getString(R.string.key_hide_push), true));
         log.setChecked(settings.getBoolean(getString(R.string.key_hide_noti), true));
@@ -258,6 +266,7 @@ public class SettingFragment extends PreferenceFragment {
         return false;
     }
 
+    @SuppressLint({"InvalidWakeLockTag", "WakelockTimeout"})
     private void initListener() {
 
         lastlog.setOnPreferenceClickListener(preference -> {
@@ -406,13 +415,28 @@ public class SettingFragment extends PreferenceFragment {
                     return true;
                 });
 
+        screen_on.setOnPreferenceChangeListener((preference,newValue) -> {
+            boolean result = (boolean) newValue;
+            PowerManager pm = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
+            if (wakeLock != null){
+                wakeLock.release();
+                wakeLock = null;
+            }
+            if (result) {
+                wakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, TAG);
+                wakeLock.acquire();
+            }
+            settings.edit().putBoolean(SCREEN_ON,result).apply();
+            return true;
+        });
+
         qpy_protect.setOnPreferenceChangeListener((preference,newValue) -> {
             Context context = getActivity();
             boolean result = (boolean) newValue;
-            settings.edit().putBoolean("qpython_protect",result).apply();
+            settings.edit().putBoolean(QPY_PROTECT,result).apply();
             if (result) {
                 ProtectActivity.DoProtect(context);
-                } else {
+            } else {
                 Toast.makeText(context,getString(R.string.restart_valid),Toast.LENGTH_SHORT).show();
                 ProtectActivity.UndoProtect();
             }
@@ -940,7 +964,7 @@ public class SettingFragment extends PreferenceFragment {
             }
         });
 
-    }*/
+    }
     private void getQPYC(boolean ispy2compatible) {
         mLoadingDialog.show();
 
@@ -1040,7 +1064,7 @@ public class SettingFragment extends PreferenceFragment {
                 Log.d(TAG, "Error in getQPYC:" + throwable.getMessage());
             }
         });
-    }
+    }*/
 
     private boolean isQPycRelease(boolean ispy2compatible) {
         boolean isRelease = true;

@@ -77,7 +77,7 @@ public class FacadeConfiguration {
       sFacadeClassList.add(WifiFacade.class);
       sFacadeClassList.add(UiFacade.class);
       sFacadeClassList.add(BatteryManagerFacade.class);
-      sFacadeClassList.add(ActivityResultFacade.class);
+      //sFacadeClassList.add(ActivityResultFacade.class);
       sFacadeClassList.add(MediaPlayerFacade.class);
       sFacadeClassList.add(PreferencesFacade.class);
       sFacadeClassList.add(QPyInterfaceFacade.class);

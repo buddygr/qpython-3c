@@ -528,4 +528,5 @@
     <string name="key_expansion">扩展</string>
     <string name="key_default">默认</string>
     <string name="click_light">轻触屏幕中心打开/关闭闪光灯。</string>
+    <string name="screen_on_label">保持屏幕常亮</string>
 </resources>

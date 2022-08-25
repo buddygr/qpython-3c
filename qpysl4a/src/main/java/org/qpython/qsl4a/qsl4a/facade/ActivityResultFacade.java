@@ -64,7 +64,7 @@ public class ActivityResultFacade extends RpcReceiver {
   @Rpc(description = sRpcDescription)
   public synchronized void setResultByte(
       @RpcParameter(name = "resultCode", description = sCodeDescription) Integer resultCode,
-      @RpcParameter(name = "resultValue") Byte resultValue) {
+      @RpcParameter(name = "resultValue") Integer resultValue) {
     mResult = new Intent();
     mResult.putExtra(Constants.EXTRA_RESULT, resultValue.byteValue());
     mResultCode = resultCode;
@@ -76,7 +76,7 @@ public class ActivityResultFacade extends RpcReceiver {
   @Rpc(description = sRpcDescription)
   public synchronized void setResultShort(
       @RpcParameter(name = "resultCode", description = sCodeDescription) Integer resultCode,
-      @RpcParameter(name = "resultValue") Short resultValue) {
+      @RpcParameter(name = "resultValue") Integer resultValue) {
     mResult = new Intent();
     mResult.putExtra(Constants.EXTRA_RESULT, resultValue.shortValue());
     mResultCode = resultCode;
@@ -88,9 +88,9 @@ public class ActivityResultFacade extends RpcReceiver {
   @Rpc(description = sRpcDescription)
   public synchronized void setResultChar(
       @RpcParameter(name = "resultCode", description = sCodeDescription) Integer resultCode,
-      @RpcParameter(name = "resultValue") Character resultValue) {
+      @RpcParameter(name = "resultValue") String resultValue) {
     mResult = new Intent();
-    mResult.putExtra(Constants.EXTRA_RESULT, resultValue.charValue());
+    mResult.putExtra(Constants.EXTRA_RESULT, resultValue.charAt(0));
     mResultCode = resultCode;
     if (mActivity != null) {
       setResult();
@@ -124,7 +124,7 @@ public class ActivityResultFacade extends RpcReceiver {
   @Rpc(description = sRpcDescription)
   public synchronized void setResultFloat(
       @RpcParameter(name = "resultCode", description = sCodeDescription) Integer resultCode,
-      @RpcParameter(name = "resultValue") Float resultValue) {
+      @RpcParameter(name = "resultValue") Double resultValue) {
     mResult = new Intent();
     mResult.putExtra(Constants.EXTRA_RESULT, resultValue.floatValue());
     mResultCode = resultCode;
@@ -176,11 +176,11 @@ public class ActivityResultFacade extends RpcReceiver {
   @Rpc(description = sRpcDescription)
   public synchronized void setResultByteArray(
       @RpcParameter(name = "resultCode", description = sCodeDescription) Integer resultCode,
-      @RpcParameter(name = "resultValue") Byte[] resultValue) {
+      @RpcParameter(name = "resultValue") Integer[] resultValue) {
     mResult = new Intent();
     byte[] array = new byte[resultValue.length];
     for (int i = 0; i < resultValue.length; i++) {
-      array[i] = resultValue[i];
+      array[i] = resultValue[i].byteValue();
     }
     mResult.putExtra(Constants.EXTRA_RESULT, array);
     mResultCode = resultCode;
@@ -192,11 +192,11 @@ public class ActivityResultFacade extends RpcReceiver {
   @Rpc(description = sRpcDescription)
   public synchronized void setResultShortArray(
       @RpcParameter(name = "resultCode", description = sCodeDescription) Integer resultCode,
-      @RpcParameter(name = "resultValue") Short[] resultValue) {
+      @RpcParameter(name = "resultValue") Integer[] resultValue) {
     mResult = new Intent();
     short[] array = new short[resultValue.length];
     for (int i = 0; i < resultValue.length; i++) {
-      array[i] = resultValue[i];
+      array[i] = resultValue[i].shortValue();
     }
     mResult.putExtra(Constants.EXTRA_RESULT, array);
     mResultCode = resultCode;
@@ -208,11 +208,11 @@ public class ActivityResultFacade extends RpcReceiver {
   @Rpc(description = sRpcDescription)
   public synchronized void setResultCharArray(
       @RpcParameter(name = "resultCode", description = sCodeDescription) Integer resultCode,
-      @RpcParameter(name = "resultValue") Character[] resultValue) {
+      @RpcParameter(name = "resultValue") String[] resultValue) {
     mResult = new Intent();
     char[] array = new char[resultValue.length];
     for (int i = 0; i < resultValue.length; i++) {
-      array[i] = resultValue[i];
+      array[i] = resultValue[i].charAt(0);
     }
     mResult.putExtra(Constants.EXTRA_RESULT, array);
     mResultCode = resultCode;
@@ -256,11 +256,11 @@ public class ActivityResultFacade extends RpcReceiver {
   @Rpc(description = sRpcDescription)
   public synchronized void setResultFloatArray(
       @RpcParameter(name = "resultCode", description = sCodeDescription) Integer resultCode,
-      @RpcParameter(name = "resultValue") Float[] resultValue) {
+      @RpcParameter(name = "resultValue") Double[] resultValue) {
     mResult = new Intent();
     float[] array = new float[resultValue.length];
     for (int i = 0; i < resultValue.length; i++) {
-      array[i] = resultValue[i];
+      array[i] = resultValue[i].floatValue();
     }
     mResult.putExtra(Constants.EXTRA_RESULT, array);
     mResultCode = resultCode;

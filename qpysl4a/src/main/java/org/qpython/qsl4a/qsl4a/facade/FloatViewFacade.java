@@ -178,6 +178,11 @@ public class FloatViewFacade extends RpcReceiver {
     operations.remove(index);
   }
 
+  @Rpc(description = "Float View Count .")
+  public int floatViewCount(){
+    return buttons.size();
+  }
+
   @Rpc(description = "QPython Background Protect .")
   public void backgroundProtect() throws Exception {
     Intent intent = new Intent();

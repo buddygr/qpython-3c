@@ -55,7 +55,7 @@ public class CommonIntentsFacade extends RpcReceiver {
     mAndroidFacade = manager.getReceiver(AndroidFacade.class);
     context = mAndroidFacade.context;
     qpyProvider = mAndroidFacade.qpyProvider;
-    mService = manager.getService();
+    mService = mAndroidFacade.mService;
   }
 
   @Override

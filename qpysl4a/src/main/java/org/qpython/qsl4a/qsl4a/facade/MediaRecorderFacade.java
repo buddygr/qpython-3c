@@ -16,16 +16,20 @@
 
 package org.qpython.qsl4a.qsl4a.facade;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
+import android.media.AudioFormat;
+import android.media.AudioRecord;
 import android.media.CamcorderProfile;
 import android.media.Image;
 import android.media.ImageReader;
@@ -36,6 +40,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.util.DisplayMetrics;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
@@ -78,24 +83,32 @@ import java.util.concurrent.TimeUnit;
  */
 public class MediaRecorderFacade extends RpcReceiver {
 
-  private final Service mService;
   private final AndroidFacade mAndroidFacade;
   private final Context context;
   private final String sdcard;
-  private Handler mHandler;
+  private final Handler mHandler;
+  private final Service mService;
   static Intent intentMP;
   static int resultCodeMP;
   static MediaProjection mediaProjection;
   static MediaRecorder mMediaRecorder;
   static Camera camera;
+  static final int SAMPLE_RATE_IN_HZ = 8000;
+  static final int BUFFER_SIZE = AudioRecord.getMinBufferSize(SAMPLE_RATE_IN_HZ,
+          AudioFormat.CHANNEL_IN_DEFAULT, AudioFormat.ENCODING_PCM_16BIT);
+  AudioRecord mAudioRecord;
+  boolean isGetVoiceRun;
+  final Object mLock;
+  final double[] volume = {-255};
 
   public MediaRecorderFacade(FacadeManager manager) {
     super(manager);
-    mService = manager.getService();
     mAndroidFacade = manager.getReceiver(AndroidFacade.class);
     context = mAndroidFacade.context;
     sdcard = Environment.getExternalStorageDirectory().toString();
     mHandler = mAndroidFacade.mHandler;
+    mService = mAndroidFacade.mService;
+    mLock = new Object();
   }
 
   @Rpc(description = "Records audio from the microphone and saves it to the given location.")
@@ -501,6 +514,61 @@ public class MediaRecorderFacade extends RpcReceiver {
     return (int) (seconds * 1000L);
   }
 
+  @Rpc(description = "Recorder Sound Volumn Get Db .")
+    public double recorderSoundVolumeGetDb() {
+      return volume[0];
+  }
+
+  @Rpc(description = "Recorder Sound Volumn Detect .")
+  public void recorderSoundVolumeDetect(
+          //interval > 0 --> start to detect sound volume decibel according to the time interval
+          //interval <= 0 --> stop to detect sound volume decibel
+          @RpcParameter(name = "interval") @RpcDefault("100") Integer interval
+  ) throws Exception {
+      if(interval>0){
+      if (isGetVoiceRun) {
+        throw new Exception("Recording, please wait ……");
+      }
+      if (ActivityCompat.checkSelfPermission(mService, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+        throw new Exception("No Permission of Record Audio ……");
+      }
+      mAudioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,
+              SAMPLE_RATE_IN_HZ, AudioFormat.CHANNEL_IN_DEFAULT,
+              AudioFormat.ENCODING_PCM_16BIT, BUFFER_SIZE);
+      isGetVoiceRun = true;
+
+      new Thread(() -> {
+        mAudioRecord.startRecording();
+        short[] buffer = new short[BUFFER_SIZE];
+        while (isGetVoiceRun) {
+          //r是实际读取的数据长度，一般而言r会小于buffersize
+          int r = mAudioRecord.read(buffer, 0, BUFFER_SIZE);
+          long v = 0;
+          // 将 buffer 内容取出，进行平方和运算
+          for (short value : buffer) {
+            v += value * value;
+          }
+          // 平方和除以数据总长度，得到音量大小。
+          double mean = v / (double) r;
+          volume[0] = 10 * Math.log10(mean);
+          //每duration毫秒1次
+          synchronized (mLock) {
+            try {
+              mLock.wait(interval);
+            } catch (InterruptedException e) {
+              e.printStackTrace();
+            }
+          }
+        }
+        mAudioRecord.stop();
+        mAudioRecord.release();
+        mAudioRecord = null;
+        volume[0] = -255;
+      }).start();
+    } else {
+        isGetVoiceRun = false;
+      }
+  }
   }
 
 

@@ -136,6 +136,11 @@
         android:defaultValue="false"
         android:title="@string/qpython_protect"/>
 
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="screen_on"
+        android:title="@string/screen_on_label"/>
+
     <Preference
         android:key="screen_record"
         android:title="@string/screen_record"/>
