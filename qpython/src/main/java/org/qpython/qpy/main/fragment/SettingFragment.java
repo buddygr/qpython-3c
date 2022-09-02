@@ -6,9 +6,11 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Path;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -57,20 +59,25 @@ import java.net.InetAddress;
 public class SettingFragment extends PreferenceFragment {
     private static final String TAG = "SettingFragment";
 
-    private LoadingDialog mLoadingDialog;
-
     private SharedPreferences settings;
     private Resources         resources;
-    private Preference        mPassWordPref, username_pref, portnum_pref, chroot_pref, lastlog, ipaddress, qpyCustom;
+    private Preference        mPassWordPref, username_pref, portnum_pref, chroot_pref, lastlog, ipaddress, qpyCustom;//, pyOptimize;
     private CheckBoxPreference sl4a, running_state, root, display_pwd, qpy_protect, screen_on;//, notebook_run;
     private PowerManager.WakeLock wakeLock;
-    //private PreferenceScreen py_inter,notebook_page;
-    //private Preference py3,py2; //notebook_res, py2compatible
-    //private Preference update_qpy3,update_qpy2compatible;
+    /* private PreferenceScreen py_inter,notebook_page;
+    private Preference py3,py2, notebook_res, py2compatible
+    private Preference update_qpy3,update_qpy2compatible;
 
-    private final Context context = getActivity();
-    private final String QPY_PROTECT = "qpython_protect";
-    private final String SCREEN_ON = "screen_on";
+    private static String[] PY_OPTIMIZE_LIST;
+    private String[] PY_OPTIMIZE(){
+        if (PY_OPTIMIZE_LIST==null)
+        PY_OPTIMIZE_LIST = new String[]{
+            "0 - " + getString(R.string.none),
+            "1 - " + getString(R.string.optimize_1),
+            "2 - " + getString(R.string.optimize_2)
+        };
+        return PY_OPTIMIZE_LIST;
+    }*/
 
     private void viewWebSite(int resId) {
         startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(getString(resId))));
@@ -130,7 +137,7 @@ public class SettingFragment extends PreferenceFragment {
                 listView.setFocusedByDefault(false);
             }
         }
-        mLoadingDialog = new LoadingDialog(getActivity());
+        //mLoadingDialog = new LoadingDialog(getActivity());
     }
 
     @Override
@@ -184,9 +191,10 @@ public class SettingFragment extends PreferenceFragment {
 
         root = (CheckBoxPreference) findPreference(resources.getString(R.string.key_root));
         qpyCustom = findPreference(resources.getString(R.string.qpy_custom_dir));
+        //pyOptimize = findPreference(resources.getString(R.string.key_python_optimize));
         sl4a = (CheckBoxPreference) findPreference(resources.getString(R.string.key_sl4a));
-        qpy_protect = (CheckBoxPreference) findPreference(QPY_PROTECT);
-        screen_on = (CheckBoxPreference) findPreference(SCREEN_ON);
+        qpy_protect = (CheckBoxPreference) findPreference(getString(R.string.key_qpython_protect));
+        screen_on = (CheckBoxPreference) findPreference(getString(R.string.key_screen_on));
         app = (SwitchPreference) findPreference(getString(R.string.key_hide_push));
         log = (SwitchPreference) findPreference(resources.getString(R.string.key_hide_noti));
         username_pref = findPreference(resources.getString(R.string.key_username));
@@ -205,8 +213,8 @@ public class SettingFragment extends PreferenceFragment {
         sl4a.setChecked(isRunning);
         sl4a.setSummary(isRunning ? R.string.sl4a_running : R.string.sl4a_un_running);
 
-        qpy_protect.setChecked(settings.getBoolean(QPY_PROTECT,false));
-        screen_on.setChecked(settings.getBoolean(SCREEN_ON,false));
+        qpy_protect.setChecked(settings.getBoolean(getString(R.string.key_qpython_protect),false));
+        screen_on.setChecked(settings.getBoolean(getString(R.string.key_screen_on),false));
 
         app.setChecked(settings.getBoolean(getString(R.string.key_hide_push), true));
         log.setChecked(settings.getBoolean(getString(R.string.key_hide_noti), true));
@@ -225,6 +233,7 @@ public class SettingFragment extends PreferenceFragment {
         chroot_pref.setSummary(settings.getString(resources.getString(R.string.key_root_dir),
                 Environment.getExternalStorageDirectory().getPath()));
         qpyCustom.setSummary(CONF.CUSTOM_PATH);
+        //pyOptimize.setSummary(PY_OPTIMIZE()[settings.getInt(getString(R.string.key_python_optimize),0)]);
 
         //py_inter.setSummary(NAction.isQPy3(getActivity()) ? R.string.py3_now : R.string.py2_now);
         //setNotebookCheckbox();
@@ -426,18 +435,18 @@ public class SettingFragment extends PreferenceFragment {
                 wakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, TAG);
                 wakeLock.acquire();
             }
-            settings.edit().putBoolean(SCREEN_ON,result).apply();
+            settings.edit().putBoolean(getString(R.string.key_screen_on),result).apply();
             return true;
         });
 
         qpy_protect.setOnPreferenceChangeListener((preference,newValue) -> {
             Context context = getActivity();
             boolean result = (boolean) newValue;
-            settings.edit().putBoolean(QPY_PROTECT,result).apply();
+            settings.edit().putBoolean(getString(R.string.key_qpython_protect),result).apply();
             if (result) {
                 ProtectActivity.DoProtect(context);
             } else {
-                Toast.makeText(context,getString(R.string.restart_valid),Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,getString(R.string.qpython_protect_close),Toast.LENGTH_SHORT).show();
                 ProtectActivity.UndoProtect();
             }
             return true;
@@ -574,6 +583,18 @@ public class SettingFragment extends PreferenceFragment {
                     .show();
             return true;
         });
+
+        /*pyOptimize.setOnPreferenceClickListener(preference ->
+        {
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(getString(R.string.optimize_grade))
+                    .setItems(PY_OPTIMIZE(), (dialogInterface, i) -> {
+                        settings.edit().putInt(getString(R.string.key_python_optimize),i).apply();
+                        pyOptimize.setSummary(PY_OPTIMIZE_LIST[i]);
+                    })
+                    .show();
+            return true;
+        });*/
 
         final CheckBoxPreference wakelock_pref = (CheckBoxPreference) findPreference(resources.getString(R.string.key_stay_awake));
         wakelock_pref.setOnPreferenceChangeListener((preference, newValue) ->
@@ -1064,7 +1085,7 @@ public class SettingFragment extends PreferenceFragment {
                 Log.d(TAG, "Error in getQPYC:" + throwable.getMessage());
             }
         });
-    }*/
+    }
 
     private boolean isQPycRelease(boolean ispy2compatible) {
         boolean isRelease = true;
@@ -1075,18 +1096,18 @@ public class SettingFragment extends PreferenceFragment {
         return isRelease;
     }
 
-    /*private void removeQPyc2Core() {
+    private void removeQPyc2Core() {
         Log.d(TAG, "removeQPyc2Core");
         String files = getActivity().getFilesDir().getAbsolutePath();
         String[] files2del = {files+"/lib/notebook.zip", files+"/lib/python27.zip", files+"/lib/python2.7"};
         for (int i=0;i<files2del.length;i++) {
             QPySDK.recursiveDelete(files2del[i]);
         }
-    }*/
+    }
 
-    /**
+    / **
      * 应该在工作线程处理文件的解压释放
-     */
+     * /
     private void extractQPyCore(Boolean ispy2Compatible) {
         QPySDK qpySDK = new QPySDK(getActivity(), getActivity());
         File libFolder = new File(CONF.SCOPE_STORAGE_PATH, QPyConstants.PY_CACHE);
@@ -1105,6 +1126,6 @@ public class SettingFragment extends PreferenceFragment {
             }
 
         }
-    }
+    }*/
 
 }

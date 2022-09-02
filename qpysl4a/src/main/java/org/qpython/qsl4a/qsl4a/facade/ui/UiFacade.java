@@ -59,8 +59,7 @@ import org.json.JSONException;
  * <br>
  * <b>Usage Notes</b><br>
  * <br>
- * The UI facade provides access to a selection of dialog boxes for general user interaction, and
- * also hosts the {@link #webViewShow} call which allows interactive use of html pages.<br>
+ * The UI facade provides access to a selection of dialog boxes for general user interaction<br>
  * The general use of the dialog functions is as follows:<br>
  * <ol>
  * <li>Create a dialog using one of the following calls:

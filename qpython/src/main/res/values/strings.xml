@@ -347,9 +347,9 @@
     <string name="download_fail">Download fail</string>
     <string name="key_reset">reset_storage</string>
     <string name="key_ftp_state">running_state</string>
-    <string name="key_username">username</string>
-    <string name="key_ftp_pwd">password</string>
-    <string name="key_port_num">portNum</string>
+    <string name="key_username" translatable="false">username</string>
+    <string name="key_ftp_pwd" translatable="false">password</string>
+    <string name="key_port_num" translatable="false">portNum</string>
     <string name="key_show_pwd">show_password</string>
     <string name="key_root_dir">chrootDir</string>
     <string name="key_stay_awake">stayAwake</string>
@@ -700,7 +700,7 @@
     <string name="apache2">https://www.apache.org/licenses/LICENSE-2.0</string>
     <string name="main_window">QPython Main Window</string>
     <string name="aux_window">QPython Aux Window</string>
-    <string name="restart_valid">Takes effect after restarting the QPython .</string>
+    <string name="qpython_protect_close">QPython Background Protect Hide Suspended Window is closed</string>
     <string name="git_source_title">Git Source</string>
     <string name="fork_to_title">Forked To</string>
     <string name="qpython_3c_text" translatable="false">gitee: qpython-3c</string>
@@ -738,4 +738,11 @@
     <string name="key_default">Default</string>
     <string name="click_light">Tap the center of the screen to turn on/off the flash light .</string>
     <string name="screen_on_label">Keep Screen On</string>
+    <!-- string name="optimize_grade">Python Optimize Grade</string>
+    <string name="none">None</string>
+    <string name="optimize_1">remove assert and __debug__-dependent statements</string>
+    <string name="optimize_2">do grade-1 changes and also discard docstrings</string>
+    <string name="key_python_optimize" translatable="false">PYTHONOPTIMIZE</string -->
+    <string name="key_screen_on" translatable="false">screen_on</string>
+    <string name="key_qpython_protect" translatable="false">qpython_protect</string>
 </resources>

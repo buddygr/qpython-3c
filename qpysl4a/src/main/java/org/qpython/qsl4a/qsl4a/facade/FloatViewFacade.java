@@ -184,10 +184,17 @@ public class FloatViewFacade extends RpcReceiver {
   }
 
   @Rpc(description = "QPython Background Protect .")
-  public void backgroundProtect() throws Exception {
+  public void backgroundProtect(
+          @RpcParameter(name = "enabled") @RpcDefault("true") Boolean enabled
+  ) throws Exception {
     Intent intent = new Intent();
     intent.setClassName(mService.getPackageName(),protectActivity);
-    intent.setAction(Intent.ACTION_VIEW);
+    String action;
+    if(enabled)
+      action = Intent.ACTION_RUN;
+    else
+      action = Intent.ACTION_DELETE;
+    intent.setAction(action);
     mAndroidFacade.startActivity(intent);
   }
 

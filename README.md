@@ -48,7 +48,7 @@ This repository is the QPython 3C project repository, you can follow the below s
 - [play new SL4A game](https://www.bilibili.com/read/cv15206348)
 - 图形界面：[音乐播放器、文件选择器、列表选择器](https://www.bilibili.com/BV1Pz4y1C7ds)、[长文本框](https://www.bilibili.com/BV1d7411R7ic)
 - 网络监测：[基站和综合网络](https://www.bilibili.com/read/cv16061380)与[WiFi网络](https://www.bilibili.com/read/cv13278468)
-- 传感器：[位置](https://www.bilibili.com/read/cv11339588)、[加速度、磁力计、计步器、光线](https://www.bilibili.com/read/cv16824060)与[电池](https://www.bilibili.com/read/cv17813243)
+- 传感器：[位置](https://www.bilibili.com/read/cv11339588)、[加速度、磁力计、计步器、光线](https://www.bilibili.com/read/cv16824060)、[电池](https://www.bilibili.com/read/cv17813243)与[分贝计](https://www.bilibili.com/read/cv18422794)
 
 ## How to ask QPython related questions
 In order to benefit those guys who have the same issue with QPython, we suggest that you should ask the issue which is related with QPython within public techical communities.

@@ -121,7 +121,7 @@ public class ScriptExec {
 
     public String[] getPyEnv(Context context, String path, String term, String pyPath) {
         //boolean isQPy3 =  NAction.isQPy3(context);
-
+        //SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String pyVer = CONF.pyVer;//QPyConstants.py3Ver;
         File filesDir = context.getFilesDir();
         File externalStorage = new File(CONF.SCOPE_STORAGE_PATH);
@@ -129,7 +129,7 @@ public class ScriptExec {
         boolean needCustom = !CONF.CUSTOM_PATH.equals(CONF.LEGACY_PATH);
         String commDir = filesDir+"/lib/"+pyVer+"/";
 
-        String[] env = new String[25 + (needCustom?1:0)];
+        String[] env = new String[24 + (needCustom?1:0)];
 
         env[0] = "TERM=" + term;
         env[1] = "PATH=" + CONF.filesDir+"/bin"+":"+path;
@@ -150,12 +150,12 @@ public class ScriptExec {
 
             if(needCustom) {
                 env[5] += ":" + CONF.CUSTOM_PATH + "/lib/" + pyVer + "/site-packages/";
-                env[25] = "ANDROID_PUBLIC_CUSTOM=" + CONF.CUSTOM_PATH;
+                env[24] = "ANDROID_PUBLIC_CUSTOM=" + CONF.CUSTOM_PATH;
             }
 
             env[14] = "PYTHONSTARTUP="+commDir+"site-packages/qpy.py";
 
-        env[6] = "PYTHONOPTIMIZE=1";
+        //env[6] = "PYTHONOPTIMIZE="+preferences.getInt(context.getString(R.string.key_python_optimize),0);
 
         File td = new File(externalStorage+"/cache");
         if (!td.exists()) td.mkdir();
@@ -179,7 +179,7 @@ public class ScriptExec {
         env[21] = "HOME="+filesDir;
         env[22] = "ANDROID_DATA="+System.getenv("ANDROID_DATA");
         env[23] = "ANDROID_ROOT="+System.getenv("ANDROID_ROOT");
-        env[24] = "EXTERNAL_STORAGE="+Environment.getExternalStorageDirectory();
+        env[6] = "EXTERNAL_STORAGE="+Environment.getExternalStorageDirectory();
         return env;
     }
 

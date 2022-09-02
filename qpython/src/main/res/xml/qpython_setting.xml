@@ -131,15 +131,20 @@
     </PreferenceScreen>
 
     <CheckBoxPreference
-        android:key="qpython_protect"
+        android:key="@string/key_qpython_protect"
         android:summary="@string/qpython_avoid_close"
         android:defaultValue="false"
         android:title="@string/qpython_protect"/>
 
     <CheckBoxPreference
         android:defaultValue="false"
-        android:key="screen_on"
+        android:key="@string/key_screen_on"
         android:title="@string/screen_on_label"/>
+
+    <!-- Preference
+        android:key="@string/key_python_optimize"
+        android:title="@string/optimize_grade"
+        android:summary=""/ -->
 
     <Preference
         android:key="screen_record"
