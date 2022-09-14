@@ -1,16 +1,16 @@
 package org.qpython.qpy.main.fragment;
 
+import static org.qpython.qpy.main.app.CONF.pyVer;
+
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Path;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,7 +22,6 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
@@ -30,15 +29,9 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.quseit.base.QBaseApp;
-import com.quseit.common.updater.downloader.Downloader;
 import com.quseit.util.NAction;
 import com.quseit.util.NStorage;
 
-import org.apache.http.Header;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.qpython.qpy.R;
 import org.qpython.qpy.main.activity.HomeMainActivity;
 import org.qpython.qpy.main.app.App;
@@ -46,9 +39,7 @@ import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.main.auxActivity.ProtectActivity;
 import org.qpython.qpy.main.auxActivity.ScreenRecordActivity;
 import org.qpython.qpy.main.service.FTPServerService;
-import org.qpython.qpy.main.widget.LoadingDialog;
 import org.qpython.qpy.texteditor.ui.view.EnterDialog;
-import org.qpython.qpysdk.QPyConstants;
 import org.qpython.qpysdk.QPySDK;
 import org.qpython.qpysdk.utils.Utils;
 import org.qpython.qsl4a.QPyScriptService;
@@ -190,7 +181,7 @@ public class SettingFragment extends PreferenceFragment {
 
 
         root = (CheckBoxPreference) findPreference(resources.getString(R.string.key_root));
-        qpyCustom = findPreference(resources.getString(R.string.qpy_custom_dir));
+        qpyCustom = findPreference(resources.getString(R.string.qpy_custom_dir_key));
         //pyOptimize = findPreference(resources.getString(R.string.key_python_optimize));
         sl4a = (CheckBoxPreference) findPreference(resources.getString(R.string.key_sl4a));
         qpy_protect = (CheckBoxPreference) findPreference(getString(R.string.key_qpython_protect));
@@ -467,7 +458,7 @@ public class SettingFragment extends PreferenceFragment {
 
         {
             new EnterDialog(getActivity())
-                    .setTitle(preference.getKey())
+                    .setTitle(getString(R.string.username_label))
                     .setText(preference.getSummary().toString())
                     .setConfirmListener(name -> {
                         preference.setSummary(name);
@@ -500,7 +491,7 @@ public class SettingFragment extends PreferenceFragment {
 
         {
             new EnterDialog(getActivity())
-                    .setTitle(mPassWordPref.getKey())
+                    .setTitle(getString(R.string.password_label))
                     .setText(password)
                     .setEnterType(InputType.TYPE_TEXT_VARIATION_PASSWORD)
                     .setConfirmListener(name -> {
@@ -517,7 +508,7 @@ public class SettingFragment extends PreferenceFragment {
 
         {
             new EnterDialog(getActivity())
-                    .setTitle(preference.getKey())
+                    .setTitle(getString(R.string.portnumber_label))
                     .setText(preference.getSummary().toString())
                     .setEnterType(InputType.TYPE_CLASS_NUMBER)
                     .setConfirmListener(name -> {
@@ -563,9 +554,15 @@ public class SettingFragment extends PreferenceFragment {
         qpyCustom.setOnPreferenceClickListener(preference ->
 
         {
+            String path = preference.getSummary().toString();
+            String msg = "\n"+getString(R.string.project)+": "+path+"/projects3\n"+
+                    getString(R.string.script)+": "+path+"/scripts3\n"+
+                    getString(R.string.library)+": "+path+"/lib/"+pyVer+"/site-packages/\n\n"+
+                    getString(R.string.edit_to_new_path);
             new EnterDialog(getActivity())
-                    .setTitle(preference.getKey())
-                    .setText(preference.getSummary().toString())
+                    .setTitle(getString(R.string.qpy_custom_dir))
+                    .setText(path)
+                    .setMessage(msg)
                     .setConfirmListener(name -> {
                         if (preference.getSummary().equals(name)) {
                             return true;
@@ -690,146 +687,6 @@ public class SettingFragment extends PreferenceFragment {
             }
         }
     }
-
-    /*private void releasePython2Standard() {
-        Observable.create((Observable.OnSubscribe<Boolean>) subscriber -> {
-            try {
-                File filesDir = getActivity().getFilesDir();
-                //removeQPyc2Core();
-                QPySDK qpysdk = new QPySDK(getActivity(), getActivity());
-                qpysdk.extractRes("private1", filesDir, true);
-                qpysdk.extractRes("private2", filesDir, true);
-                qpysdk.extractRes("private~", new File(filesDir,"lib/python2.7/site-packages"), true);
-                qpysdk.extractRes("private3", filesDir,true);
-
-                File externalStorage = new File(Environment.getExternalStorageDirectory(), "qpython");
-                qpysdk.extractRes("public", new File(externalStorage + "/lib"),true);
-
-                subscriber.onNext(true);
-                subscriber.onCompleted();
-            } catch (Exception e) {
-                e.printStackTrace();
-                subscriber.onError(new Throwable("Failed to release Py2 resources"));
-            }
-        })
-        .subscribeOn(Schedulers.io())
-        .doOnSubscribe(() -> mLoadingDialog.show())
-        .subscribeOn(AndroidSchedulers.mainThread())
-        .observeOn(AndroidSchedulers.mainThread())
-        .doOnTerminate(() -> mLoadingDialog.dismiss())
-        .subscribe(new Observer<Boolean>() {
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Toast.makeText(getActivity(), "Faild to extract Py2 resource", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onNext(Boolean aBoolean) {
-                NAction.setQPyInterpreter(getActivity(), "2.x");
-                py_inter.setSummary(R.string.py2_now);
-
-                getActivity().recreate();
-            }
-        });
-    }*/
-
-    /*private void releasePython2Compatable(Preference preference) {
-        Observable.create((Observable.OnSubscribe<Boolean>) subscriber -> {
-            try {
-
-                //removeQPyc2Core();
-
-                extractQPyCore(true);
-
-                subscriber.onNext(true);
-                subscriber.onCompleted();
-            } catch (Exception e) {
-                e.printStackTrace();
-                subscriber.onError(new Throwable("Failed to release Py2 resources"));
-            }
-        })
-        .subscribeOn(Schedulers.io())
-        .doOnSubscribe(() -> mLoadingDialog.show())
-        .subscribeOn(AndroidSchedulers.mainThread())
-        .observeOn(AndroidSchedulers.mainThread())
-        .doOnTerminate(() -> mLoadingDialog.dismiss())
-        .subscribe(new Observer<Boolean>() {
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Toast.makeText(getActivity(), "Faild to extract Py2 resource", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onNext(Boolean aBoolean) {
-                NAction.setQPyInterpreter(getActivity(), "2.x");
-                py_inter.setSummary(R.string.py2_now);
-
-                getActivity().recreate();
-            }
-        });
-    }*/
-
-
-    /*private void releasePython3() {
-        QPySDK qpysdk = new QPySDK(this.getActivity(), this.getActivity());
-        Observable.create((Observable.OnSubscribe<Boolean>) subscriber -> {
-            try {
-                File filesDir = getActivity().getFilesDir();
-                releaseQPycRes(NStorage.getSP(App.getContext(),QPyConstants.KEY_PY3_RES));
-                //extractQPyCore(false);
-
-                qpysdk.extractRes("private31", filesDir, true);
-                qpysdk.extractRes("private32", filesDir, true);
-                qpysdk.extractRes("private~", new File(filesDir,"lib/python"+QPyConstants.py3Ver+"/site-packages"), true);
-                qpysdk.extractRes("private33", filesDir,true);
-                //qpysdk.extractRes("notebook3", filesDir, true);
-
-                File externalStorage = new File(Environment.getExternalStorageDirectory(), "qpython");
-                qpysdk.extractRes("public3", new File(externalStorage + "/lib"));
-
-                subscriber.onNext(true);
-                subscriber.onCompleted();
-            } catch (Exception e) {
-                e.printStackTrace();
-                subscriber.onError(new Throwable("Failed to release Py3 resources"));
-            }
-        })
-        .subscribeOn(Schedulers.io())
-        .doOnSubscribe(() -> mLoadingDialog.show())
-        .subscribeOn(AndroidSchedulers.mainThread())
-        .observeOn(AndroidSchedulers.mainThread())
-        .doOnTerminate(() -> mLoadingDialog.dismiss())
-        .subscribe(new Observer<Boolean>() {
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Toast.makeText(getActivity(), "Faild to extract Py3 resource", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onNext(Boolean aBoolean) {
-                NAction.setQPyInterpreter(getActivity(), "3.x");
-                py_inter.setSummary(R.string.py3_now);
-
-                getActivity().recreate();
-            }
-        });
-
-    }*/
 
     private void updatePreference(Preference preference) {
         SharedPreferences.Editor editor = settings.edit();

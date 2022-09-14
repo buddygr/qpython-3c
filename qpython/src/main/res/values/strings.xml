@@ -745,4 +745,6 @@
     <string name="key_python_optimize" translatable="false">PYTHONOPTIMIZE</string -->
     <string name="key_screen_on" translatable="false">screen_on</string>
     <string name="key_qpython_protect" translatable="false">qpython_protect</string>
+    <string name="edit_to_new_path">You can edit it to new path .</string>
+    <string name="qpy_custom_dir_key">QPython Custom Directory</string>
 </resources>

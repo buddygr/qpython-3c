@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Environment;
 
 import com.quseit.config.BASE_CONF;
+import com.quseit.util.DocumentsUtils;
 import com.quseit.util.FileHelper;
 
 public interface QPyConstants extends BASE_CONF {
@@ -34,7 +35,7 @@ public interface QPyConstants extends BASE_CONF {
     //String KEY_NOTEBOOK_RES = "setting.notebook3sresource.path";
     //String KEY_NOTEBOOK2_RES = "setting.notebook2resource.path";
 
-    String LEGACY_PATH = Environment.getExternalStorageDirectory().getPath() + "/" + BASE_PATH;
+    String LEGACY_PATH = DocumentsUtils.SDCARD_PATH + BASE_PATH;
     String LEGACY_LOG = LEGACY_PATH+"/log/last.log";
 
     String QPYC3 = "https://dl.qpy.io/py3.json";

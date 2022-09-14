@@ -14,7 +14,7 @@ For different usage scenarios, QPython has three branches, namely [QPython Ox , 
 
 QPython Ox is mainly aimed at programming learners, and it provides more friendly features for beginners.  
 QPython 3x is mainly for experienced Python users, and it provides some advanced technical features.  
-QPython 3C is forked from QPython OP (one branch of QPython Ox) . QPython 3C is mainly aimed at Android 7.0 to 12.0 with 64bit, and it provides a lot of advanced technical features .
+QPython 3C is forked from QPython OP (one branch of QPython Ox) . QPython 3C is mainly aimed at Android 7.0 to 13 with 64bit, and it provides a lot of advanced technical features .
 
 ## Quick start
 
@@ -38,17 +38,18 @@ This repository is the QPython 3C project repository, you can follow the below s
 ## Related 相关链接
 
 - [Setup QPython 3C](https://www.bilibili.com/read/cv13322251)
-- [QPython 3x features](https://github.com/qpython-android/qpython.org/blob/master/qpython-docs/source/en/qpython_3x_featues.rst), [QPython Ox features](https://github.com/qpython-android/qpython.org/blob/master/qpython-docs/source/en/qpython_ox_featues.rst)
 - [QPySL4A APIs](https://github.com/qpython-android/qpysl4a/blob/master/doc/en/APIs.rst) and [test scripts](https://github.com/qpython-android/qpysl4a/issues/1)
-- [new SL4A Functions 拍照录音录像、截屏录屏、外置卡读写](https://www.bilibili.com/read/cv13418026)
+- [new SL4A Functions 拍照录音录像、截屏录屏](https://www.bilibili.com/read/cv13418026)
+- [new SL4A Functions 外置卡读写](https://www.bilibili.com/read/cv18800240)
 - [new SL4A Functions 电话、网页、系统等](https://www.bilibili.com/read/cv11197543)
 - [new SL4A Functions 可视化窗口、悬浮窗](https://www.bilibili.com/read/cv16138580)
 - [new SL4A Functions Javax.Crypto.Cipher 加解密](https://www.bilibili.com/read/cv11108237)
 - new SL4A Functions [Open File](https://www.bilibili.com/read/cv11037013) and [Video Play](https://www.bilibili.com/BV1xK4y1D7eV)
-- [play new SL4A game](https://www.bilibili.com/read/cv15206348)
+- new SL4A games [贪食蛇](https://www.bilibili.com/video/BV1rR4y1j7HF) and [字母消除](https://www.bilibili.com/video/BV1ge4y1H7AW)
 - 图形界面：[音乐播放器、文件选择器、列表选择器](https://www.bilibili.com/BV1Pz4y1C7ds)、[长文本框](https://www.bilibili.com/BV1d7411R7ic)
 - 网络监测：[基站和综合网络](https://www.bilibili.com/read/cv16061380)与[WiFi网络](https://www.bilibili.com/read/cv13278468)
-- 传感器：[位置](https://www.bilibili.com/read/cv11339588)、[加速度、磁力计、计步器、光线](https://www.bilibili.com/read/cv16824060)、[电池](https://www.bilibili.com/read/cv17813243)与[分贝计](https://www.bilibili.com/read/cv18422794)
+- [位置](https://www.bilibili.com/read/cv11339588)与[导航卫星](https://www.bilibili.com/read/cv18956157)
+- 传感器：[加速度、磁力计、计步器、光线](https://www.bilibili.com/read/cv16824060)、[电池](https://www.bilibili.com/read/cv17813243)与[分贝计](https://www.bilibili.com/read/cv18422794)
 
 ## How to ask QPython related questions
 In order to benefit those guys who have the same issue with QPython, we suggest that you should ask the issue which is related with QPython within public techical communities.

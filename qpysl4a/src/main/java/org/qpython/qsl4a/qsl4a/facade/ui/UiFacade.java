@@ -16,8 +16,10 @@
 
 package org.qpython.qsl4a.qsl4a.facade.ui;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.app.Service;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Environment;
 import android.util.AndroidRuntimeException;
@@ -27,7 +29,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.qpython.qsl4a.QSL4APP;
+import org.qpython.qsl4a.R;
 import org.qpython.qsl4a.qsl4a.FutureActivityTaskExecutor;
 import org.qpython.qsl4a.qsl4a.facade.EventFacade;
 import org.qpython.qsl4a.qsl4a.facade.FacadeManager;
@@ -44,15 +49,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.json.JSONArray;
-import org.json.JSONException;
 
 /**
  * User Interface Facade. <br>
@@ -102,8 +103,8 @@ import org.json.JSONException;
  * You can also manipulate menu options. The menu options are available for both {@link #dialogShow}
  * and {@link #fullShow}.
  * <ul>
- * <li>{@link #clearOptionsMenu}
- * <li>{@link #addOptionsMenuItem}
+ * <li>{link clearOptionsMenu}
+ * <li>{link addOptionsMenuItem}
  * </ul>
  * <br>
  * <b>Some notes:</b><br>
@@ -134,6 +135,7 @@ public class UiFacade extends RpcReceiver {
   private List<Integer> mOverrideKeys = Collections.synchronizedList(new ArrayList<Integer>());
 
   private final String sdcard;
+  private final Context context;
 
   public UiFacade(FacadeManager manager) {
     super(manager);
@@ -144,6 +146,7 @@ public class UiFacade extends RpcReceiver {
     mEventFacade = manager.getReceiver(EventFacade.class);
     mMenuUpdated = new AtomicBoolean(false);
     sdcard = Environment.getExternalStorageDirectory().toString();
+    context = mService.getApplicationContext();
   }
 
   /**
@@ -157,8 +160,7 @@ public class UiFacade extends RpcReceiver {
           @RpcParameter(name = "title", description = "title of the input box") @RpcDefault("Value") final String title,
           @RpcParameter(name = "message", description = "message to display above the input box") @RpcDefault("Please enter value:") final String message,
           @RpcParameter(name = "defaultText", description = "text to insert into the input box") @RpcOptional final String text,
-          @RpcParameter(name = "inputType", description = "type of input data, ie number or text") @RpcOptional final String inputType)
-          throws InterruptedException {
+          @RpcParameter(name = "inputType", description = "type of input data, ie number or text") @RpcOptional final String inputType) {
     dialogDismiss();
     mDialogTask = new AlertDialogTask(title, message);
     ((AlertDialogTask) mDialogTask).setTextInput(text);
@@ -174,6 +176,13 @@ public class UiFacade extends RpcReceiver {
     dialogDismiss();
     mDialogTask = new AlertDialogTask(title, message);
     ((AlertDialogTask) mDialogTask).setPasswordInput();
+  }
+
+  @Rpc(description = "set dialog message is a html .")
+  public void dialogSetMessageIsHtml(
+          @RpcParameter(name = "messageIsHtml") @RpcDefault("true") Boolean messageIsHtml
+  ){
+    ((AlertDialogTask) mDialogTask).setMessageIsHtml(messageIsHtml);
   }
 
   /**
@@ -195,9 +204,9 @@ public class UiFacade extends RpcReceiver {
           @RpcParameter(name = "message", description = "message to display above the input box") @RpcDefault("Please enter value:") final String message,
           @RpcParameter(name = "defaultText", description = "text to insert into the input box") @RpcOptional final String text)
           throws InterruptedException {
-    dialogCreateInput(title, message, text, "text");
-    dialogSetNegativeButtonText("Cancel");
-    dialogSetPositiveButtonText("Ok");
+    dialogCreateInput(title, message, text, "textMultiLine");
+    dialogSetNegativeButtonText(context.getString(R.string.cancel));
+    dialogSetPositiveButtonText(context.getString(R.string.ok));
     dialogShow();
     Map<String, Object> response = (Map<String, Object>) dialogGetResponse();
     if ("positive".equals(response.get("which"))) {
@@ -214,8 +223,8 @@ public class UiFacade extends RpcReceiver {
           @RpcParameter(name = "message", description = "message to display above the input box") @RpcDefault("Please enter password:") final String message)
           throws InterruptedException {
     dialogCreatePassword(title, message);
-    dialogSetNegativeButtonText("Cancel");
-    dialogSetPositiveButtonText("Ok");
+    dialogSetNegativeButtonText(context.getString(R.string.cancel));
+    dialogSetPositiveButtonText(context.getString(R.string.ok));
     dialogShow();
     Map<String, Object> response = (Map<String, Object>) dialogGetResponse();
     if ("positive".equals(response.get("which"))) {
@@ -456,11 +465,11 @@ public class UiFacade extends RpcReceiver {
     }
   }
 
-  /**
+  /* *
    * See <a href=http://code.google.com/p/android-scripting/wiki/UsingWebView>wiki page</a> for more
    * detail.
-   */
-  /*@Rpc(description = "Display a WebView with the given URL.")
+   * /
+  @Rpc(description = "Display a WebView with the given URL.")
   public void webViewShow(
           @RpcParameter(name = "url") String url,
           @RpcParameter(name = "wait", description = "block until the user exits the WebView") @RpcOptional Boolean wait)
@@ -478,11 +487,11 @@ public class UiFacade extends RpcReceiver {
         throw new RuntimeException(e);
       }
     }
-  }*/
+  }
 
-  /**
-   * Context menus are used primarily with {@link #webViewShow}
-   */
+  /* *
+   * Context menus are used primarily with {webViewShow}
+   * /
   @Rpc(description = "Adds a new item to context menu.")
   public void addContextMenuItem(
           @RpcParameter(name = "label", description = "label for this menu item") String label,
@@ -515,7 +524,7 @@ public class UiFacade extends RpcReceiver {
    * print "And done."
    *
    * </pre>
-   */
+   * /
   @Rpc(description = "Adds a new item to options menu.")
   public void addOptionsMenuItem(
           @RpcParameter(name = "label", description = "label for this menu item") String label,
@@ -535,7 +544,7 @@ public class UiFacade extends RpcReceiver {
   public void clearOptionsMenu() {
     mOptionsMenuItems.clear();
     mMenuUpdated.set(true);
-  }
+  }*/
 
   public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
     for (UiMenuItem item : mContextMenuItems) {
@@ -672,7 +681,7 @@ public class UiFacade extends RpcReceiver {
     String rst;
     for(String id:Ids) {
       rst = mFullScreenTask.setViewProperty(id, property, value);
-      if (!rst.equals("OK"))
+      if (!rst.equals(context.getString(R.string.ok)))
         return rst;
     }
     return "OK";
@@ -785,6 +794,7 @@ public class UiFacade extends RpcReceiver {
     }
   }
 
+  @SuppressLint("SimpleDateFormat")
   @Rpc(description = "Get the Full Screen Activity ScreenShot to path .")
   public String fullGetScreenShot(
           @RpcParameter(name = "path") @RpcOptional String path) throws Exception {

@@ -38,6 +38,8 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
+import com.quseit.util.DocumentsUtils;
+
 import org.qpython.qsl4a.QSL4APP;
 import org.qpython.qsl4a.qsl4a.FileUtils;
 import org.qpython.qsl4a.qsl4a.FutureActivityTaskExecutor;
@@ -82,7 +84,7 @@ public class CameraFacade extends RpcReceiver {
     mService = manager.getService();
 
     mAndroidFacade = manager.getReceiver(AndroidFacade.class);
-    sdcard = Environment.getExternalStorageDirectory().toString();
+    sdcard = DocumentsUtils.SDCARD;
     context = mAndroidFacade.context;
     qpyProvider = mAndroidFacade.qpyProvider;
   }

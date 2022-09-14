@@ -20,6 +20,7 @@ import android.os.Build;
 
 import com.google.common.collect.Maps;
 
+import org.qpython.qsl4a.qsl4a.facade.ui.UiConfig;
 import org.qpython.qsl4a.qsl4a.facade.ui.UiFacade;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.MethodDescriptor;
@@ -91,6 +92,7 @@ public class FacadeConfiguration {
       sFacadeClassList.add(FloatViewFacade.class);
       sFacadeClassList.add(DocumentFileFacade.class);
       sFacadeClassList.add(HarmonyOsFacade.class);
+      sFacadeClassList.add(UiConfig.class);
 
     for (Class<? extends RpcReceiver> recieverClass : sFacadeClassList) {
       for (MethodDescriptor rpcMethod : MethodDescriptor.collectFrom(recieverClass)) {

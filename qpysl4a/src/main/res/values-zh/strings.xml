@@ -2,4 +2,7 @@
 <resources>
     <string name="app_name">QSL4A</string>
     <string name="float_view_out_range">悬浮窗索引超出范围。</string>
+    <string name="float_view_not_exist">悬浮窗索引不存在。</string>
+    <string name="ok">确认</string>
+    <string name="cancel">取消</string>
 </resources>

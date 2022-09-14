@@ -20,6 +20,8 @@ import java.util.Map;
 @SuppressWarnings("deprecation")
 public class HarmonyOsFacade extends RpcReceiver {
 
+    private static final String HARMONY = "Harmony";
+
     public HarmonyOsFacade(FacadeManager manager) {
     super(manager);
   }
@@ -37,7 +39,7 @@ public class HarmonyOsFacade extends RpcReceiver {
                 Class<?> buildExClass = Class.forName("com.huawei.system.BuildEx");
                 Object osBrand = buildExClass.getMethod("getOsBrand").invoke(buildExClass);
                 assert osBrand != null;
-                return "Harmony".equalsIgnoreCase(osBrand.toString());
+                return HARMONY.equalsIgnoreCase(osBrand.toString());
             } catch (Throwable x) {
                 return false;
             }
@@ -45,11 +47,17 @@ public class HarmonyOsFacade extends RpcReceiver {
 
         /**
          * 获取鸿蒙系统版本号
-         *
-         * @return 版本号
+         * edit by 乘着船
+         * @return 版本号等
          */
-        private static String getHarmonyVersion() throws Exception {
-            return getSystemProperty("hw_sc.build.platform.version", "");
+        private static void getHarmonyVersion(Map<String,String> map) throws Exception {
+            putHwScMap(map,"Version","platform.version");
+            putHwScMap(map,"ApiVersion","os.apiversion");
+            putHwScMap(map,"ReleaseType","os.releasetype");
+        }
+
+        private static void putHwScMap(Map<String,String> map,String str1,String str2) throws Exception {
+            map.put(HARMONY+str1,getSystemProperty("hw_sc.build."+str2, ""));
         }
 
         /**
@@ -88,7 +96,7 @@ public class HarmonyOsFacade extends RpcReceiver {
             boolean isHarmony = isHarmonyOs();
             map.put("isHarmonyOs",String.valueOf(isHarmony));
             if (isHarmony) {
-                map.put("HarmonyVersion",getHarmonyVersion());
+                getHarmonyVersion(map);
                 map.put("HarmonyDisplayVersion",getHarmonyDisplayVersion());
             }
             return map;

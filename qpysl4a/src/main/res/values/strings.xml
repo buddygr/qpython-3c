@@ -2,4 +2,7 @@
 <resources>
     <string name="app_name">QSL4A</string>
     <string name="float_view_out_range">Float View Index Out of Range .</string>
+    <string name="float_view_not_exist">Float View Index Not Exist .</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 </resources>

@@ -62,7 +62,7 @@ public class ApplicationManagerFacade extends RpcReceiver {
     return applications;
   }
 
-  @Rpc(description = "get all packages")
+  /*@Rpc(description = "get all packages")
   public Map<String,String> getAllPackages() {
     Map<String, String> packages = new HashMap<>();
     List<PackageInfo> packageInfos = context.getPackageManager().getInstalledPackages(PackageManager.GET_ACTIVITIES |
@@ -95,7 +95,7 @@ public class ApplicationManagerFacade extends RpcReceiver {
         packages.put(info.packageName, info.applicationInfo.loadLabel(mPackageManager).toString());
     }
     return packages;
-  }
+  }*/
 
   @Rpc(description = "Start activity with the given classname and/or packagename .")
   public void launch(@RpcParameter(name = "classname") @RpcOptional String classname,
@@ -129,6 +129,39 @@ public class ApplicationManagerFacade extends RpcReceiver {
       runningPackages.add(info.service.getPackageName());
     }
     return new ArrayList<String>(runningPackages);
+  }
+
+  @Rpc(description = "get installed packages")
+  public Map<String,String> getInstalledPackages(
+          @RpcParameter(name = "flag") @RpcDefault("4") Integer flag
+  ) {
+    Map<String, String> packages = new HashMap<>();
+    List<PackageInfo> packageInfos = context.getPackageManager().getInstalledPackages(PackageManager.GET_UNINSTALLED_PACKAGES);
+    boolean allow;
+    for (PackageInfo info : packageInfos) {
+      switch (flag) {
+        case 5://所有应用
+          allow = true;
+          break;
+        case 4://用户应用
+          allow = ( info.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM ) == 0;
+          break;
+        case 3://系统应用
+          allow = ( info.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM ) != 0;
+          break;
+        case 2://系统已更新应用
+          allow = ( info.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP ) != 0;
+          break;
+        case 1://系统未更新应用
+          allow = ( info.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM ) != 0 && ( info.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP ) == 0;
+          break;
+        default:
+          allow = false;
+      }
+      if(allow)
+          packages.put(info.packageName,  info.applicationInfo.loadLabel(mPackageManager).toString());
+    }
+    return packages;
   }
 
   @SuppressWarnings("deprecation")

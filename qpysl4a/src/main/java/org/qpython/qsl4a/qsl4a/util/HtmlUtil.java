@@ -8,12 +8,29 @@ import java.io.IOException;
 import java.net.URL;
 
 public class HtmlUtil {
+    public static int widthFixed = 0;
+    public static int heightFixed = 0;
+    public static double widthRatio = 1.0;
+    public static double heightRatio = 1.0;
 
     public static final Html.ImageGetter imageGetter = source -> {
         Drawable drawable = null;
+        int width,height;
         try {
             drawable = Drawable.createFromStream(new URL(source).openStream(), null);
-            drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+            if(widthFixed <= 0)
+                width = drawable.getIntrinsicWidth();
+            else
+                width = widthFixed;
+            if(heightFixed <= 0)
+                height = drawable.getIntrinsicHeight();
+            else
+                height = heightFixed;
+            if(widthRatio != 1.0)
+                width *= widthRatio;
+            if(heightRatio != 1.0)
+                height *= heightRatio;
+            drawable.setBounds(0, 0, width, height);
         } catch (IOException e) {
             e.printStackTrace();
         }

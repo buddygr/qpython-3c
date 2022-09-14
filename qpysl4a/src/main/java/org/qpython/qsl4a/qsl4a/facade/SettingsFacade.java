@@ -67,7 +67,7 @@ public class SettingsFacade extends RpcReceiver {
   /**
    * Creates a new SettingsFacade.
    * 
-   * @param service
+   * param service
    *          is the {@link Context} the APIs will run under
    */
   public SettingsFacade(FacadeManager manager) {
@@ -287,12 +287,12 @@ public class SettingsFacade extends RpcReceiver {
   }
 
   @Rpc(description = "get screen infomation .")
-  public Map<String,Float> getScreenInfo(){
-    Map<String,Float> s = new HashMap<>();
+  public Map<String,Object> getScreenInfo(){
+    Map<String,Object> s = new HashMap<>();
     DisplayMetrics dm = context.getResources().getDisplayMetrics();
-    s.put("widthPixels",(float)dm.widthPixels);
-    s.put("heightPixels",(float)dm.heightPixels);
-    s.put("densityDpi",(float)dm.densityDpi);
+    s.put("widthPixels",dm.widthPixels);
+    s.put("heightPixels",dm.heightPixels);
+    s.put("densityDpi",dm.densityDpi);
     s.put("density",dm.density);
     s.put("xdpi",dm.xdpi);
     s.put("ydpi",dm.ydpi);

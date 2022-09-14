@@ -127,7 +127,7 @@ public class AndroidFacade extends RpcReceiver {
   }
 
   ClipboardManager getClipboardManager() {
-    Object clipboard = null;
+    Object clipboard;
     if (mClipboard == null) {
       try {
         clipboard = mService.getSystemService(Context.CLIPBOARD_SERVICE);
@@ -202,16 +202,17 @@ public class AndroidFacade extends RpcReceiver {
           }
           startActivityForResult(intent, requestCode);
         } catch (Exception e) {
-          intent.putExtra("EXCEPTION", e.getMessage());
-          setResult(intent);
+          if(intent!=null) {
+            intent.putExtra("EXCEPTION", e.getMessage());
+            setResult(intent);
+          }
         }
       }
 
       @Override
       public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (data==null) {
+        if (data==null)
           data=new Intent();
-        }
         data.putExtra("RESULT_CODE",resultCode);
         setResult(data);
       }
@@ -234,9 +235,9 @@ public class AndroidFacade extends RpcReceiver {
     for (int i = 0; i < names.length(); i++) {
       String name = names.getString(i);
       Object data = extras.get(name);
-      if (data == null) {
-        continue;
-      }
+      //if (data == null) {
+      //  continue;
+      //}
       if (data instanceof Integer) {
         intent.putExtra(name, (Integer) data);
       }

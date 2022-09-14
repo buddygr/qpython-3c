@@ -66,6 +66,11 @@ public class EnterDialog {
         return this;
     }
 
+    public EnterDialog setMessage(String msg) {
+        binding.tvMessage.setText(msg);
+        return this;
+    }
+
     public EnterDialog setConfirmListener(final ClickListener listener) {
         binding.tvPositive.setOnClickListener(v -> {
             if (listener.OnClickListener(binding.etEnter.getText().toString())) {

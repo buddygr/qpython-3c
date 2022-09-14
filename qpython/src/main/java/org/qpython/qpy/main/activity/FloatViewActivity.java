@@ -32,7 +32,7 @@ public class FloatViewActivity extends Activity
         //参数数组
         static final ArrayList<WindowManager.LayoutParams> params = FloatViewFacade.params;
         //时间数组
-        static final ArrayList<String> times = FloatViewFacade.times;
+        static final ArrayList<Long> times = FloatViewFacade.times;
         //操作类型数组
         static final ArrayList<String> operations = FloatViewFacade.operations;
         static WindowManager windowManager;
@@ -95,10 +95,16 @@ public class FloatViewActivity extends Activity
         //moveTaskToBack(true);
         //索引参数
         index = intent.getIntExtra("index",-1);
+
+        boolean reinit = false;
         if (index>=0) {
             try {
                 floatButton = buttons.get(index);
-                layoutParams = params.get(index);
+                if(floatButton==null){
+                    floatButton = new Button(this);
+                    layoutParams = new WindowManager.LayoutParams();
+                    reinit = true;
+                } else layoutParams = params.get(index);
             } catch (Exception e){
                 index=-1;
             }
@@ -117,11 +123,7 @@ public class FloatViewActivity extends Activity
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public boolean onTouch(View view, MotionEvent event) {
-                int index;
-                for(index =0; index < buttons.size(); index++){
-                    if(view==buttons.get(index))
-                        break;
-                }
+                int index = (int) view.getTag();
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         x = (int) event.getRawX();
@@ -142,7 +144,7 @@ public class FloatViewActivity extends Activity
                         } else {
                             operations.set(index, "click");
                         }
-                        times.set(index, getTime());
+                        times.set(index, System.currentTimeMillis());
                         break;
                     case MotionEvent.ACTION_UP:
                     if (operations.get(index).equals("click")) {
@@ -190,15 +192,23 @@ public class FloatViewActivity extends Activity
         try {
             if(index>=buttons.size()){
                 windowManager.addView(floatButton, layoutParams);
+                floatButton.setTag(buttons.size());
                 buttons.add(floatButton);
                 params.add(layoutParams);
-                times.add(getTime());
+                times.add(System.currentTimeMillis());
                 operations.add("initial");
             } else {
+                if(reinit) {
+                    windowManager.addView(floatButton, layoutParams);
+                    buttons.set(index,floatButton);
+                    operations.set(index,"reinitial");
+                    floatButton.setTag(index);
+                } else {
+                    windowManager.updateViewLayout(floatButton, layoutParams);
+                    operations.set(index,"modify");
+                }
                 params.set(index,layoutParams);
-                times.set(index,getTime());
-                windowManager.updateViewLayout(floatButton, layoutParams);
-                operations.set(index,"modify");
+                times.set(index,System.currentTimeMillis());
             }
         } catch (Exception e) {
             Toast.makeText(this,getString(R.string.float_view_permission)+"\n"+ e,Toast.LENGTH_LONG).show();
@@ -226,10 +236,5 @@ public class FloatViewActivity extends Activity
             return (int) l;
         }
     }
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    @SuppressLint({"SimpleDateFormat"})
-    private String getTime(){
-        return new SimpleDateFormat("yyyyMMdd-HHmmss-SSS").format(new Date(System.currentTimeMillis()));
-    }
+    
 }

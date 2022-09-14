@@ -33,7 +33,7 @@ public class FloatViewFacade extends RpcReceiver {
   //参数数组
   public static final ArrayList<WindowManager.LayoutParams> params = new ArrayList<>();
   //时间数组
-  public static final ArrayList<String> times = new ArrayList<>();
+  public static final ArrayList<Long> times = new ArrayList<>();
   //操作类型数组
   public static final ArrayList<String> operations = new ArrayList<>();
   //窗口管理器
@@ -124,14 +124,18 @@ public class FloatViewFacade extends RpcReceiver {
         throw new Exception(context.getString(R.string.float_view_out_range));
       }
       WindowManager.LayoutParams layoutParams = params.get(index);
-      //返回横坐标，原点为屏幕中心
-      result.put("x", layoutParams.x);
-      //返回纵坐标，原点为屏幕中心
-      result.put("y", layoutParams.y);
-      //返回操作时间
-      result.put("time",times.get(index));
-      //返回操作类型
-      result.put("operation",operations.get(index));
+      if(layoutParams == null){
+        result.put("exception",context.getString(R.string.float_view_not_exist));
+      } else {
+        //返回横坐标，原点为屏幕中心
+        result.put("x", layoutParams.x);
+        //返回纵坐标，原点为屏幕中心
+        result.put("y", layoutParams.y);
+        //返回操作时间
+        result.put("time", times.get(index));
+        //返回操作类型
+        result.put("operation", operations.get(index));
+      }
       //返回索引位置
       result.put("index",index);
       return result;
@@ -146,9 +150,9 @@ public class FloatViewFacade extends RpcReceiver {
     //返回删除的悬浮窗个数
     if (index>-2){
       if(index==-1){//删除所有悬浮窗
-        index = buttons.size();
+        index = 0;
         for(Button button : buttons)
-          windowManager.removeView(button);
+          index += removeButton(button);
         buttons.clear();
         params.clear();
         times.clear();
@@ -158,8 +162,7 @@ public class FloatViewFacade extends RpcReceiver {
           if(index>=buttons.size()){
             throw new Exception(context.getString(R.string.float_view_out_range));
           }
-          removeButton(index);
-          index = 1;
+          index = removeButton(index);
         } catch (Exception e){
           throw new Exception(e.toString());
         }
@@ -170,17 +173,29 @@ public class FloatViewFacade extends RpcReceiver {
     return index;
   }
 
-  public static void removeButton(int index){
-    windowManager.removeView(buttons.get(index));
-    buttons.remove(index);
-    params.remove(index);
-    times.remove(index);
-    operations.remove(index);
+  public static int removeButton(int index){
+    int i = removeButton(buttons.get(index));
+    buttons.set(index,null);
+    params.set(index,null);
+    times.set(index,null);
+    operations.set(index,null);
+    return i;
+  }
+
+  private static int removeButton(Button button){
+    if(button!=null) {
+      windowManager.removeView(button);
+      return 1;
+    } else return 0;
   }
 
   @Rpc(description = "Float View Count .")
   public int floatViewCount(){
-    return buttons.size();
+    int cnt = 0;
+    for(int i=0;i<buttons.size();i++)
+      if(buttons.get(i)!=null)
+        cnt+=1;
+      return cnt;
   }
 
   @Rpc(description = "QPython Background Protect .")

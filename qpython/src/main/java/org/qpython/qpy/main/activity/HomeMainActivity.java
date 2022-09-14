@@ -17,6 +17,7 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
+import android.text.Spanned;
 import android.widget.Toast;
 
 import com.quseit.util.FileHelper;
@@ -38,56 +39,38 @@ import org.qpython.qpy.texteditor.TedLocalActivity;
 import org.qpython.qpysdk.QPySDK;
 import org.qpython.qsl4a.QPyScriptService;
 import org.qpython.qsl4a.qsl4a.facade.QPyInterfaceFacade;
+import org.qpython.qsl4a.qsl4a.util.HtmlUtil;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HomeMainActivity extends BaseActivity {
 
     private QPySDK qpysdk;
     private ActivityMainBinding binding;
+    private static SharedPreferences PREF;
+
+    private static String CONSOLE_SETTING = "HomeMainActivity_ConsoleMenu";
+    private static Spanned[] consoleItem;
+    private static final List<Byte> consoleMenu = new ArrayList<>();
 
     public static void start(Context context) {
         Intent starter = new Intent(context, HomeMainActivity.class);
         context.startActivity(starter);
     }
 
-    /*public static void start(Context context, String userName) {
-        Intent starter = new Intent(context, HomeMainActivity.class);
-        starter.putExtra(USER_NAME, userName);
-        context.startActivity(starter);
-    }*/
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        //App.setActivity(this);
+        PREF = PreferenceManager.getDefaultSharedPreferences(this);
         setHandler();
+        setConsoleMenu();
         startMain();
-        //handlePython3(getIntent());
         handleNotification(savedInstanceState);
         runShortcut(getIntent());
     }
-
-    /*private void initIcon() {
-        binding.icon.setImageResource(R.drawable.img_home_logo_3);
-        switch (NAction.getQPyInterpreter(this)) {
-            case "3.x":
-                binding.icon.setImageResource(R.drawable.img_home_logo_3);
-                break;
-            case "2.x":
-                binding.icon.setImageResource(R.drawable.img_home_logo);
-                break;
-        }
-    }
-
-    private void initUser() {
-        if (App.getUser() == null) {
-            binding.login.setVisibility(View.GONE);
-        } else {
-            binding.login.setText(Html.fromHtml(getString(R.string.welcome_s, App.getUser().getNick())));
-        }
-    }*/
 
     private void startMain() {
         initListener();
@@ -130,15 +113,12 @@ public class HomeMainActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        //initUser();
-        //initIcon();
         handleNotification();
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        //handlePython3(intent);
         runShortcut(intent);
     }
 
@@ -154,15 +134,6 @@ public class HomeMainActivity extends BaseActivity {
     private void initListener() {
 
         binding.ivScan.setOnClickListener(v -> Bus.getDefault().post(new StartQrCodeActivityEvent()));
-        /*binding.login.setOnClickListener(v -> {
-            if (App.getUser() == null) {
-                sendEvent(getString(R.string.event_login));
-                //startActivityForResult(new Intent(this, SignInActivity.class), LOGIN_REQUEST_CODE);
-            } else {
-                sendEvent(getString(R.string.event_me));
-                //UserActivity.start(this);
-            }
-        });*/
 
         binding.llTerminal.setOnClickListener(v -> {
             //TermActivity.startActivity(HomeMainActivity.this);
@@ -174,20 +145,16 @@ public class HomeMainActivity extends BaseActivity {
         binding.llTerminal.setOnLongClickListener(v -> {
             startPyService();
 
-            CharSequence[] chars = new CharSequence[]{
-                    this.getString(R.string.python_interpreter),
-                    this.getString(R.string.color_python_interpreter),
-                    this.getString(R.string.ipython_interactive),
-                    this.getString(R.string.sl4a_gui_console),
-                    this.getString(R.string.browser_console),
-                    this.getString(R.string.shell_terminal),
-                    this.getString(R.string.python_shell_terminal),
-                    this.getString(R.string.jupyter_notebook),
-            };
+            List<Spanned> list = new ArrayList<>();
+            for(byte i = 0;i < consoleItem.length;i++)
+                list.add(consoleItem[consoleMenu.get(i)]);
+            Spanned[] chars = list.toArray(new Spanned[consoleItem.length]);
             new AlertDialog.Builder(this, R.style.MyDialog)
                     .setTitle(R.string.choose_action)
                     .setItems(chars, (dialog, which) -> {
-                        switch (which) {
+                        byte i;
+                        i = consoleMenu.get(which);
+                        switch (i) {
                             case 0:
                                 startShell("default");
                                 break;
@@ -212,6 +179,15 @@ public class HomeMainActivity extends BaseActivity {
                             case 7:
                                 playPy("open_notebook");
                                 break;
+                        }
+                        if(which>0){
+                            i = consoleMenu.get(which - 1);
+                            consoleMenu.set(which - 1,consoleMenu.get(which));
+                            consoleMenu.set(which,i);
+                            StringBuilder sb = new StringBuilder();
+                            for(i = 0; i < consoleItem.length; i++)
+                                sb.append(consoleMenu.get(i));
+                            FileHelper.putFileContents(this,CONSOLE_SETTING,sb.toString());
                         }
                     }).setNegativeButton(getString(R.string.close), (dialogInterface, i) -> dialogInterface.dismiss())
                     .show();
@@ -256,23 +232,9 @@ public class HomeMainActivity extends BaseActivity {
         Bus.getDefault().unregister(this);
     }
 
-    /*private void handlePython3(Intent intent) {
-        String action = intent.getAction();
-        if (action != null && action.equals(getString(R.string.action_from_python_three))
-                && NAction.getQPyInterpreter(this).equals(PYTHON_2)) {
-            new AlertDialog.Builder(this)
-                    .setTitle(R.string.py2_now)
-                    .setMessage(R.string.switch_py3_hint)
-                    .setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss())
-                    .setPositiveButton(R.string.goto_setting, (dialog, which) -> SettingActivity.startActivity(this))
-                    .create()
-                    .show();
-        }
-    }*/
-
     private void handleNotification(Bundle bundle) {
         if (bundle == null) return;
-        if (!bundle.getBoolean("force") && !PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.key_hide_push), true)) {
+        if (!bundle.getBoolean("force") && !PREF.getBoolean(getString(R.string.key_hide_push), true)) {
             return;
         }
         String type = bundle.getString("type", "");
@@ -293,7 +255,7 @@ public class HomeMainActivity extends BaseActivity {
     }
 
     private void handleNotification() {
-        if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.key_hide_push), true)) {
+        if (!PREF.getBoolean(getString(R.string.key_hide_push), true)) {
             return;
         }
         SharedPreferences sharedPreferences = getSharedPreferences(CONF.NOTIFICATION_SP_NAME, MODE_PRIVATE);
@@ -339,7 +301,7 @@ public class HomeMainActivity extends BaseActivity {
 
         String[] permssions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
-        if (PreferenceManager.getDefaultSharedPreferences(this).getString("security_tip","").equals(getString(R.string.security_version)))
+        if (PREF.getString("security_tip","").equals(getString(R.string.security_version)))
         {
             QpySdkAgree(permssions);
         } else {
@@ -353,7 +315,7 @@ public class HomeMainActivity extends BaseActivity {
                     .setTitle(R.string.notice)
                     .setMessage(content)
                     .setPositiveButton(R.string.agree, (dialog1, which) -> {
-                        PreferenceManager.getDefaultSharedPreferences(this).edit().putString("security_tip",getString(R.string.security_version)).apply();
+                        PREF.edit().putString("security_tip",getString(R.string.security_version)).apply();
                         QpySdkAgree(permssions);
                     })
                     .setNegativeButton(R.string.disagree, (dialog1, which) -> finish())
@@ -369,18 +331,11 @@ public class HomeMainActivity extends BaseActivity {
             @Override
             public void onGrant() {
                 //这里只执行一次做为初始化
-                CONF.CUSTOM_PATH = PreferenceManager.getDefaultSharedPreferences(HomeMainActivity.this).getString(getString(R.string.qpy_custom_dir),CONF.LEGACY_PATH);
+                CONF.CUSTOM_PATH = PREF.getString(getString(R.string.qpy_custom_dir_key),CONF.LEGACY_PATH);
 
                 if ( NAction.isQPyInterpreterSet(HomeMainActivity.this) ) {
                     getPyVer(true);
                 } else {
-                    /*new AlertDialog.Builder(HomeMainActivity.this, R.style.MyDialog)
-                            .setTitle(R.string.notice)
-                            .setMessage(R.string.py2_or_3)
-                            .setPositiveButton(R.string.use_py3, (dialog1, which) -> initQpySDK3())
-                            .setNegativeButton(R.string.use_py2, (dialog1, which) -> initQpySDK())
-                            .create()
-                            .show();*/
                     NAction.setQPyInterpreter(HomeMainActivity.this, "3.x");
                     initQPy();
                 }
@@ -393,23 +348,6 @@ public class HomeMainActivity extends BaseActivity {
 
         });
     }
-
-    /**
-     * 在工作线程中作初始化
-     *
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    private void initQpySDK3() {
-        Log.d(TAG, "initQpySDK3");
-        NAction.setQPyInterpreter(HomeMainActivity.this, "3.x");
-        initQPy();
-        initIcon();
-    }
-    private void initQpySDK() {
-        Log.d(TAG, "initQpySDK");
-        initQPy(false);
-        NAction.setQPyInterpreter(HomeMainActivity.this, "2.x");
-        initIcon();
-    }*/
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void initQPy(){
@@ -448,18 +386,6 @@ public class HomeMainActivity extends BaseActivity {
             Toast.makeText(this,e.toString(),Toast.LENGTH_LONG).show();
         }
     }
-
-    /*@Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case LOGIN_REQUEST_CODE:
-                    //binding.login.setText(Html.fromHtml(getString(R.string.welcome_s, App.getUser().getNick())));
-                    break;
-            }
-        }
-    }*/
 
     @Subscribe
     public void startQrCodeActivity(StartQrCodeActivityEvent event) {
@@ -515,4 +441,38 @@ public class HomeMainActivity extends BaseActivity {
         };
     }
 
+    private void setConsoleMenu(){
+        CONSOLE_SETTING = getFilesDir() + "/text/ver/" + CONSOLE_SETTING;
+        consoleItem = new Spanned[]{
+                strIdToHtm(R.string.python_interpreter,"bfdfdf"),
+                strIdToHtm(R.string.color_python_interpreter,"dfdfbf"),
+                strIdToHtm(R.string.ipython_interactive,"dfbfdf"),
+                strIdToHtm(R.string.sl4a_gui_console,"ffffff"),
+                strIdToHtm(R.string.browser_console,"ffbfbf"),
+                strIdToHtm(R.string.shell_terminal,"bfffbf"),
+                strIdToHtm(R.string.python_shell_terminal,"bfbfff"),
+                strIdToHtm(R.string.jupyter_notebook,"ffbfff"),
+        };
+        byte i, k;
+        int l = consoleItem.length;
+        try{
+            String s = FileHelper.getFileContents(CONSOLE_SETTING);
+            for(i = 0; i < l; i++){
+                k = Byte.parseByte(s.substring( i, i + 1 ));
+                consoleMenu.add(k);
+            }
+            for(i = 0; i < l; i++){
+                if(!consoleMenu.contains(i))
+                    throw new Exception("invalid console menu .");
+            }
+        }
+        catch (Exception e){
+            consoleMenu.clear();
+            for (i = 0; i < l; i++)
+                consoleMenu.add(i);
+        }}
+
+    private Spanned strIdToHtm(int strId,String color){
+        return HtmlUtil.textToHtml("<font color=#"+color+"><big>"+this.getString(strId)+"</big></font>");
+    }
 }

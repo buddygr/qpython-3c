@@ -1,20 +1,17 @@
 package com.quseit.util;
+//by 乘着船 at 2021-2022
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
-import android.os.storage.StorageManager;
-import android.os.storage.StorageVolume;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
-import android.support.annotation.RequiresApi;
 import android.support.v4.provider.DocumentFile;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,18 +23,33 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.support.v4.app.ActivityCompat.startActivityForResult;
-
 public class DocumentsUtils {
 
     private static final String TAG = DocumentsUtils.class.getSimpleName();
 
-    public static final int OPEN_DOCUMENT_TREE_CODE = 8000;
+    //public static final int OPEN_DOCUMENT_TREE_CODE = 8000;
     public static final int MAX_BUFFER_SIZE = 5242880;//max buffer size 5MB
 
-    private static List<String> sExtSdCardPaths = new ArrayList<>();
+    public static final String SDCARD = Environment.getExternalStorageDirectory().getPath();
+    public static final String SDCARD_PATH = SDCARD + "/";
+    public static final String CONTENT_PRF = "content://";
+    public static final String[] SDCARD_CONTENT = new String[]{
+            CONTENT_PRF + "com.android.externalstorage.documents/tree/primary%3A", "/document/primary%3A"};
+    public static final String ANDROID_PATH = SDCARD_PATH + "Android/";
+    public static final String[] ANDROID_CONTENT = new String[]{
+            SDCARD_CONTENT[0] + "Android%2F", SDCARD_CONTENT[1] + "Android%2F"};
 
-    private static String requestRootPath = null;
+    public static final int ANDROID_SAVE_INTENT =
+            Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION ;
+    public static final int ANDROID_OPEN_INTENT =
+            Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION |
+            Intent.FLAG_GRANT_PREFIX_URI_PERMISSION |
+            ANDROID_SAVE_INTENT ;
+
+    public static List<String> sExtSdCardPaths = new ArrayList<>();
+
+    //private static String requestRootPath = null;
 
     private DocumentsUtils() {
 
@@ -73,7 +85,7 @@ public class DocumentsUtils {
                 }
             }
         }
-        if (sExtSdCardPaths.isEmpty()) sExtSdCardPaths.add("/sdcard");
+        if (sExtSdCardPaths.isEmpty()) sExtSdCardPaths.add(SDCARD);
         return sExtSdCardPaths.toArray(new String[0]);
     }
 
@@ -89,9 +101,9 @@ public class DocumentsUtils {
     private static String getExtSdCardFolder(final File file, Context context) {
         String[] extSdPaths = getExtSdCardPaths(context);
         try {
-            for (int i = 0; i < extSdPaths.length; i++) {
-                if (file.getCanonicalPath().startsWith(extSdPaths[i])) {
-                    return extSdPaths[i];
+            for (String extSdPath : extSdPaths) {
+                if (file.getCanonicalPath().startsWith(extSdPath)) {
+                    return extSdPath;
                 }
             }
         } catch (IOException e) {
@@ -117,11 +129,15 @@ public class DocumentsUtils {
      * existing, it is created.
      *
      * @param file        The file.
-     * @param isDirectory flag indicating if the file should be a directory.
+     * @param isDirectory true/false/null
+     *        true/false - flag indicating if the file should be a directory ,
+     *            if file not exist, it will be create .
+     *        null - do not know the file is a directory ,
+     *            if file not exist, it will not be create .
      * @return The DocumentFile
      */
-    public static DocumentFile getDocumentFile(final File file, final boolean isDirectory,
-                                               Context context) {
+    public static DocumentFile getDocumentFile(
+            final File file, final Boolean isDirectory, Context context) {
 
         String baseFolder = getExtSdCardFolder(file, context);
         boolean originalDirectory = false;
@@ -160,6 +176,7 @@ public class DocumentsUtils {
             DocumentFile nextDocument = document.findFile(parts[i]);
 
             if (nextDocument == null) {
+                if(isDirectory == null) return null;
                 if ((i < parts.length - 1) || isDirectory) {
                     nextDocument = document.createDirectory(parts[i]);
                 } else {
@@ -185,8 +202,9 @@ public class DocumentsUtils {
 
     private static boolean FileDelete(File file) {
         if (file.isFile()) return file.delete();
-        File subFiles[] = file.listFiles();
-        if (subFiles.length==0) return file.delete();
+        File[] subFiles = file.listFiles();
+        if (subFiles==null || subFiles.length==0)
+            return file.delete();
         boolean ret = true;
         for(File subFile:subFiles){
             if (subFile.isDirectory()) ret = FileDelete(subFile) && ret;
@@ -224,7 +242,7 @@ public class DocumentsUtils {
         return res;
     }
 
-    public static boolean canWrite(Context context, File file) {
+    /*public static boolean canWrite(Context context, File file) {
         boolean res = canWrite(file);
 
         if (!res && DocumentsUtils.isOnExtSdCard(file, context)) {
@@ -232,7 +250,7 @@ public class DocumentsUtils {
             res = documentFile != null && documentFile.canWrite();
         }
         return res;
-    }
+    }*/
 
     private static boolean renameToCross(Context context,File src,File dest) throws Exception {
         copy(context,src,dest);
@@ -245,7 +263,7 @@ public class DocumentsUtils {
         boolean res = src.renameTo(dest);
         if (res) return true;
 
-        if (!res && isOnExtSdCard(dest, context)) {
+        if (isOnExtSdCard(dest, context)) {
             DocumentFile srcDoc;
             if (isOnExtSdCard(src, context)) {
                 srcDoc = getDocumentFile(src, false, context);
@@ -311,23 +329,21 @@ public class DocumentsUtils {
         return out;
     }
 
-    public static boolean saveTreeUri(Context context, String rootPath, Uri uri) {
+    public static void saveTreeUri(Context context, String rootPath, Uri uri) {
         DocumentFile file = DocumentFile.fromTreeUri(context, uri);
         if (file != null && file.canWrite()) {
             SharedPreferences perf = PreferenceManager.getDefaultSharedPreferences(context);
             perf.edit().putString(rootPath, uri.toString()).apply();
-            return true;
         } else {
             Log.e(TAG, "no write permission: " + rootPath);
         }
-        return false;
     }
 
-    public static boolean checkWritableRootPath(Context context, String rootPath) {
+    /*public static boolean checkWritableRootPath(Context context, String rootPath) {
         File root = new File(rootPath);
         if (!root.canWrite()) {
 
-            if (DocumentsUtils.isOnExtSdCard(root, context)) {
+            if (isOnExtSdCard(root, context)) {
                 DocumentFile documentFile = DocumentsUtils.getDocumentFile(root, true, context);
                 return documentFile == null || !documentFile.canWrite();
             } else {
@@ -344,7 +360,7 @@ public class DocumentsUtils {
             }
         }
         return false;
-    }
+    }*/
 
     private static void copyFile (
             Context context, File srcFile, File destFile) throws Exception {
@@ -354,7 +370,7 @@ public class DocumentsUtils {
         if (fos==null) fos=new FileOutputStream(destFile);
         int len = fis.available();
         if (len>MAX_BUFFER_SIZE) len=MAX_BUFFER_SIZE;
-        byte flush[] =new byte [len];
+        byte[] flush =new byte [len];
         while((len=fis.read(flush))>0) {
             fos.write(flush,0,len);
         }
@@ -426,7 +442,7 @@ public class DocumentsUtils {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    /*@RequiresApi(api = Build.VERSION_CODES.N)
     public static void storageShowOpen(
             String rootPath, Activity context
     ) {
@@ -454,10 +470,10 @@ public class DocumentsUtils {
             return false;
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.N)
+        /*@RequiresApi(api = Build.VERSION_CODES.N)
         public static void storageShowOpenAll (Activity context) {
         for (String rootPath:getExtSdCardPaths(context)){
             storageShowOpen(rootPath,context);
         }
-        }
+        }*/
 }

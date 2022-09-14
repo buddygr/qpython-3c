@@ -530,4 +530,5 @@
     <string name="none">无</string>
     <string name="optimize_1">移除assert和__debug__依赖声明</string>
     <string name="optimize_2">在等级1的改变基础上，同时丢弃文档字符串</string -->
+    <string name="edit_to_new_path">您可以将其编辑为新路径。</string>
 </resources>

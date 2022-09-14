@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
-
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="60dp"
@@ -10,32 +8,57 @@
         android:orientation="vertical"
         android:padding="@dimen/default_margin">
 
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="7">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
         <TextView
             android:id="@+id/tv_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="标题"
             android:textColor="@color/colorAccent"
             android:textSize="18sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/tv_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@color/white"
+            />
 
         <EditText
             android:id="@+id/et_enter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="20dp"
             android:background="@drawable/edit_text_green_bg"
             android:padding="5dp"
             android:textColor="#FFF"
             android:textColorHint="@color/text_gray"
-            android:textCursorDrawable="@drawable/edit_text_cursor"/>
+            android:textCursorDrawable="@drawable/edit_text_cursor"
+            android:inputType="textMultiLine"
+            />
+
+        </LinearLayout>
+
+        </ScrollView>
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="30dp"
             android:layout_gravity="right"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_weight="3">
 
             <TextView
                 android:id="@+id/tv_negative"
