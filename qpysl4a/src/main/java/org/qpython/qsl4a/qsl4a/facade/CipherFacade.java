@@ -37,27 +37,22 @@ public class CipherFacade extends RpcReceiver {
         mPackageManager = mService.getPackageManager();
     }
 
-    private static byte[] readFromFile(String filePath) {
-        try {
-            File file = new File(filePath);
-            FileInputStream fis = new FileInputStream(file);
-            int length = fis.available();
-            byte[] data = new byte[length];
-            fis.read(data);
-            fis.close();
-            return data;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new byte[0];
-        }}
+    private static byte[] readFromFile(String filePath) throws Exception {
+        File file = new File(filePath);
+        FileInputStream fis = new FileInputStream(file);
+        int length = fis.available();
+        byte[] data = new byte[length];
+        fis.read(data);
+        fis.close();
+        return data;
+        }
 
-    private static void writeToFile(String filePath, byte[] data) {
-        try {
-            FileOutputStream fos = new FileOutputStream(filePath);
-            fos.write(data);
-            fos.flush();
-            fos.close();
-        } catch (Exception e) {e.printStackTrace();}}
+    private static void writeToFile(String filePath, byte[] data) throws Exception {
+        FileOutputStream fos = new FileOutputStream(filePath);
+        fos.write(data);
+        fos.flush();
+        fos.close();
+    }
 
     /**
      * @function cipherInit 加密解密引擎设置
@@ -93,11 +88,12 @@ public class CipherFacade extends RpcReceiver {
             } else {
                 InitialVector = initialVector.getBytes(encodingFormat);
             }
-            /*if (InitialVector.length > 16){
-                byte[] IV = {};
-                System.arraycopy(InitialVector,0,IV,0,16);
-                InitialVector = IV;
-            }*/
+        }
+        if (InitialVector.length > 16){
+            //InitialVector长度大于16时自动截取
+            byte[] IV = new byte[16];
+            System.arraycopy(InitialVector,0,IV,0,16);
+            InitialVector = IV;
         }
         //Algorithm 加密算法如AES
         String Algorithm;

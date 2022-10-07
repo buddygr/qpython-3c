@@ -204,11 +204,7 @@ public class QPySDK {
 
     public boolean needUpdateRes(){
         String fn = context.getFilesDir()+"/text/ver/qpython";
-        if (readDiskVersion(fn).equals(getVersion())){
-            return false;
-        } else {
-            return true;
-        }
+        return !readDiskVersion(fn).equals(getVersion());
     }
 
     public String[] getPyVer(){

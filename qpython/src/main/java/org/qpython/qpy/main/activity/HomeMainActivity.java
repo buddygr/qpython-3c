@@ -33,17 +33,21 @@ import org.qpython.qpy.databinding.ActivityMainBinding;
 import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.main.auxActivity.ProtectActivity;
 import org.qpython.qpy.main.auxActivity.ScreenRecordActivity;
+import org.qpython.qpy.main.fragment.SettingFragment;
 import org.qpython.qpy.main.utils.Bus;
 import org.qpython.qpy.texteditor.EditorActivity;
 import org.qpython.qpy.texteditor.TedLocalActivity;
 import org.qpython.qpysdk.QPySDK;
 import org.qpython.qsl4a.QPyScriptService;
+import org.qpython.qsl4a.qsl4a.facade.AndroidFacade;
 import org.qpython.qsl4a.qsl4a.facade.QPyInterfaceFacade;
 import org.qpython.qsl4a.qsl4a.util.HtmlUtil;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class HomeMainActivity extends BaseActivity {
 
@@ -69,7 +73,7 @@ public class HomeMainActivity extends BaseActivity {
         setConsoleMenu();
         startMain();
         handleNotification(savedInstanceState);
-        runShortcut(getIntent());
+        runShortcut();
     }
 
     private void startMain() {
@@ -79,9 +83,6 @@ public class HomeMainActivity extends BaseActivity {
         openQpySDK();
         setTaskDescription(new ActivityManager.TaskDescription(getString(R.string.aux_window)));
         ProtectActivity.CheckProtect(this);
-        /*if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-            UpdateHelper.checkConfUpdate(this, QPyConstants.BASE_PATH);
-        }*/
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -136,8 +137,7 @@ public class HomeMainActivity extends BaseActivity {
         binding.ivScan.setOnClickListener(v -> Bus.getDefault().post(new StartQrCodeActivityEvent()));
 
         binding.llTerminal.setOnClickListener(v -> {
-            //TermActivity.startActivity(HomeMainActivity.this);
-            //默认启动彩色Python解释器
+            startPyService();
             TermActivity.startActivity(HomeMainActivity.this);
             sendEvent(getString(R.string.event_term));
         });
@@ -417,6 +417,20 @@ public class HomeMainActivity extends BaseActivity {
         }
     }}
 
+    private void runShortcut(){
+        if(SplashActivity.delay > 100){
+            if(CONF.pyVer.isEmpty())
+                return;
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    runShortcut(getIntent());
+                }
+            },500);
+            SplashActivity.delay = 100;
+        } else runShortcut(getIntent());
+    }
+
     public static class StartQrCodeActivityEvent {
 
     }
@@ -431,14 +445,14 @@ public class HomeMainActivity extends BaseActivity {
             @Override
             public void handleMessage(Message msg){
                 super.handleMessage(msg);
-                Object[] object = (Object[]) msg.obj;
+                String[] string = (String[]) msg.obj;
                 ScriptExec.getInstance().playScript(
                         HomeMainActivity.this,
-                        (String) object[0],
-                        (String) object[1],
+                        string[0],string[1],
                         false);
             }
         };
+        AndroidFacade.handler = QPyInterfaceFacade.handler;
     }
 
     private void setConsoleMenu(){

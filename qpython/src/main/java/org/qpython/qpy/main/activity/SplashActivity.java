@@ -13,7 +13,7 @@ import java.util.TimerTask;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private static int delay = 1000;
+    public static int delay = 1000;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

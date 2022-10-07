@@ -17,6 +17,7 @@
 package org.qpython.qsl4a.qsl4a.facade;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -27,6 +28,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Contacts.PhonesColumns;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.telephony.CellIdentityCdma;
 import android.telephony.CellIdentityGsm;
@@ -39,7 +41,6 @@ import android.telephony.CellInfoGsm;
 import android.telephony.CellInfoLte;
 import android.telephony.CellInfoNr;
 import android.telephony.CellInfoWcdma;
-import android.telephony.CellLocation;
 import android.telephony.CellSignalStrengthCdma;
 import android.telephony.CellSignalStrengthGsm;
 import android.telephony.CellSignalStrengthLte;
@@ -62,7 +63,6 @@ import org.qpython.qsl4a.qsl4a.rpc.RpcStopEvent;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.URLEncoder;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -491,6 +491,8 @@ public class PhoneFacade extends RpcReceiver {
         return mTelephonyManager.getDeviceSoftwareVersion();
     }
 
+    @SuppressLint("HardwareIds")
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Rpc(description = "Returns the phone number string for line 1, for example, the MSISDN for a GSM phone. Return null if it is unavailable.")
     public String getLine1Number() throws Exception {
         if (ActivityCompat.checkSelfPermission(mService, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mService, Manifest.permission.READ_PHONE_NUMBERS) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mService, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {

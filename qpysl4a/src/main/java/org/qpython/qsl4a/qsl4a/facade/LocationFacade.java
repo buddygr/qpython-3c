@@ -22,14 +22,19 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.GnssStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 
 import com.google.common.collect.Maps;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
@@ -89,8 +94,14 @@ public class LocationFacade extends RpcReceiver {
   private final EventFacade mEventFacade;
   private final Service mService;
   private final Map<String, Location> mLocationUpdates;
+  private LocaCallback mLocaCallback;
+  private JSONArray mGnssStatus;
   private final LocationManager mLocationManager;
   private final Geocoder mGeocoder;
+
+  private final static String[] GnssTypes = new String[]{
+          "UNKNOWN","GPS","SBAS","GLONASS","QZSS","BEIDOU","GALILEO","IRNSS"
+  };
 
   private final LocationListener mLocationListener = new LocationListener() {
     @Override
@@ -130,7 +141,7 @@ public class LocationFacade extends RpcReceiver {
     stopLocating();
   }
 
-  public void check_Access_Fine_Location_Permission() throws Exception {
+  private void check_Access_Fine_Location_Permission() throws Exception {
     if (ActivityCompat.checkSelfPermission(mService, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
       throw new Exception(Manifest.permission.ACCESS_FINE_LOCATION);
     }
@@ -150,14 +161,19 @@ public class LocationFacade extends RpcReceiver {
   @Rpc(description = "Starts collecting location data.")
   @RpcStartEvent("location")
   public void startLocating(
-      @RpcParameter(name = "minDistance", description = "minimum time between updates in milliseconds") @RpcDefault("60000") Integer minUpdateTime,
-      @RpcParameter(name = "minUpdateDistance", description = "minimum distance between updates in meters") @RpcDefault("30") Integer minUpdateDistance) throws Exception {
+      @RpcParameter(name = "minUpdateTime", description = "minimum time between updates in milliseconds") @RpcDefault("60000") Integer minUpdateTime,
+      @RpcParameter(name = "minUpdateDistance", description = "minimum distance between updates in meters") @RpcDefault("30") Integer minUpdateDistance,
+      @RpcParameter(name = "updateGnssStatus", description = "get Global Navigation Satellite System status") @RpcDefault("false") Boolean updateGnssStatus) throws Exception {
     check_Access_Fine_Location_Permission();
     for (String provider : mLocationManager.getAllProviders()) {
       mLocationManager.requestLocationUpdates(provider, minUpdateTime, minUpdateDistance,
           mLocationListener, mService.getMainLooper());
     }
-  }
+    if(Build.VERSION.SDK_INT >= 28 && updateGnssStatus){
+        mLocaCallback = new LocaCallback();
+        mLocationManager.registerGnssStatusCallback(mLocaCallback,
+                Handler.createAsync(mService.getMainLooper()));
+  }}
 
   @Rpc(description = "Returns the current location as indicated by all available providers.", returns = "A map of location information by provider.")
   public Map<String, JSONObject> readLocation() throws JSONException {
@@ -170,11 +186,20 @@ public class LocationFacade extends RpcReceiver {
     return result;
   }
 
+  @Rpc(description = "read Global Navigation Satellite System status if Android >= 9 .")
+  public JSONArray readGnssStatus(){
+    return mGnssStatus;
+  }
+
   @Rpc(description = "Stops collecting location data.")
   @RpcStopEvent("location")
   public synchronized void stopLocating() {
     mLocationManager.removeUpdates(mLocationListener);
     mLocationUpdates.clear();
+    if(Build.VERSION.SDK_INT >=28 && mLocaCallback != null){
+      mLocationManager.unregisterGnssStatusCallback(mLocaCallback);
+      mGnssStatus = null;
+    }
   }
 
   @Rpc(description = "Returns the last known location of the device.", returns = "A map of location information by provider.")
@@ -198,6 +223,48 @@ public class LocationFacade extends RpcReceiver {
     for(int i=0;i<addressList.size();i++)
       address[i]=buildJsonAddress(addressList.get(i));
     return address;
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.O)
+  public class LocaCallback extends GnssStatus.Callback {
+    @Override
+    public void onSatelliteStatusChanged(GnssStatus status) {
+      super.onSatelliteStatusChanged(status);
+      //解析组装卫星信息
+      try {
+        mGnssStatus = buildJsonGnssStatus(status);
+      } catch (JSONException e) {
+        mGnssStatus = new JSONArray();
+        mGnssStatus.put(e.toString());
+      }
+    }
+
+    @Override
+    public void onStarted() {
+      super.onStarted();
+    }
+
+    @Override
+    public void onStopped() {
+      super.onStopped();
+    }
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.O)
+  private static JSONArray buildJsonGnssStatus(GnssStatus status) throws JSONException {
+    JSONArray results = new JSONArray();
+    int satelliteCount = status.getSatelliteCount();
+    for (int i = 0; i < satelliteCount; i++) {
+      JSONObject result = new JSONObject();
+      result.put("ConstellationType", GnssTypes[status.getConstellationType(i)]);
+      result.put("AzimuthDegrees",status.getAzimuthDegrees(i));
+      result.put("ElevationDegrees",status.getElevationDegrees(i));
+      result.put("Cn0DbHz",status.getCn0DbHz(i));
+      result.put("Svid",status.getSvid(i));
+      result.put("UsedInFix",status.usedInFix(i));
+      results.put(result);
+    }
+    return results;
   }
 
   private static JSONObject buildJsonAddress(Address address) throws JSONException {

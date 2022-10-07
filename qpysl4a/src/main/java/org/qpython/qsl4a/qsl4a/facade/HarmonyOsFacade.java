@@ -21,6 +21,7 @@ import java.util.Map;
 public class HarmonyOsFacade extends RpcReceiver {
 
     private static final String HARMONY = "Harmony";
+    private static final String EMUI = "Emui";
 
     public HarmonyOsFacade(FacadeManager manager) {
     super(manager);
@@ -54,11 +55,18 @@ public class HarmonyOsFacade extends RpcReceiver {
             putHwScMap(map,"Version","platform.version");
             putHwScMap(map,"ApiVersion","os.apiversion");
             putHwScMap(map,"ReleaseType","os.releasetype");
+            map.put("Open"+HARMONY+"Version",getSystemProperty("hw_sc.build.os.version", ""));
+            putRoEmuiMap(map,"Version","version.emui");
+            putRoEmuiMap(map,"ApiLevel","hw_emui_api_level");
         }
 
         private static void putHwScMap(Map<String,String> map,String str1,String str2) throws Exception {
             map.put(HARMONY+str1,getSystemProperty("hw_sc.build."+str2, ""));
         }
+
+    private static void putRoEmuiMap(Map<String,String> map,String str1,String str2) throws Exception {
+        map.put(EMUI+str1,getSystemProperty("ro.build."+str2, ""));
+    }
 
         /**
          * 获取属性

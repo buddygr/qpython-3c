@@ -77,8 +77,9 @@ public class JsonBuilder {
             return data;
         }
         if (data instanceof Set<?>) {
-            List<Object> items = new ArrayList<Object>((Set<?>) data);
-            return buildJsonList(items);
+            //List<Object> items = new ArrayList<Object>((Set<?>) data);
+            //return buildJsonList(items);
+            return buildJsonSet((Set <?>) data);
         }
         if (data instanceof List<?>) {
             return buildJsonList((List<?>) data);
@@ -102,10 +103,10 @@ public class JsonBuilder {
             // TODO(damonkohler): I would like to make this a checked cast if possible.
             return buildJsonMap((Map<String, ?>) data);
         }
-        if (data instanceof ScanResult) {
+        /*if (data instanceof ScanResult) {
             return buildJsonScanResult((ScanResult) data);
         }
-        /*if (data instanceof CellLocation) {
+        if (data instanceof CellLocation) {
             return buildJsonCellLocation((CellLocation) data);
         }
         if (data instanceof WifiInfo) {
@@ -145,6 +146,14 @@ public class JsonBuilder {
     private static <T> JSONArray buildJsonList(final List<T> list) throws JSONException {
         JSONArray result = new JSONArray();
         for (T item : list) {
+            result.put(build(item));
+        }
+        return result;
+    }
+
+    private static <T> JSONArray buildJsonSet(final Set<T> set) throws JSONException {
+        JSONArray result = new JSONArray();
+        for (T item : set) {
             result.put(build(item));
         }
         return result;
@@ -218,7 +227,7 @@ public class JsonBuilder {
         return result;
     }
 
-    private static JSONObject buildJsonScanResult(ScanResult scanResult) throws JSONException {
+    /*private static JSONObject buildJsonScanResult(ScanResult scanResult) throws JSONException {
         JSONObject result = new JSONObject();
         result.put("bssid", scanResult.BSSID);
         result.put("ssid", scanResult.SSID);
@@ -228,7 +237,7 @@ public class JsonBuilder {
         return result;
     }
 
-    /*private static JSONObject buildJsonCellLocation(CellLocation cellLocation) throws JSONException {
+    private static JSONObject buildJsonCellLocation(CellLocation cellLocation) throws JSONException {
         JSONObject result = new JSONObject();
         if (cellLocation instanceof GsmCellLocation) {
             GsmCellLocation location = (GsmCellLocation) cellLocation;

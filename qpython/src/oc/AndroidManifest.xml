@@ -373,13 +373,13 @@
             android:name=".main.activity.NotebookListActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"/>-->
 
-        <!--友盟-->
+        <!--友盟 - ->
         <meta-data
             android:name="UMENG_APPKEY"
             android:value="5a24fdea8f4a9d34b00000b5"/>
         <meta-data
             android:name="UMENG_CHANNEL"
-            android:value="QPython"/>
+            android:value="QPython"/ -->
 
         <!--微信-->
         <!--activity

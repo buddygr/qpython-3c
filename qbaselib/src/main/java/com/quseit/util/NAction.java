@@ -414,7 +414,11 @@ public class NAction {
 	public static void setQPyInterpreter(Context context, String qpyInterVal) {
 		 NStorage.setSP(context, "conf.default_qpy_interpreter", qpyInterVal);
 		// It shouldn't be here and need to be refactor
-		ACache.get(context).clear();
+		try {
+			ACache.get(context).clear();
+		} catch (Exception exception) {
+			exception.printStackTrace();
+		}
 	}
 	
 	public static boolean httpPing(String url, int timeout) {

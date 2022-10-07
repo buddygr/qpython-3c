@@ -17,6 +17,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.quseit.util.NAction;
+import com.quseit.util.StringUtils;
 
 import org.qpython.qpy.R;
 import org.qpython.qpy.console.util.TermSettings;
@@ -48,7 +49,7 @@ public class ScriptExec {
     private static final int    SCRIPT_CONSOLE_CODE = 1237;
     private static final int    PID_INIT_VALUE      = -1;
     private static final int    DEFAULT_BUFFER_SIZE = 8192;
-    private static final int    LOG_NOTIFICATION_ID = (int) System.currentTimeMillis();
+    //private static final int    LOG_NOTIFICATION_ID = (int) System.currentTimeMillis();
     private InputStream  mIn;
     private OutputStream mOut;
     private String logFile = CONF.ABSOLUTE_LOG;
@@ -338,7 +339,10 @@ public class ScriptExec {
         int[] pid = new int[1];
 
         mArguments.add(script);
-        mArguments.add(argv);
+        //乘着船 修改↓
+        //mArguments.add(argv);
+        StringUtils.argvParse(argv,mArguments);
+        //修改↑
 
         String[] argumentsArray = mArguments.toArray(new String[mArguments.size()]);
 
@@ -353,7 +357,7 @@ public class ScriptExec {
         mPid.set(pid[0]);
         mOut = new FileOutputStream(mFd);
         mIn = new StreamGobbler(new FileInputStream(mFd), mLog, DEFAULT_BUFFER_SIZE);
-        long mStartTime = System.currentTimeMillis();
+        //long mStartTime = System.currentTimeMillis();
 
         new Thread(() -> {
             int returnValue = Exec.waitFor(mPid.get());

@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class DocumentsUtils {
 
@@ -273,17 +274,24 @@ public class DocumentsUtils {
             DocumentFile destDoc = getDocumentFile(dest.getParentFile(), true, context);
 
             if (srcDoc != null && destDoc != null) {
-                    if (src.getParent().equals(dest.getParent())) {
-                        res = srcDoc.renameTo(dest.getName());
-                    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                if(!srcDoc.exists())
+                    throw new FileNotFoundException(src.toString());
+                if (Objects.equals(src.getParent(), dest.getParent())) {
+                    DocumentFile DestDoc = DocumentsUtils.getDocumentFile(dest, null, context);
+                    if(DestDoc!=null && DestDoc.exists()){
+                        if(!DestDoc.delete())
+                            return false;
+                    }
+                    res = srcDoc.renameTo(dest.getName());
+                }/* else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         DocumentFile srcParentDoc = srcDoc.getParentFile();
                         if (srcParentDoc!=null) {
                         res = DocumentsContract.moveDocument(context.getContentResolver(),
                                 srcDoc.getUri(),
                                 srcParentDoc.getUri(),
                                 destDoc.getUri()) != null;
-                    } else return renameToCross(context, src, dest);
-                    }
+                }*/ else return renameToCross(context, src, dest);
+                    //}
             } else {
                 if ((src.exists() || srcDoc!=null) && (dest.canWrite() || destDoc!=null))
                     return renameToCross(context, src, dest);

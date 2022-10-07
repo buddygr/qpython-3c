@@ -282,6 +282,7 @@ public class SettingsFacade extends RpcReceiver {
     s.put("brand",Build.BRAND);
     s.put("device",Build.DEVICE);
     s.put("display",Build.DISPLAY);
+    s.put("manufacturer",Build.MANUFACTURER);
     s.put("language", Locale.getDefault().getLanguage());
     return s;
   }

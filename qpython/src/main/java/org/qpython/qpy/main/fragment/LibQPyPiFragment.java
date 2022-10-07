@@ -1,5 +1,6 @@
 package org.qpython.qpy.main.fragment;
 
+import android.annotation.SuppressLint;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -106,7 +107,11 @@ public class LibQPyPiFragment extends RefreshFragment {
                 binding.progressBar.setVisibility(View.GONE);
                 binding.swipeList.setVisibility(View.VISIBLE);
                 if (header != null) {
-                    header.setText(getString(R.string.last_refresh, ACache.get(getContext()).getAsString(CacheKey.QPYPI_LAST_REFRESH)));
+                    try {
+                        header.setText(getString(R.string.last_refresh, ACache.get(getContext()).getAsString(CacheKey.QPYPI_LAST_REFRESH)));
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
                 }
             }
 
@@ -117,6 +122,7 @@ public class LibQPyPiFragment extends RefreshFragment {
                 binding.netError.setVisibility(View.VISIBLE);
             }
 
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onNext(List<QpypiModel> libModels) {
                 String f;
@@ -128,7 +134,11 @@ public class LibQPyPiFragment extends RefreshFragment {
                         lib.setInstalled(true);
                     }
                 }
-                ACache.get(getContext()).put(CacheKey.QPYPI, tostring(libModels));
+                try {
+                    ACache.get(getContext()).put(CacheKey.QPYPI, tostring(libModels));
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
                 dataList.addAll(libModels);
                 adapter.notifyDataSetChanged();
             }

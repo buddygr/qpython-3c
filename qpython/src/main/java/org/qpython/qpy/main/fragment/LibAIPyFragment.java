@@ -116,7 +116,11 @@ public class LibAIPyFragment extends RefreshFragment {
                         lib.setInstalled(true);
                     }
                 }
-                ACache.get(getContext()).put(CacheKey.AIPY, tostring(o));
+                try {
+                    ACache.get(getContext()).put(CacheKey.AIPY, tostring(o));
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
                 dataList.addAll(o);
                 adapter.notifyDataSetChanged();
             }

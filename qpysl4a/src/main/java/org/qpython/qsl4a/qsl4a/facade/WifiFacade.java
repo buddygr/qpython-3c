@@ -1,15 +1,19 @@
 package org.qpython.qsl4a.qsl4a.facade;
 
+import android.Manifest;
 import android.app.Service;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.net.DhcpInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
@@ -23,6 +27,7 @@ import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -59,8 +64,31 @@ public class WifiFacade extends RpcReceiver {
   }
 
   @Rpc(description = "Returns the list of access points found during the most recent Wifi scan.")
-  public List<ScanResult> wifiGetScanResults() {
-    return mWifi.getScanResults();
+  public JSONArray wifiGetScanResults() throws Exception {
+    check_Access_Fine_Location_And_Wifi_Permission();
+    JSONArray result = new JSONArray();
+    for (ScanResult scanResult : mWifi.getScanResults())
+         result.put(buildJsonScanResult(scanResult));
+    return result;
+  }
+
+  private void check_Access_Fine_Location_And_Wifi_Permission() throws Exception {
+    for (String i : new String[]{
+            Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.CHANGE_WIFI_STATE
+    }){
+    if (ActivityCompat.checkSelfPermission(mService, i) != PackageManager.PERMISSION_GRANTED) {
+      throw new Exception(i);
+    }
+  }}
+
+  private static JSONObject buildJsonScanResult(ScanResult scanResult) throws JSONException {
+    JSONObject result = new JSONObject();
+    result.put("bssid", scanResult.BSSID);
+    result.put("ssid", scanResult.SSID);
+    result.put("frequency", scanResult.frequency);
+    result.put("level", scanResult.level);
+    result.put("capabilities", scanResult.capabilities);
+    return result;
   }
 
   @Rpc(description = "Acquires a full Wifi lock.")
@@ -226,9 +254,9 @@ public class WifiFacade extends RpcReceiver {
   }
 
   @Rpc(description = "get dhcp info")
-  public Map getDhcpInfo(@RpcParameter(name="ipConvertToString") @RpcDefault("true") Boolean ipConvertToString) {
+  public Map<String,Object> getDhcpInfo(@RpcParameter(name="ipConvertToString") @RpcDefault("true") Boolean ipConvertToString) {
     DhcpInfo info = mWifi.getDhcpInfo();
-    Map map = new HashMap();
+    Map<String,Object> map = new HashMap();
     if (ipConvertToString) {
       map.put("serverAddress", intToIp(info.serverAddress));
       map.put("ipAddress", intToIp(info.ipAddress));

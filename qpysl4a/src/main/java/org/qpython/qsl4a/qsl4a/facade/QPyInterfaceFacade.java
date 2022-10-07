@@ -71,7 +71,7 @@ public class QPyInterfaceFacade extends RpcReceiver {
                               ) {
         try {
             Message msg = new Message();
-            msg.obj = new Object[]{path,arg};
+            msg.obj = new String[]{path,arg};
             handler.sendMessage(msg);
         } catch (Exception e) {
             Intent intent = new Intent();

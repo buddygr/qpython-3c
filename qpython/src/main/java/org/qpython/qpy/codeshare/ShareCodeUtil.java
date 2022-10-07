@@ -1,6 +1,7 @@
 package org.qpython.qpy.codeshare;
 
-import android.app.Activity;
+import static org.qpython.qpy.main.server.CacheKey.CLOUD_FILE;
+
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -8,22 +9,14 @@ import android.widget.Toast;
 
 import com.google.gson.reflect.TypeToken;
 import com.quseit.util.ACache;
-import com.quseit.util.FileHelper;
 import com.quseit.util.NetStateUtil;
 
-import org.qpython.qpy.R;
 import org.qpython.qpy.codeshare.pojo.CloudFile;
 import org.qpython.qpy.codeshare.pojo.Gist;
-
 import org.qpython.qpy.main.app.App;
-import org.qpython.qpy.main.event.ShareCodeCallback;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-
-import static org.qpython.qpy.main.server.CacheKey.CLOUD_FILE;
 
 /**
  * FireBase database util
@@ -33,10 +26,10 @@ import static org.qpython.qpy.main.server.CacheKey.CLOUD_FILE;
 public class ShareCodeUtil {
 
     public static final String USAGE = "usage";
-    public static final String PROJECT = "project";
+    //public static final String PROJECT = "project";
     public static final String SCRIPT = "script";
-    public static final String PROJECT_PATH = "/projects/";
-    public static final String SCRIPTS_PATH = "/scripts/";
+    //public static final String PROJECT_PATH = "/projects/";
+    //public static final String SCRIPTS_PATH = "/scripts/";
 
     private static final int MAX_FILE = 100;
 
@@ -61,18 +54,18 @@ public class ShareCodeUtil {
     /**
      * 管理文件内存
      */
-    private List<CloudFile> getCacheFile() {
+    private List<CloudFile> getCacheFile() throws Exception {
         String content = ACache.get(App.getContext()).getAsString(CLOUD_FILE);
         List<CloudFile> cloudFiles = App.getGson().fromJson(content, new TypeToken<List<CloudFile>>() {
         }.getType());
         return cloudFiles == null ? new ArrayList<>() : cloudFiles;
     }
 
-    private void saveCacheFile(List<CloudFile> cloudFiles) {
+    private void saveCacheFile(List<CloudFile> cloudFiles) throws Exception {
         ACache.get(App.getContext()).put(CLOUD_FILE, App.getGson().toJson(cloudFiles));
     }
 
-    private void saveCacheFile(CloudFile cloudFile) {
+    private void saveCacheFile(CloudFile cloudFile) throws Exception {
         List<CloudFile> list = getCacheFile();
         if (!list.contains(cloudFile)) {
             list.add(cloudFile);
@@ -80,7 +73,7 @@ public class ShareCodeUtil {
         saveCacheFile(list);
     }
 
-    private void deleteCacheFile(CloudFile cloudFile) {
+    private void deleteCacheFile(CloudFile cloudFile) throws Exception {
         List<CloudFile> list = getCacheFile();
         if (list.contains(cloudFile)) {
             list.remove(cloudFile);
@@ -88,7 +81,7 @@ public class ShareCodeUtil {
         saveCacheFile(list);
     }
 
-    private void clearCacheFile() {
+    private void clearCacheFile() throws Exception {
         ACache.get(App.getContext()).put(CLOUD_FILE, "");
     }
 

@@ -21,6 +21,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -31,6 +32,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.os.StatFs;
 import android.os.Vibrator;
 import android.text.ClipboardManager;
@@ -50,6 +52,7 @@ import org.qpython.qsl4a.qsl4a.rpc.Rpc;
 import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
 import org.qpython.qsl4a.qsl4a.rpc.RpcOptional;
 import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
+import org.qpython.qsl4a.qsl4a.util.HtmlUtil;
 import org.qpython.qsl4a.qsl4a.util.SPFUtils;
 
 import java.lang.reflect.Field;
@@ -98,6 +101,8 @@ public class AndroidFacade extends RpcReceiver {
   private ClipboardManager mClipboard = null;
   public final Context context;
   public final String qpyProvider;
+
+  public static Handler handler;
 
   private final int intentFlags = Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION  | Intent.FLAG_GRANT_WRITE_URI_PERMISSION ;
 
@@ -600,14 +605,24 @@ public class AndroidFacade extends RpcReceiver {
     mVibrator.vibrate(duration);
   }
 
-  @Rpc(description = "Displays a short-duration Toast notification.")
+  @Rpc(description = "Displays a Toast notification.")
   public void makeToast(@RpcParameter(name = "message") final String message,
-                        @RpcParameter(name = "length") @RpcDefault("0") final Integer length) {
-    mHandler.post(new Runnable() {
-      public void run() {
-        Toast.makeText(mService, message, length).show();
-      }
+                        @RpcParameter(name = "length") @RpcDefault("0") final Integer length,
+                        @RpcParameter(name = "isHtml") @RpcDefault("false") final Boolean isHtml) {
+    mHandler.post(() -> {
+      if(isHtml)
+          Toast.makeText(mService, HtmlUtil.textToHtml(message), length).show();
+      else
+          Toast.makeText(mService, message, length).show();
     });
+  }
+
+  public void makeToast(final String message,final Integer length) {
+    makeToast(message,length,false);
+  }
+
+  public void makeToast(final String message) {
+    makeToast(message,0,false);
   }
 
   /* 乘着船：过时删除
@@ -673,6 +688,7 @@ public class AndroidFacade extends RpcReceiver {
 
   private static int NOTIFICATION_ID = 0x20002;//通知栏消息id
 
+  @SuppressLint("UnspecifiedImmutableFlag")
   @Rpc(description = "Displays a notification that will be canceled when the user clicks on it.")
   public void notify(
           @RpcParameter(name = "title", description = "title") final String title,
@@ -681,34 +697,43 @@ public class AndroidFacade extends RpcReceiver {
           @RpcParameter(name = "arg") @RpcOptional final String arg) {
     // This contentIntent is a noop.
     Intent intent;
-
+    PendingIntent contentIntent = null;
     if (uri!=null) {
       //android.util.Log.d("AndroidFacade", "attachmentUri:"+attachmentUri);
       if (uri.startsWith("http:") || uri.startsWith("https:")) {
         intent = SPFUtils.getLinkAsIntent(context, uri);
       } else {
-        intent = new Intent();
         if (uri.endsWith(".py")) {
-          intent.setClassName(mService.getPackageName(), "org.qpython.qpylib.MPyApi");
-          intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-          intent.setAction("org.qpython.qpylib.action.MPyApi");
-          Bundle mBundle = new Bundle();
-          mBundle.putString("app", SPFUtils.getCode(mService.getApplicationContext()));
-          mBundle.putString("act", "onPyApi");
-          mBundle.putString("flag", "api");
-          mBundle.putString("param", "fileapi");
-          mBundle.putString("pyfile", uri);
-          mBundle.putString("pyarg",arg);
-          intent.putExtras(mBundle);
+          try{
+            intent = new Intent (context,NotificationClickReceiver.class);
+            intent.putExtra("path",uri);
+            intent.putExtra("arg",arg);
+            contentIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+          } catch (Exception e) {
+            intent = new Intent();
+            intent.setClassName(mService.getPackageName(), "org.qpython.qpylib.MPyApi");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setAction("org.qpython.qpylib.action.MPyApi");
+            Bundle mBundle = new Bundle();
+            mBundle.putString("app", SPFUtils.getCode(mService.getApplicationContext()));
+            mBundle.putString("act", "onPyApi");
+            mBundle.putString("flag", "api");
+            mBundle.putString("param", "fileapi");
+            mBundle.putString("pyfile", uri);
+            mBundle.putString("pyarg", arg);
+            intent.putExtras(mBundle);
+          }
         } else {
+        intent = new Intent();
         intent.setClassName(context.getPackageName(), uri);
       }}
     } else {
       intent = new Intent();
     }
-    PendingIntent contentIntent = PendingIntent.getActivity(mService, NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    if(contentIntent == null)
+        contentIntent = PendingIntent.getActivity(mService, NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     Notification notification = SPFUtils.getNotification(context, title, message, contentIntent,
-            SPFUtils.getDrawableId(mService, "img_home_logo"), null, Notification.FLAG_AUTO_CANCEL);
+            SPFUtils.getDrawableId(mService, "img_home_logo"), null);
 
     // Get a unique notification id from the application.
     mNotificationManager.notify(NotificationIdFactory.create(), notification);
@@ -857,5 +882,19 @@ public class AndroidFacade extends RpcReceiver {
       }
     }
     return result;
+  }
+
+  public static class NotificationClickReceiver extends BroadcastReceiver {
+    public NotificationClickReceiver(){}
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      Message msg = new Message();
+      msg.obj = new String[]{
+              intent.getStringExtra("path"),
+              intent.getStringExtra("arg")
+      };
+      handler.sendMessage(msg);
+    }
   }
 }

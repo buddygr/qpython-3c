@@ -413,6 +413,7 @@
                 android:resource="@xml/file_paths" />
         </provider>
         <receiver android:name="org.qpython.qpy.main.receiver.BootBroadcastReceiver" />
+        <receiver android:name="org.qpython.qsl4a.qsl4a.facade.AndroidFacade$NotificationClickReceiver"/>
     </application>
 
     <meta-data

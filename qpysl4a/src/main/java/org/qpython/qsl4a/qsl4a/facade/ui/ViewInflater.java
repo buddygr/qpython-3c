@@ -75,8 +75,8 @@ import java.util.Map.Entry;
 
 public class ViewInflater {
   private static XmlPullParserFactory mFactory;
-  public static final String ANDROID = "http://schemas.android.com/apk/res/android";
-  public static final String QPYTHON = "http://www.qpython.org";
+  //public static final String ANDROID = "http://schemas.android.com/apk/res/android";
+  //public static final String QPYTHON = "http://www.qpython.org";
   public static final int BASESEQ = 0x7f0f0000;
   private int mNextSeq = BASESEQ;
   private final Map<String, Integer> mIdList = new HashMap<String, Integer>();
@@ -370,13 +370,10 @@ public class ViewInflater {
     if (view != null) {
       getLayoutParams(view, root); // Make quite sure every view has a layout param.
       for (int i = 0; i < xml.getAttributeCount(); i++) {
-        String ns = xml.getAttributeNamespace(i);
+        //String ns = xml.getAttributeNamespace(i);
         String attr = xml.getAttributeName(i);
-        if (ANDROID.equals(ns)) {
+        //if (ANDROID.equals(ns) || QPYTHON.equals(ns))
           setProperty(view, root, attr, xml.getAttributeValue(i));
-        } else if (QPYTHON.equals(ns)) {
-          setProperty(view, root, attr, xml.getAttributeValue(i));
-        }
       }
       if (root != null) {
         root.addView(view);

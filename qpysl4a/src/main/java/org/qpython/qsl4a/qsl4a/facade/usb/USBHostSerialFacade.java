@@ -569,14 +569,14 @@ public class USBHostSerialFacade extends RpcReceiver {
    * connectionFailed: Indicate that the connection attempt failed and notify the UI Activity. {{{1
    */
   private void connectionFailed() {
-    mAndroidFacade.makeToast("USBHostSerial: Unable to connect device",0);
+    mAndroidFacade.makeToast("USBHostSerial: Unable to connect device");
   }
 
   /**
    * connectionLost: Indicate that the connection was lost and notify the UI Activity. {{{1
    */
   private void connectionLost() {
-    mAndroidFacade.makeToast("USBHostSerial: connection lost",0);
+    mAndroidFacade.makeToast("USBHostSerial: connection lost");
   }
 
   /**

@@ -65,7 +65,11 @@ public class Service extends CacheKey {
         }.getType(), LIB);
         if (libList == null || forceRefresh) {
             toSubscribe(NAction.isQPy3(App.getContext()) ? request.getLibs3() : request.getLibs(), subscriber);
-            ACache.get(App.getContext()).put(CacheKey.LIB_LAST_REFRESH, DateTimeHelper.getDate());
+            try {
+                ACache.get(App.getContext()).put(CacheKey.LIB_LAST_REFRESH, DateTimeHelper.getDate());
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
         } else {
             toSubscribe(Observable.just(libList), subscriber);
         }
@@ -178,7 +182,12 @@ public class Service extends CacheKey {
     }
 
     private <T> T getObject(Type type, String key) {
-        String cacheStr = ACache.get(App.getContext()).getAsString(key);
+        String cacheStr = null;
+        try {
+            cacheStr = ACache.get(App.getContext()).getAsString(key);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
         return cacheStr == null ? null : App.getGson().fromJson(cacheStr, type);
     }
 }

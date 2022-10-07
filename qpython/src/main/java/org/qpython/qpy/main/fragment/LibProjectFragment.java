@@ -111,7 +111,11 @@ public class LibProjectFragment extends RefreshFragment {
                 binding.progressBar.setVisibility(View.GONE);
                 binding.swipeList.setVisibility(View.VISIBLE);
                 if (header != null) {
-                    header.setText(getString(R.string.last_refresh, ACache.get(getContext()).getAsString(CacheKey.LIB_LAST_REFRESH)));
+                    try {
+                        header.setText(getString(R.string.last_refresh, ACache.get(getContext()).getAsString(CacheKey.LIB_LAST_REFRESH)));
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
                 }
             }
 
@@ -143,7 +147,11 @@ public class LibProjectFragment extends RefreshFragment {
                         lib.setInstalled(true);
                     }
                 }
-                ACache.get(getContext()).put(CacheKey.LIB, tostring(libModels));
+                try {
+                    ACache.get(getContext()).put(CacheKey.LIB, tostring(libModels));
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
                 dataList.addAll(libModels);
                 adapter.notifyDataSetChanged();
             }

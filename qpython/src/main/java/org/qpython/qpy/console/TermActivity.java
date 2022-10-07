@@ -310,11 +310,13 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
 
         TSIntent = new Intent(this, TermService.class);
         startService(TSIntent);
+
+        /*启动SL4A服务
         try {
             startService(new Intent(this, QPyScriptService.class));
         } catch (Exception E) {
-            Toast.makeText(this,E.toString(),Toast.LENGTH_LONG);
-        }
+            Toast.makeText(this,E.toString(),Toast.LENGTH_LONG).show();
+        }*/
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, TermDebug.LOG_TAG);

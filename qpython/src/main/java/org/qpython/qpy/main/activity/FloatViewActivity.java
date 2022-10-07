@@ -39,6 +39,9 @@ public class FloatViewActivity extends Activity
         static DisplayMetrics displayMetrics;
         //public static Handler handler;
 
+        private static final int DEFAULT_FLAG =
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE ;
+
         @SuppressLint({"SimpleDateFormat", "HandlerLeak"})
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -64,9 +67,9 @@ public class FloatViewActivity extends Activity
         }
 
     @SuppressLint("ClickableViewAccessibility")
-    public void floatView(Intent intent){
+    public void floatView(final Intent intent){
         //Intent intent = getIntent();
-        if (intent==null) intent = new Intent();
+        //if (intent==null) intent = new Intent();
         WindowManager.LayoutParams layoutParams = null;
         int index;
         //悬浮按钮
@@ -86,13 +89,11 @@ public class FloatViewActivity extends Activity
         //悬浮窗文字颜色 格式:aarrggbb或rrggbb
         int textColor=colorToInt(intent.getStringExtra("textColor"),"ff000000");
         //字体大小
-        int textSize=intent.getIntExtra("textSize",10);
-        //脚本路径
-        final String script=intent.getStringExtra("script");
-        //脚本参数
-        final String arg=intent.getStringExtra("arg");
+        final int textSize=intent.getIntExtra("textSize",10);
+        //单击移除
         final boolean clickRemove = intent.getBooleanExtra("clickRemove",true);
-        //moveTaskToBack(true);
+        //脚本路径
+        final String script = intent.getStringExtra("script");
         //索引参数
         index = intent.getIntExtra("index",-1);
 
@@ -114,8 +115,8 @@ public class FloatViewActivity extends Activity
             layoutParams = new WindowManager.LayoutParams();
             index = buttons.size();
         }
-            WindowManager.LayoutParams finalLayoutParams = layoutParams;
-            floatButton.setOnTouchListener(new View.OnTouchListener() {
+            //WindowManager.LayoutParams finalLayoutParams = layoutParams;
+        floatButton.setOnTouchListener(new View.OnTouchListener() {
             private int x;
             private int y;
 
@@ -123,7 +124,7 @@ public class FloatViewActivity extends Activity
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public boolean onTouch(View view, MotionEvent event) {
-                int index = (int) view.getTag();
+                final int index = (int) view.getTag();
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         x = (int) event.getRawX();
@@ -135,11 +136,12 @@ public class FloatViewActivity extends Activity
                         boolean moved = nowX != x || nowY != y;
                         x = nowX;
                         y = nowY;
-                        finalLayoutParams.x = nowX - displayMetrics.widthPixels/2;
-                        finalLayoutParams.y = nowY - displayMetrics.heightPixels/2;
                         // 更新悬浮窗控件布局
                         if (moved) {
-                            windowManager.updateViewLayout(view, finalLayoutParams);
+                            final WindowManager.LayoutParams layoutParams = params.get(index);
+                            layoutParams.x = nowX - displayMetrics.widthPixels/2;
+                            layoutParams.y = nowY - displayMetrics.heightPixels/2;
+                            windowManager.updateViewLayout(view, layoutParams);
                             operations.set(index, "move");
                         } else {
                             operations.set(index, "click");
@@ -148,10 +150,14 @@ public class FloatViewActivity extends Activity
                         break;
                     case MotionEvent.ACTION_UP:
                     if (operations.get(index).equals("click")) {
-                            if(script!=null)
+                            if(script!=null){
+                                //脚本参数
+                                //final String arg = intent.getStringExtra("arg");
                                 ScriptExec.getInstance().playScript(FloatViewActivity.this,
-                                        script, arg,false);
-                            if (clickRemove) FloatViewFacade.removeButton(index);
+                                        script, intent.getStringExtra("arg"),false);
+                            }
+                            if (clickRemove)
+                                FloatViewFacade.removeButton(index);
                             FloatViewActivity.this.finish();
                         }
                     default:
@@ -169,8 +175,7 @@ public class FloatViewActivity extends Activity
         floatButton.setTextSize(textSize);
         layoutParams.type=WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;//下拉通知栏不可见
         // 设置Window flag,锁定悬浮窗 ,若不设置，悬浮窗会占用整个屏幕的点击事件，FLAG_NOT_FOCUSABLE不设置会导致菜单键和返回键失效
-        layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        layoutParams.flags = intent.getIntExtra("flag",DEFAULT_FLAG);
         layoutParams.format = PixelFormat.RGBA_8888; // 设置图片格式，效果为背景透明
         //悬浮窗宽度
         int width = intent.getIntExtra("width",300);

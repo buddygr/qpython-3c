@@ -164,14 +164,16 @@ public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppLis
         intent.putExtra("type", "script");
         intent.putExtra("path", qPyScriptModel.getPath());
         intent.putExtra("isProj", qPyScriptModel.isProj());
-
+        String label = dataList.get(position).getLabel();
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             ShortcutManager mShortcutManager = context.getSystemService(ShortcutManager.class);
             if (mShortcutManager.isRequestPinShortcutSupported()) {
+                if(label.endsWith(".py"))
+                    label = label.substring(0,label.length()-3);
                 ShortcutInfo pinShortcutInfo =
-                        new ShortcutInfo.Builder(context, dataList.get(position).getLabel())
-                                .setShortLabel(dataList.get(position).getLabel())
-                                .setLongLabel(dataList.get(position).getLabel())
+                        new ShortcutInfo.Builder(context, label)
+                                .setShortLabel(label)
+                                .setLongLabel(label)
                                 .setIcon(Icon.createWithResource(context, dataList.get(position).getIconRes()))
                                 .setIntent(intent)
                                 .build();
@@ -188,7 +190,7 @@ public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppLis
             //on Home screen
             Intent addIntent = new Intent();
             addIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, intent);
-            addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, dataList.get(position).getLabel());
+            addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, label);
             addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                     Intent.ShortcutIconResource.fromContext(context.getApplicationContext(),
                             dataList.get(position).getIconRes()));

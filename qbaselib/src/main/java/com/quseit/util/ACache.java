@@ -48,18 +48,18 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
 public class ACache {
-    public static final  int                 TIME_HOUR    = 60 * 60;
-    public static final  int                 TIME_DAY     = TIME_HOUR * 24;
+    //public static final  int                 TIME_HOUR    = 60 * 60;
+    //public static final  int                 TIME_DAY     = TIME_HOUR * 24;
     private static final int                 MAX_SIZE     = 1000 * 1000 * 50; // 50 mb
     private static final int                 MAX_COUNT    = Integer.MAX_VALUE; // 不限制存放数据的数量
     private static       Map<String, ACache> mInstanceMap = new HashMap<String, ACache>();
     private ACacheManager mCache;
 
-    public static ACache get(Context ctx) {
+    public static ACache get(Context ctx) throws Exception {
         return get(ctx, "ACache");
     }
 
-    public static ACache get(Context ctx, String cacheName) {
+    public static ACache get(Context ctx, String cacheName) throws Exception {
         File f = new File(ctx.getCacheDir(), cacheName);
         return get(f, MAX_SIZE, MAX_COUNT);
     }

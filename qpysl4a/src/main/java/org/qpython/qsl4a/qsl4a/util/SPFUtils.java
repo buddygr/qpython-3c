@@ -64,7 +64,7 @@ public class SPFUtils {
     }
 
     public static Notification getNotification(Context context, String contentTitle, String contentText, PendingIntent intent,
-                                               int smallIconId, Bitmap largeIconId, int flags) {
+                                               int smallIconId, Bitmap largeIconId) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel chan = new NotificationChannel(context.getPackageName(), contentTitle, NotificationManager.IMPORTANCE_DEFAULT);
 
@@ -74,7 +74,7 @@ public class SPFUtils {
             assert manager != null;
             manager.createNotificationChannel(chan);
 
-            Notification notification = new Notification.Builder(context, context.getPackageName()) //new Notification(icon, tickerText, when);
+            return new Notification.Builder(context, context.getPackageName()) //new Notification(icon, tickerText, when);
                     .setTicker(contentTitle)
                     .setContentTitle(contentTitle)
                     .setContentText(contentText)
@@ -83,10 +83,9 @@ public class SPFUtils {
                     .setAutoCancel(true)
                     .setContentIntent(intent)
                     .build();
-
-            return notification;
         } else {
-            Notification notification = new Notification.Builder(context) //new Notification(icon, tickerText, when);
+
+            return new Notification.Builder(context) //new Notification(icon, tickerText, when);
                     .setTicker(contentTitle)
                     .setContentTitle(contentTitle)
                     .setContentText(contentText)
@@ -95,8 +94,6 @@ public class SPFUtils {
                     .setAutoCancel(true)
                     .setContentIntent(intent)
                     .build();
-
-            return notification;
         }
     }
 

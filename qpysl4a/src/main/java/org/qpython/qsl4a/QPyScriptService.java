@@ -117,7 +117,7 @@ public class QPyScriptService extends Service {
 
             Log.d(TAG, "startMyMain:" + mProxy.getAddress().getHostName() + ":" + mProxy.getAddress().getPort() + ":" + mProxy.getSecret());
             mLatch.countDown();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
     }

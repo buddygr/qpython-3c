@@ -98,9 +98,9 @@ public class ApplicationManagerFacade extends RpcReceiver {
   }*/
 
   @Rpc(description = "Start activity with the given classname and/or packagename .")
-  public void launch(@RpcParameter(name = "classname") @RpcOptional String classname,
+  public void launch(@RpcParameter(name = "classname") @RpcOptional final String classname,
                      @RpcParameter(name = "packagename") @RpcOptional String packagename,
-                     @RpcParameter(name = "wait") @RpcDefault("true") @RpcOptional Boolean wait)
+                     @RpcParameter(name = "wait") @RpcDefault("true") final Boolean wait)
           throws Exception {
     Intent intent;
     if (classname == null) {
@@ -116,8 +116,8 @@ public class ApplicationManagerFacade extends RpcReceiver {
   }
 
   @Rpc(description = "Returns a list of packages running activities or services.", returns = "List of packages running activities.")
-  public List<String> getRunningPackages() {
-    Set<String> runningPackages = new HashSet<String>();
+  public Set<String> getRunningPackages() {
+    Set<String> runningPackages = new HashSet<>();
     List<ActivityManager.RunningAppProcessInfo> appProcesses =
         mActivityManager.getRunningAppProcesses();
     for (ActivityManager.RunningAppProcessInfo info : appProcesses) {
@@ -128,12 +128,12 @@ public class ApplicationManagerFacade extends RpcReceiver {
     for (ActivityManager.RunningServiceInfo info : serviceProcesses) {
       runningPackages.add(info.service.getPackageName());
     }
-    return new ArrayList<String>(runningPackages);
+    return runningPackages;
   }
 
   @Rpc(description = "get installed packages")
   public Map<String,String> getInstalledPackages(
-          @RpcParameter(name = "flag") @RpcDefault("4") Integer flag
+          @RpcParameter(name = "flag") @RpcDefault("4") final Integer flag
   ) {
     Map<String, String> packages = new HashMap<>();
     List<PackageInfo> packageInfos = context.getPackageManager().getInstalledPackages(PackageManager.GET_UNINSTALLED_PACKAGES);
@@ -167,7 +167,7 @@ public class ApplicationManagerFacade extends RpcReceiver {
   @SuppressWarnings("deprecation")
 @Rpc(description = "Force stops a package.")
   public void forceStopPackage(
-      @RpcParameter(name = "packageName", description = "name of package") String packageName) {
+      @RpcParameter(name = "packageName", description = "name of package") final String packageName) {
     mActivityManager.restartPackage(packageName);
   }
 

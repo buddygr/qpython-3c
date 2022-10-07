@@ -723,7 +723,7 @@
     <string name="qpy_custom_dir">QPython Custom Directory</string>
     <string name="qpython_gitee" translatable="false">https://gitee.com/qpython-android</string>
     <string name="download">Download</string>
-    <string name="security_version">20220416</string>
+    <string name="security_version" translatable="false">20220924</string>
     <string name="float_view">Float View</string>
     <string name="video_player">Video Player</string>
     <string name="exit_after_close_progress">Press the back key to exit after close the progress bar</string>

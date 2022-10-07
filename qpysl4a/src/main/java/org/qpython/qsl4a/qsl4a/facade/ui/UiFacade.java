@@ -643,13 +643,9 @@ public class UiFacade extends RpcReceiver {
     if (mFullScreenTask == null) {
       throw new RuntimeException("No screen displayed.");
     }
-    List<String> Ids = new ArrayList<String>();
-    for (int i = 0; i < ids.length(); i++) {
-      Ids.add(ids.get(i).toString());
-    }
     JSONArray rst = new JSONArray();
-    for(String id:Ids) {
-      rst.put(mFullScreenTask.getViewPropery(id,property));
+    for (int i = 0; i < ids.length(); i++) {
+      rst.put(mFullScreenTask.getViewPropery(ids.get(i).toString(),property));
     }
     return rst;
   }
@@ -674,14 +670,10 @@ public class UiFacade extends RpcReceiver {
     if (mFullScreenTask == null) {
       throw new RuntimeException("No screen displayed.");
     }
-    List<String> Ids = new ArrayList<String>();
-      for (int i = 0; i < ids.length(); i++) {
-        Ids.add(ids.get(i).toString());
-      }
     String rst;
-    for(String id:Ids) {
-      rst = mFullScreenTask.setViewProperty(id, property, value);
-      if (!rst.equals(context.getString(R.string.ok)))
+      for (int i = 0; i < ids.length(); i++) {
+      rst = mFullScreenTask.setViewProperty(ids.get(i).toString(), property, value);
+      if (!rst.equals("OK"))
         return rst;
     }
     return "OK";
