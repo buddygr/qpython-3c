@@ -166,7 +166,7 @@
     <string name="addshortcut_example_hint">--示例=\"\"a\"</string>
     <string name="addshortcut_make_text_icon">制作文字图标</string>
     <string name="addshortcut_navigator_title">选择快捷方式文件</string>
-    <string name="addshortcut_shortcut_label">快捷方式标签</string>
+    <string name="addshortcut_shortcut_label">"快捷方式标签 "</string>
     <string name="addshortcut_title">终端快捷方式</string>
     <string name="colorvalue_icon_text_entry_hint">输入标签文字</string>
     <string name="colorvalue_label_lock_button_column">锁</string>
@@ -513,7 +513,6 @@
     <string name="qr_goto">你想访问这个URL吗？</string>
     <string name="qpy_custom_dir">QPython自定义目录</string>
     <string name="download">下载</string>
-    <string name="qpypi_up" translatable="false">扩展</string>
     <string name="event_qpypi">打开扩展</string>
     <string name="qpypi_manager">扩展</string>
     <string name="float_view">悬浮窗</string>

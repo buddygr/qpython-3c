@@ -14,11 +14,14 @@
  * the License.
  */
 
-package org.qpython.qsl4a.qsl4a;
+package org.qpython.qsl4a.qsl4a.util;
 
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.Environment;
+
+import org.qpython.qsl4a.qsl4a.IoUtils;
+import org.qpython.qsl4a.qsl4a.LogUtil;
 
 import java.io.BufferedReader;
 import java.io.File;

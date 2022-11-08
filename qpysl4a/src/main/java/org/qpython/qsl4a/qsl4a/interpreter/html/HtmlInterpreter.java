@@ -18,7 +18,7 @@ package org.qpython.qsl4a.qsl4a.interpreter.html;
 
 import android.content.Context;
 
-import org.qpython.qsl4a.qsl4a.FileUtils;
+import org.qpython.qsl4a.qsl4a.util.FileUtils;
 import org.qpython.qsl4a.qsl4a.interpreter.Interpreter;
 import org.qpython.qsl4a.qsl4a.language.HtmlLanguage;
 

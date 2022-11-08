@@ -9,7 +9,7 @@ import android.os.Message;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.qpython.qsl4a.qsl4a.FileUtils;
+import org.qpython.qsl4a.qsl4a.util.FileUtils;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
 import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;

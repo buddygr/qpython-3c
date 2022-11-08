@@ -16,6 +16,7 @@
 
 package org.qpython.qsl4a.qsl4a.facade;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.app.Service;
 
@@ -23,6 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.media.AudioManager;
+import android.net.TrafficStats;
 import android.os.Build;
 import android.os.Environment;
 import android.os.PowerManager;
@@ -57,6 +59,8 @@ public class SettingsFacade extends RpcReceiver {
 
   public static int AIRPLANE_MODE_OFF = 0;
   public static int AIRPLANE_MODE_ON = 1;
+
+  private byte TRAFFIC_SUPPORT = 0;
 
   private final Service mService;
   private final AudioManager mAudio;
@@ -273,6 +277,7 @@ public class SettingsFacade extends RpcReceiver {
     return Resources.getSystem().getConfiguration().getLocales().get(0).toString();
   }
 
+  @SuppressLint("HardwareIds")
   @Rpc(description = "get system infomation .")
   public Map<String,String> getSysInfo(){
     Map<String,String> s = new HashMap<>();
@@ -284,6 +289,10 @@ public class SettingsFacade extends RpcReceiver {
     s.put("display",Build.DISPLAY);
     s.put("manufacturer",Build.MANUFACTURER);
     s.put("language", Locale.getDefault().getLanguage());
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+      s.put("serial",Build.getSerial());
+    else
+      s.put("serial",Build.SERIAL);
     return s;
   }
 
@@ -306,6 +315,59 @@ public class SettingsFacade extends RpcReceiver {
     return SystemClock.elapsedRealtimeNanos();
   }
 
+  @Rpc(description = "get total Rx bytes")
+  public Map<String,Long> getTotalRxBytes(){
+    if(unTrafficSupport())
+      return null;
+    Map<String,Long> map = new HashMap<>();
+    map.put("bytes",TrafficStats.getTotalRxBytes());
+    map.put("time",System.currentTimeMillis());
+    return map;
+  }
+
+  @Rpc(description = "get total Tx bytes")
+  public Map<String,Long> getTotalTxBytes(){
+    if(unTrafficSupport())
+      return null;
+    Map<String,Long> map = new HashMap<>();
+    map.put("bytes",TrafficStats.getTotalTxBytes());
+    map.put("time",System.currentTimeMillis());
+    return map;
+  }
+
+  @Rpc(description = "get mobile Rx bytes")
+  public Map<String,Long> getMobileRxBytes(){
+    if(unTrafficSupport())
+      return null;
+    Map<String,Long> map = new HashMap<>();
+    map.put("bytes",TrafficStats.getMobileRxBytes());
+    map.put("time",System.currentTimeMillis());
+    return map;
+  }
+
+  @Rpc(description = "get mobile Tx bytes")
+  public Map<String,Long> getMobileTxBytes(){
+    if(unTrafficSupport())
+      return null;
+    Map<String,Long> map = new HashMap<>();
+    map.put("bytes",TrafficStats.getMobileTxBytes());
+    map.put("time",System.currentTimeMillis());
+    return map;
+  }
+
+  private boolean unTrafficSupport(){
+    if(TRAFFIC_SUPPORT > 0)
+      return false;
+    else if(TRAFFIC_SUPPORT < 0)
+      return true;
+    int uid = context.getApplicationInfo().uid;
+  if(TrafficStats.getUidRxBytes(uid) == TrafficStats.UNSUPPORTED || TrafficStats.getUidTxBytes(uid) == TrafficStats.UNSUPPORTED){
+    TRAFFIC_SUPPORT = -1;
+    return true;
+  } else {
+    TRAFFIC_SUPPORT = 1;
+    return false;
+  }}
 
   @Override
   public void shutdown() {

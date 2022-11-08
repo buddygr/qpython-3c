@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.PixelFormat;
-import android.icu.text.SimpleDateFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,7 +22,6 @@ import org.qpython.qsl4a.qsl4a.facade.FloatViewFacade;
 import org.qpython.qsl4a.qsl4a.util.HtmlUtil;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 public class FloatViewActivity extends Activity
     {

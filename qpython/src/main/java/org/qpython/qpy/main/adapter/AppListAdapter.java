@@ -45,7 +45,7 @@ public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppLis
 
     private List<AppModel> dataList;
     private String         type;
-    private Context        context;
+    private final Context  context;
     private Callback       callback;
 
     public AppListAdapter(List<AppModel> dataList, String type, Context context) {
@@ -170,20 +170,31 @@ public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppLis
             if (mShortcutManager.isRequestPinShortcutSupported()) {
                 if(label.endsWith(".py"))
                     label = label.substring(0,label.length()-3);
-                ShortcutInfo pinShortcutInfo =
-                        new ShortcutInfo.Builder(context, label)
-                                .setShortLabel(label)
-                                .setLongLabel(label)
-                                .setIcon(Icon.createWithResource(context, dataList.get(position).getIconRes()))
-                                .setIntent(intent)
-                                .build();
-                Intent pinnedShortcutCallbackIntent =
-                        mShortcutManager.createShortcutResultIntent(pinShortcutInfo);
-                PendingIntent successCallback = PendingIntent.getBroadcast(context, 0,
-                        pinnedShortcutCallbackIntent, 0);
-                mShortcutManager.requestPinShortcut(pinShortcutInfo,
-                        successCallback.getIntentSender());
-            Toast.makeText(context, context.getString(R.string.shortcut_create_unsuc, dataList.get(position).getLabel()), Toast.LENGTH_LONG).show();
+                intent.putExtra("label",label);
+                new EnterDialog(context)
+                        .setTitle(context.getString(R.string.addshortcut_shortcut_label))
+                        .setMessage(context.getString(R.string.shortcut_create_unsuc))
+                        .setText(label)
+                        .setConfirmListener(enterLabel -> {
+                            if(enterLabel.isEmpty())
+                                enterLabel=intent.getStringExtra("label");
+                            intent.removeExtra("label");
+                            ShortcutInfo pinShortcutInfo =
+                                    new ShortcutInfo.Builder(context, enterLabel)
+                                            .setShortLabel(enterLabel)
+                                            .setLongLabel(enterLabel)
+                                            .setIcon(Icon.createWithResource(context, dataList.get(position).getIconRes()))
+                                            .setIntent(intent)
+                                            .build();
+                            Intent pinnedShortcutCallbackIntent =
+                                    mShortcutManager.createShortcutResultIntent(pinShortcutInfo);
+                            PendingIntent successCallback = PendingIntent.getBroadcast(context, 0,
+                                    pinnedShortcutCallbackIntent, 0);
+                            mShortcutManager.requestPinShortcut(pinShortcutInfo,
+                                    successCallback.getIntentSender());
+                            return true;
+                        }).show();
+            //Toast.makeText(context, context.getString(R.string.shortcut_create_unsuc, dataList.get(position).getLabel()), Toast.LENGTH_LONG).show();
             }
         } else {
             //Adding shortcut for MainActivity

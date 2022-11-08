@@ -398,6 +398,7 @@ public class PhoneFacade extends RpcReceiver {
         return mTelephonyManager.getSimOperatorName();
     }
 
+    @SuppressLint("HardwareIds")
     @Rpc(description = "Returns the serial number of the SIM, if applicable. Return null if it is unavailable.")
     public String getSimSerialNumber() {
         return mTelephonyManager.getSimSerialNumber();

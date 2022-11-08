@@ -35,7 +35,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import org.qpython.qsl4a.qsl4a.FileUtils;
+import org.qpython.qsl4a.qsl4a.util.FileUtils;
 import org.qpython.qsl4a.qsl4a.LogUtil;
 import org.qpython.qsl4a.qsl4a.SingleThreadExecutor;
 import org.qpython.qsl4a.qsl4a.event.Event;
