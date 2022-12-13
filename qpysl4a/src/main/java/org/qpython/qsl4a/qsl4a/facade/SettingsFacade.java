@@ -17,6 +17,7 @@
 package org.qpython.qsl4a.qsl4a.facade;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.app.Service;
 
@@ -40,6 +41,7 @@ import org.qpython.qsl4a.qsl4a.FutureActivityTaskExecutor;
 import org.qpython.qsl4a.qsl4a.LogUtil;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -279,10 +281,10 @@ public class SettingsFacade extends RpcReceiver {
 
   @SuppressLint("HardwareIds")
   @Rpc(description = "get system infomation .")
-  public Map<String,String> getSysInfo(){
-    Map<String,String> s = new HashMap<>();
+  public Map<String,Object> getSysInfo(){
+    Map<String,Object> s = new HashMap<>();
     s.put("model", Build.MODEL);
-    s.put("sdk",Build.VERSION.SDK);
+    s.put("sdk",Build.VERSION.SDK_INT);
     s.put("release",Build.VERSION.RELEASE);
     s.put("brand",Build.BRAND);
     s.put("device",Build.DEVICE);
@@ -293,6 +295,9 @@ public class SettingsFacade extends RpcReceiver {
       s.put("serial",Build.getSerial());
     else
       s.put("serial",Build.SERIAL);
+    s.put("hardware", Build.HARDWARE);
+    s.put("user", Build.USER);
+    s.put("abis", Build.SUPPORTED_ABIS);
     return s;
   }
 
@@ -368,6 +373,17 @@ public class SettingsFacade extends RpcReceiver {
     TRAFFIC_SUPPORT = 1;
     return false;
   }}
+
+  @Rpc(description = "get Memory Information")
+  public Map<String,Long> getMemoryInfo(){
+    ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+    ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+    activityManager.getMemoryInfo(mi);
+    Map<String,Long> map = new HashMap<>();
+    map.put("availMem",mi.availMem);
+    map.put("totalMem",mi.totalMem);
+    return map;
+  }
 
   @Override
   public void shutdown() {

@@ -41,7 +41,7 @@ class EmulatorDebug {
     /**
      * Set to true to log unknown escape sequences.
      */
-    public static final boolean LOG_UNKNOWN_ESCAPE_SEQUENCES = DEBUG & false;
+    public static final boolean LOG_UNKNOWN_ESCAPE_SEQUENCES = false;
 
     /**
      * The tag we use when logging, so that our messages can be distinguished
@@ -50,16 +50,4 @@ class EmulatorDebug {
      */
     public static final String LOG_TAG = "EmulatorView";
 
-    public static String bytesToString(byte[] data, int base, int length) {
-        StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            byte b = data[base + i];
-            if (b < 32 || b > 126) {
-                buf.append(String.format("\\x%02x", b));
-            } else {
-                buf.append((char) b);
-            }
-        }
-        return buf.toString();
-    }
 }

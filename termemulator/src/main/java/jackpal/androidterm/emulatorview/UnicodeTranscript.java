@@ -48,6 +48,7 @@ class UnicodeTranscript {
     private Object[] mLines;
     private StyleRow[] mColor;
     private boolean[] mLineWrap;
+    private boolean[] mLineLastEmpty;
     private int mTotalRows;
     private int mScreenRows;
     private int mColumns;
@@ -66,6 +67,7 @@ class UnicodeTranscript {
         mLines = new Object[totalRows];
         mColor = new StyleRow[totalRows];
         mLineWrap = new boolean[totalRows];
+        mLineLastEmpty = new boolean[totalRows];
         tmpColor = new StyleRow(defaultStyle, mColumns);
 
         mDefaultStyle = defaultStyle;
@@ -127,6 +129,14 @@ class UnicodeTranscript {
 
     public boolean getLineWrap(int row) {
         return mLineWrap[externalToInternalRow(row)];
+    }
+
+    public void setLineLastEmpty(int row,boolean empty) {
+        mLineLastEmpty[externalToInternalRow(row)] = empty;
+    }
+
+    public boolean getLineLastEmpty(int row) {
+        return mLineLastEmpty[externalToInternalRow(row)];
     }
 
     /**

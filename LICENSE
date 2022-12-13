@@ -6,7 +6,9 @@ Related to granting permissions:
 QPython3C will not collect any user information. You can grant corresponding permissions according to your own situation. Unauthorized permissions will lose their corresponding functions.
 
 Open source software security tips:
-If a security vulnerability occurs when using QPython3C, the QPython3C developer may not have the time or ability to repair it. Continued use means that the QPython3C users bears the relevant security risks, which has nothing to do with the QPython developer.
+If a security vulnerability occurs when using QPython3C, QPython3C developers may have no time or ability to fix it.
+If the QPython3C is not used properly, a large amount of important data may be lost.
+Continued use means users taking risks in terms of security vulnerabilities, data loss and etc, which has nothing to do with QPython developers.
 
 Open source and free but requires support:
 Open source software production requires investment cost. Please support more QPython developers.
@@ -33,7 +35,9 @@ Once it is found that QPython3C is used for network wall climbing, illegal intru
 QPython3C不会收集任何用户信息，您可以根据自身情况授予相应权限，未被授予的权限将会失去对应功能。
 
 开源软件安全提示：
-使用QPython3C如果出现安全漏洞，QPython3C开发者可能没时间也无力修复，继续使用意味着自行承担与此相关安全风险，与QPython开发者无关。
+使用QPython3C如果出现安全漏洞，QPython3C开发者可能没时间也无力修复。
+如果QPython3C使用不当，可能会造成重要数据大量丢失。
+继续使用意味着使用者自行承担安全漏洞和数据丢失等方面的风险，与QPython开发者无关。
 
 开源免费但需要支持：
 开源软件制作需要投入成本，请多支持QPython开发者。

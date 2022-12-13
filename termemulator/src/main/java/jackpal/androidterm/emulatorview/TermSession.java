@@ -27,9 +27,9 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
 
 /**
  * A terminal session, consisting of a VT100 terminal emulator and its
@@ -113,7 +113,7 @@ public class TermSession {
     public TermSession(final boolean exitOnEOF) {
         mWriteCharBuffer = CharBuffer.allocate(2);
         mWriteByteBuffer = ByteBuffer.allocate(4);
-        mUTF8Encoder = Charset.forName("UTF-8").newEncoder();
+        mUTF8Encoder = StandardCharsets.UTF_8.newEncoder();
         mUTF8Encoder.onMalformedInput(CodingErrorAction.REPLACE);
         mUTF8Encoder.onUnmappableCharacter(CodingErrorAction.REPLACE);
 
@@ -142,8 +142,7 @@ public class TermSession {
                                     mMsgHandler.obtainMessage(NEW_INPUT));
                         }
                     }
-                } catch (IOException e) {
-                } catch (InterruptedException e) {
+                } catch (IOException | InterruptedException ignored) {
                 }
 
                 if (exitOnEOF) mMsgHandler.sendMessage(mMsgHandler.obtainMessage(EOF));
@@ -156,6 +155,7 @@ public class TermSession {
             private byte[] mBuffer = new byte[4096];
 
             @Override
+            @SuppressLint("HandlerLeak")
             public void run() {
                 Looper.prepare();
 
@@ -192,12 +192,10 @@ public class TermSession {
                     writeQueue.read(buffer, 0, bytesToWrite);
                     termOut.write(buffer, 0, bytesToWrite);
                     termOut.flush();
-                } catch (IOException e) {
+                } catch (IOException | InterruptedException e) {
                     // Ignore exception
                     // We don't really care if the receiver isn't listening.
                     // We just make a best effort to answer the query.
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
@@ -225,10 +223,10 @@ public class TermSession {
     }
 
     private String convert(byte[] bytes) {
-        StringBuffer stringBuffer = new StringBuffer();
+        StringBuilder stringBuffer = new StringBuilder();
         int index = 0;
         while (index < bytes.length && bytes[index] != 0) {
-            stringBuffer.append(Character.toString((char) bytes[index]));
+            stringBuffer.append((char) bytes[index]);
             index++;
         }
         return stringBuffer.toString();
@@ -249,7 +247,7 @@ public class TermSession {
      * @param rows    The number of rows in the terminal window.
      */
     public void initializeEmulator(int columns, int rows) {
-        mTranscriptScreen = new TranscriptScreen(columns, TRANSCRIPT_ROWS, rows, mColorScheme);
+        mTranscriptScreen = new TranscriptScreen(columns, TRANSCRIPT_ROWS, rows);
         mEmulator = new TerminalEmulator(this, mTranscriptScreen, columns, rows, mColorScheme);
         mEmulator.setDefaultUTF8Mode(mDefaultUTF8Mode);
         mEmulator.setKeyListener(mKeyListener);
@@ -494,7 +492,7 @@ public class TermSession {
     private void readFromProcess() {
         int bytesAvailable = mByteQueue.getBytesAvailable();
         int bytesToRead = Math.min(bytesAvailable, mReceiveBuffer.length);
-        int bytesRead = 0;
+        int bytesRead;
         try {
             bytesRead = mByteQueue.read(mReceiveBuffer, 0, bytesToRead);
         } catch (InterruptedException e) {

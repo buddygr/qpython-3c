@@ -54,8 +54,7 @@ class TranscriptScreen implements Screen {
      *                   transcript that holds lines that have scrolled off the top of the
      *                   screen.
      */
-    public TranscriptScreen(int columns, int totalRows, int screenRows,
-                            ColorScheme scheme) {
+    public TranscriptScreen(int columns, int totalRows, int screenRows) {
         init(columns, totalRows, screenRows, TextStyle.kNormalTextStyle);
     }
 
@@ -85,6 +84,10 @@ class TranscriptScreen implements Screen {
 
     public void setLineWrap(int row) {
         mData.setLineWrap(row);
+    }
+
+    public void setLineLastEmpty(int row,boolean empty) {
+        mData.setLineLastEmpty(row,empty);
     }
 
     /**
@@ -477,6 +480,10 @@ class TranscriptScreen implements Screen {
      */
     boolean getScriptLineWrap(int row) {
         return mData.getLineWrap(row);
+    }
+
+    boolean getScriptLineLastEmpty(int row) {
+        return mData.getLineLastEmpty(row);
     }
 
     /**

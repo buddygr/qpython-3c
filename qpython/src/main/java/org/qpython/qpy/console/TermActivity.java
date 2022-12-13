@@ -495,7 +495,7 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
             if (mArgs != null || shell_type != null) {
                 mTermSessions.add(createPyTermSession(mArgs));
             } else if (mTermSessions.size() == 0) {
-                    mTermSessions.add(createPyTermSession(null));
+                mTermSessions.add(createPyTermSession(null));
             }
             //存在内存泄漏
             mTermSessions.addCallback(this);

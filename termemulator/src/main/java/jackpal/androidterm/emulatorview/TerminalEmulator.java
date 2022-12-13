@@ -16,8 +16,6 @@
 
 package jackpal.androidterm.emulatorview;
 
-import android.util.Log;
-
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -274,7 +272,7 @@ public class TerminalEmulator {
     /**
      * True if the next character to be emitted will be automatically wrapped to
      * the next line. Used to disambiguate the case where the cursor is
-     * positioned on column mColumns-1.
+     * positioned on column mColumns-2 or mColumns-1 .
      */
     private boolean mAboutToAutoWrap;
 
@@ -423,7 +421,7 @@ public class TerminalEmulator {
         mSession = session;
         mMainBuffer = screen;
         mScreen = mMainBuffer;
-        mAltBuffer = new TranscriptScreen(columns, rows, rows, scheme);
+        mAltBuffer = new TranscriptScreen(columns, rows, rows);
         mRows = rows;
         mColumns = columns;
         mTabStop = new boolean[mColumns];
@@ -675,8 +673,19 @@ public class TerminalEmulator {
         //Log.d(EmulatorDebug.LOG_TAG, "In: '" + EmulatorDebug.bytesToString(buffer, base, length) + "'");
 
         //乘着船 修改：不同终端不同退格模式
-        String s = EmulatorDebug.bytesToString(buffer, base, length);
-        if (s.contains("\\x08\\x08  \\x08\\x08"))
+        StringBuilder buf = new StringBuilder();
+        int i;byte b;
+        for (i = 0; i < length; i++) {
+            b = buffer[base + i];
+            if (b < 32 || b > 125) {
+                buf.append(String.format("~%02x", b));
+            } else {
+                buf.append((char) b);
+            }
+        }
+        String s = buf.toString();
+        i = s.indexOf("~08~08  ");
+        if (i > -1 && i < s.indexOf("  ~08~08"))
             backSpaceType = 1;//传统退格模式
         else
             backSpaceType = 0;//自动化退格模式
@@ -684,9 +693,9 @@ public class TerminalEmulator {
             sb = new StringBuffer();
         } else if (sb != null) {
             sb.append(s
-                    .replace("\\x0d", "")
-                    .replace("\\x0a", "")
-                    .replace("\\x08", ""));
+                    .replace("~0d", "")
+                    .replace("~0a", "")
+                    .replace("~08", ""));
         }
 
 //        if (sb != null && EmulatorDebug.bytesToString(buffer, base, length).equals("\\x0d\\x0a")) {
@@ -704,15 +713,14 @@ public class TerminalEmulator {
 //            sb = null;
 //        }
 
-        for (int i = 0; i < length; i++) {
-            byte b = buffer[base + i];
+        for (i = 0; i < length; i++) {
+            b = buffer[base + i];
             try {
                 process(b);
                 mProcessedCharCount++;
-            } catch (Exception e) {
-                Log.e(EmulatorDebug.LOG_TAG, "Exception while processing character "
-                        + Integer.toString(mProcessedCharCount) + " code "
-                        + Integer.toString(b), e);
+            } catch (Exception ignored) {
+                //Log.e(EmulatorDebug.LOG_TAG, "Exception while processing character "
+                       // + mProcessedCharCount + " code " + b, e);
             }
         }
     }
@@ -733,7 +741,7 @@ public class TerminalEmulator {
 //        return history;
 //    }
 
-    private static final int HISTORY_MAX = 10;
+    //private static final int HISTORY_MAX = 10;
 
     //private LinkedList<String> history = new LinkedList<>();
     private StringBuffer       sb      = null;
@@ -883,9 +891,10 @@ public class TerminalEmulator {
         int width=0; //单字符宽度
         int tWidth=0; //累计字符宽度
         if (mCursorCol<=0) { //跨行退格
-            line = mScreen.getScriptLine(mCursorRow-1);//目标行：上一行
+            i = mCursorRow - 1;
+            line = mScreen.getScriptLine(i);//目标行：上一行
             //定位光标到：上一行最后一个字符
-            setCursorRowCol(mCursorRow-1,line.length-1);
+            setCursorRowCol(i,mColumns - (mScreen.getScriptLineLastEmpty(i)?1:0));
         } else { //本行退格
             line = mScreen.getScriptLine(mCursorRow);//目标行：本行
         }
@@ -1555,22 +1564,22 @@ public class TerminalEmulator {
                 mForeColor = code - 90 + 8;
             } else if (code >= 100 && code <= 107) { // bright background color
                 mBackColor = code - 100 + 8;
-            } else {
+            /*} else {
                 if (EmulatorDebug.LOG_UNKNOWN_ESCAPE_SEQUENCES) {
                     Log.w(EmulatorDebug.LOG_TAG, String.format("SGR unknown code %d", code));
-                }
+                }*/
             }
         }
     }
 
     private boolean checkColor(int color) {
         boolean result = isValidColor(color);
-        if (!result) {
+        /*if (!result) {
             if (EmulatorDebug.LOG_UNKNOWN_ESCAPE_SEQUENCES) {
                 Log.w(EmulatorDebug.LOG_TAG,
                         String.format("Invalid color %d", color));
             }
-        }
+        }*/
         return result;
     }
 
@@ -1872,9 +1881,9 @@ public class TerminalEmulator {
     }
 
     private void logError(String error) {
-        if (EmulatorDebug.LOG_UNKNOWN_ESCAPE_SEQUENCES) {
+        /*if (EmulatorDebug.LOG_UNKNOWN_ESCAPE_SEQUENCES) {
             Log.e(EmulatorDebug.LOG_TAG, error);
-        }
+        }*/
         finishSequence();
     }
 
@@ -1898,11 +1907,17 @@ public class TerminalEmulator {
         if (autoWrap) {
             /*乘着船 修改：
             修正中文换行末尾缺字符的bug，
-            剩一个字符时，或者上次操作剩两个以下字符时(mAboutToAutoWrap变量)，
-            立即换行，避免下个字符是中文，导致超出范围显示不全
+            采用自动宽度width，英文字符为1，中文字符为2，
+            剩width个以下字符时，
+            或者上次操作剩width个以下字符时(mAboutToAutoWrap变量)，
+            立即换行，避免下个字符导致中文显示不全
             */
-            if ((mCursorCol >= mColumns - 1) || mAboutToAutoWrap) {
-                mScreen.setLineWrap(mCursorRow);
+            if ((mCursorCol + width > mColumns) || mAboutToAutoWrap) {
+                //writeToFile("st","row="+mCursorRow+",col="+mCursorCol+",w="+width+",c="+c+",aboutAutoWrap="+mAboutToAutoWrap);
+                if(!mAboutToAutoWrap) {
+                    mScreen.setLineWrap(mCursorRow);
+                    mScreen.setLineLastEmpty(mCursorRow, width == 2);
+                }
                 mCursorCol = 0;
                 mJustWrapped = true;
                 if (mCursorRow + 1 < mBottomMargin) {
@@ -1935,15 +1950,18 @@ public class TerminalEmulator {
 
         if (autoWrap) {
             //乘着船 修改：修正中文换行末尾缺字符的bug，
-            //剩两个或一个字符时，即可换行，避免下个字符是中文，导致超出范围显示不全
-            mAboutToAutoWrap = (mCursorCol >= mColumns - 2);
+            //剩width个字符时，即可换行，避免下个字符导致中文显示不全
+            mAboutToAutoWrap = (mCursorCol + width > mColumns);
 
             //Force line-wrap flag to trigger even for lines being typed
-            if (mAboutToAutoWrap)
+            if (mAboutToAutoWrap) {
+                //writeToFile("ab","row="+mCursorRow+",col="+mCursorCol+",w="+width+",c="+c);
+                mScreen.setLineLastEmpty(mCursorRow,  width == 2);
                 mScreen.setLineWrap(mCursorRow);
+            }
         }
 
-        mCursorCol = Math.min(mCursorCol + width, mColumns - 1);
+        mCursorCol = Math.min(mCursorCol + width, mColumns);
         if (width > 0) {
             mLastEmittedCharWidth = width;
         }
@@ -1954,7 +1972,7 @@ public class TerminalEmulator {
     }
 
     private void emit(byte b) {
-        if (mUseAlternateCharSet && b < 128) {
+        if (mUseAlternateCharSet) {
             emit((int) mSpecialGraphicsCharMap[b]);
         } else {
             emit((int) b);
@@ -2005,7 +2023,7 @@ public class TerminalEmulator {
 
     private void setCursorRowCol(int row, int col) {
         mCursorRow = Math.min(row, mRows - 1);
-        mCursorCol = Math.min(col, mColumns - 1);
+        mCursorCol = Math.min(col, mColumns);
         mAboutToAutoWrap = false;
     }
 

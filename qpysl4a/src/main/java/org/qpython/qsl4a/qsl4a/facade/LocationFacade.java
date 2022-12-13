@@ -169,11 +169,11 @@ public class LocationFacade extends RpcReceiver {
       mLocationManager.requestLocationUpdates(provider, minUpdateTime, minUpdateDistance,
           mLocationListener, mService.getMainLooper());
     }
-    if(Build.VERSION.SDK_INT >= 28 && updateGnssStatus){
-        mLocaCallback = new LocaCallback();
-        mLocationManager.registerGnssStatusCallback(mLocaCallback,
-                Handler.createAsync(mService.getMainLooper()));
-  }}
+    if(updateGnssStatus && Build.VERSION.SDK_INT >= 26){
+        mLocationManager.registerGnssStatusCallback(
+          new LocaCallback(),
+          new Handler(mService.getMainLooper()));
+    }}
 
   @Rpc(description = "Returns the current location as indicated by all available providers.", returns = "A map of location information by provider.")
   public Map<String, JSONObject> readLocation() throws JSONException {
@@ -186,7 +186,7 @@ public class LocationFacade extends RpcReceiver {
     return result;
   }
 
-  @Rpc(description = "read Global Navigation Satellite System status if Android >= 9 .")
+  @Rpc(description = "read Global Navigation Satellite System status if Android >= 8 .")
   public JSONArray readGnssStatus(){
     return mGnssStatus;
   }
@@ -196,7 +196,7 @@ public class LocationFacade extends RpcReceiver {
   public synchronized void stopLocating() {
     mLocationManager.removeUpdates(mLocationListener);
     mLocationUpdates.clear();
-    if(Build.VERSION.SDK_INT >=28 && mLocaCallback != null){
+    if(Build.VERSION.SDK_INT >=26 && mLocaCallback != null){
       mLocationManager.unregisterGnssStatusCallback(mLocaCallback);
       mGnssStatus = null;
     }
@@ -254,6 +254,7 @@ public class LocationFacade extends RpcReceiver {
   private static JSONArray buildJsonGnssStatus(GnssStatus status) throws JSONException {
     JSONArray results = new JSONArray();
     int satelliteCount = status.getSatelliteCount();
+    float k;
     for (int i = 0; i < satelliteCount; i++) {
       JSONObject result = new JSONObject();
       result.put("ConstellationType", GnssTypes[status.getConstellationType(i)]);
@@ -262,6 +263,9 @@ public class LocationFacade extends RpcReceiver {
       result.put("Cn0DbHz",status.getCn0DbHz(i));
       result.put("Svid",status.getSvid(i));
       result.put("UsedInFix",status.usedInFix(i));
+      k = status.getCarrierFrequencyHz(i);
+      if(k!=0)
+          result.put("CarrierFrequencyHz",k);
       results.put(result);
     }
     return results;

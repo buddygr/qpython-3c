@@ -228,15 +228,22 @@ public class WifiFacade extends RpcReceiver {
     JSONArray connectedIP = new JSONArray();
     BufferedReader br = new BufferedReader(new FileReader(
             "/proc/net/arp"));
-    String line, IpMac;
+    String line;
+    String[] fields = null;
     String[] splitted;
+    int i;
     while ((line = br.readLine()) != null) {
-      if (line.contains("address")) continue;
-      splitted = line.split(" +");
-      if (splitted != null) {
-        IpMac = splitted[0] + "|" + splitted[3];
-        connectedIP.put(IpMac);
+      if (line.contains("address")) {
+        fields = line.split(" {2,}");
+        continue;
       }
+      splitted = line.split(" +");
+      if (fields == null || fields.length != splitted.length)
+        continue;
+      JSONObject address = new JSONObject();
+      for(i = 0;i < splitted.length;i++)
+        address.put(fields[i],splitted[i]);
+      connectedIP.put(address);
     }
     return connectedIP;
   }

@@ -442,11 +442,11 @@ public class QWebViewActivity extends BaseActivity {
 
     // if ext endswith .ipynb, you have option to open it with NotebookActivity
     public void loadurl(final WebView view, final String url) {
-        URL u = null;
+        //URL u = null;
         try {
-            u = new URL(url);
+            /*u = new URL(url);
             String path = u.getPath();
-            /*if (  NotebookUtil.isNotebookLibInstall(this)
+            if (  NotebookUtil.isNotebookLibInstall(this)
                     && path!=null
                     && path.endsWith((NotebookUtil.ext))) {
 
@@ -474,7 +474,7 @@ public class QWebViewActivity extends BaseActivity {
                 view.loadUrl(url);// 载入网页
 
            // }
-        } catch (MalformedURLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             view.loadUrl(url);// 载入网页
 

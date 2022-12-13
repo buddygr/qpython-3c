@@ -19,6 +19,7 @@
             android:defaultValue="false"
             android:key="auto_break_lines"
             android:summaryOn="@string/config_summary_word_wrap"
+            android:summaryOff="@string/config_summary_word_expand"
             android:title="@string/config_title_word_wrap"/>
 
         <CheckBoxPreference

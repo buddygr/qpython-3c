@@ -33,6 +33,7 @@
             android:padding="15dp"
             android:singleLine="true"
             android:text="#FFF"
+            android:textSize="20dp"
             />
         <!--android:textAppearance="?android:attr/textAppearanceLarge"-->
 
@@ -45,7 +46,7 @@
             android:layout_marginTop="5dp"
             android:background="#ff313431"/>
 
-        <ImageView
+        <TextView
             android:id="@+id/window_list_close"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -53,6 +54,9 @@
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
             android:scaleType="center"
-            android:src="@drawable/btn_close_window"/>
+            android:textSize="20dp"
+            android:text="×"
+            androidtextStyle="bold"
+            android:textColor="#ff7f7f"/>
     </LinearLayout>
 </layout>

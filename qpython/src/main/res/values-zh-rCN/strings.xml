@@ -15,9 +15,10 @@
     <string name="config_title_scroll_fling">快速滚动</string>
     <string name="config_summary_line_numbers">在左侧显示的行号</string>
     <string name="config_summary_word_wrap">如果某行对于屏幕太宽时，自动换行</string>
+    <string name="config_summary_word_expand">如果某行对于屏幕太宽时，向右扩展</string>
     <string name="config_summary_scroll_fling">如果有性能问题，不要选中</string>
 
-    <string name="config_gist_icon"></string>
+    <string name="config_gist_icon" />
     <string name="config_title_gist">显示Gist按钮</string>
 
     <!-- Options Menu in QEdit -->
