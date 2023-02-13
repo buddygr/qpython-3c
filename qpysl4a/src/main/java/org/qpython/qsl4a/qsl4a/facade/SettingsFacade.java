@@ -21,11 +21,15 @@ import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.app.Service;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.media.AudioManager;
 import android.net.TrafficStats;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.PowerManager;
@@ -37,18 +41,20 @@ import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
 import org.qpython.qsl4a.QSL4APP;
-import org.qpython.qsl4a.qsl4a.FutureActivityTaskExecutor;
+import org.qpython.qsl4a.qsl4a.future.FutureActivityTaskExecutor;
 import org.qpython.qsl4a.qsl4a.LogUtil;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import org.qpython.qsl4a.qsl4a.future.FutureActivityTask;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
+import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
 import org.qpython.qsl4a.qsl4a.rpc.RpcOptional;
 import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
 
@@ -59,16 +65,18 @@ import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
  */
 public class SettingsFacade extends RpcReceiver {
 
-  public static int AIRPLANE_MODE_OFF = 0;
-  public static int AIRPLANE_MODE_ON = 1;
+  //public static int AIRPLANE_MODE_OFF = 0;
+  //public static int AIRPLANE_MODE_ON = 1;
 
-  private byte TRAFFIC_SUPPORT = 0;
+  private static byte TRAFFIC_SUPPORT = 0;
+  private final int qpython_uid;
 
   private final Service mService;
   private final AudioManager mAudio;
   private final PowerManager mPower;
   private final AndroidFacade mAndroidFacade;
   private final Context context;
+  private final ContentResolver contentResolver;
 
   /**
    * Creates a new SettingsFacade.
@@ -83,6 +91,8 @@ public class SettingsFacade extends RpcReceiver {
     mPower = (PowerManager) mService.getSystemService(Context.POWER_SERVICE);
     mAndroidFacade = manager.getReceiver(AndroidFacade.class);
     context = mAndroidFacade.context;
+    contentResolver = mService.getContentResolver();
+    qpython_uid = context.getApplicationInfo().uid;
   }
 
   private void NotificationPolicyAccessGranted() throws Exception {
@@ -96,10 +106,12 @@ public class SettingsFacade extends RpcReceiver {
     }
   }}
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Rpc(description = "Sets the screen timeout to this number of seconds.", returns = "The original screen timeout.")
-  public Integer setScreenTimeout(@RpcParameter(name = "value") Integer value) {
+  public Integer setScreenTimeout(@RpcParameter(name = "value") Integer value) throws Exception {
+    checkWriteSettings();
     Integer oldValue = getScreenTimeout();
-    android.provider.Settings.System.putInt(mService.getContentResolver(),
+    android.provider.Settings.System.putInt(contentResolver,
         android.provider.Settings.System.SCREEN_OFF_TIMEOUT, value * 1000);
     return oldValue;
   }
@@ -107,7 +119,7 @@ public class SettingsFacade extends RpcReceiver {
   @Rpc(description = "Returns the current screen timeout in seconds.", returns = "the current screen timeout in seconds.")
   public Integer getScreenTimeout() {
     try {
-      return android.provider.Settings.System.getInt(mService.getContentResolver(),
+      return android.provider.Settings.System.getInt(contentResolver,
           android.provider.Settings.System.SCREEN_OFF_TIMEOUT) / 1000;
     } catch (SettingNotFoundException e) {
       return 0;
@@ -118,14 +130,14 @@ public class SettingsFacade extends RpcReceiver {
 @Rpc(description = "Checks the airplane mode setting.", returns = "True if airplane mode is enabled.")
   public Boolean checkAirplaneMode() {
     try {
-      return android.provider.Settings.System.getInt(mService.getContentResolver(),
-          android.provider.Settings.System.AIRPLANE_MODE_ON) == AIRPLANE_MODE_ON;
+      return android.provider.Settings.System.getInt(contentResolver,
+          android.provider.Settings.System.AIRPLANE_MODE_ON) == 1;//AIRPLANE_MODE_ON == 1
     } catch (SettingNotFoundException e) {
       return false;
     }
   }
 
-  @SuppressWarnings("deprecation")
+  /*@SuppressWarnings("deprecation")
 @Rpc(description = "Toggles airplane mode on and off.", returns = "True if airplane mode is enabled.")
   public Boolean toggleAirplaneMode(@RpcParameter(name = "enabled") @RpcOptional Boolean enabled) {
     if (enabled == null) {
@@ -138,7 +150,7 @@ public class SettingsFacade extends RpcReceiver {
     intent.putExtra("state", enabled);
     mService.sendBroadcast(intent);
     return enabled;
-  }
+  }*/
 
   @Rpc(description = "Checks the ringer silent mode setting.", returns = "True if ringer silent mode is enabled.")
   public Boolean checkRingerSilentMode() {
@@ -214,24 +226,39 @@ public class SettingsFacade extends RpcReceiver {
   @Rpc(description = "Returns the screen backlight brightness.", returns = "the current screen brightness between 0 and 255")
   public Integer getScreenBrightness() {
     try {
-      return android.provider.Settings.System.getInt(mService.getContentResolver(),
+      return android.provider.Settings.System.getInt(contentResolver,
           android.provider.Settings.System.SCREEN_BRIGHTNESS);
     } catch (SettingNotFoundException e) {
       return 0;
     }
   }
 
+  @RequiresApi(api = Build.VERSION_CODES.M)
   @Rpc(description = "Sets the the screen backlight brightness.", returns = "the original screen brightness.")
   public Integer setScreenBrightness(
-      @RpcParameter(name = "value", description = "brightness value between 0 and 255") Integer value) {
+      @RpcParameter(name = "value", description = "brightness value between 0 and 255") @RpcOptional Integer value) throws Exception {
+
+    checkWriteSettings();
+
+    Integer oldValue = getScreenBrightness();
+
+    if(value == null){
+      Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
+      return oldValue;
+    }
+
     if (value < 0) {
       value = 0;
     } else if (value > 255) {
       value = 255;
     }
     final int brightness = value;
-    Integer oldValue = getScreenBrightness();
-    android.provider.Settings.System.putInt(mService.getContentResolver(),
+
+    if (Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+      Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+    }
+
+    android.provider.Settings.System.putInt(contentResolver,
         android.provider.Settings.System.SCREEN_BRIGHTNESS, brightness);
 
     FutureActivityTask<Object> task = new FutureActivityTask<Object>() {
@@ -251,6 +278,16 @@ public class SettingsFacade extends RpcReceiver {
     taskExecutor.execute(task);
 
     return oldValue;
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.M)
+  public void checkWriteSettings() throws Exception {
+    if (!Settings.System.canWrite(context)) {
+      Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS, Uri.parse("package:" + context.getPackageName()));
+      mAndroidFacade.startActivityForResult(intent);
+      if(!Settings.System.canWrite(context))
+        throw new Exception("No permission : MANAGE_WRITE_SETTINGS .");
+    }
   }
 
   @Rpc(description = "Checks if the screen is on or off (requires API level 7).", returns = "True if the screen is currently on.")
@@ -320,13 +357,13 @@ public class SettingsFacade extends RpcReceiver {
     return SystemClock.elapsedRealtimeNanos();
   }
 
-  @Rpc(description = "get total Rx bytes")
+  /*@Rpc(description = "get total Rx bytes")
   public Map<String,Long> getTotalRxBytes(){
     if(unTrafficSupport())
       return null;
     Map<String,Long> map = new HashMap<>();
     map.put("bytes",TrafficStats.getTotalRxBytes());
-    map.put("time",System.currentTimeMillis());
+    map.put("time",SystemClock.elapsedRealtime());
     return map;
   }
 
@@ -336,7 +373,7 @@ public class SettingsFacade extends RpcReceiver {
       return null;
     Map<String,Long> map = new HashMap<>();
     map.put("bytes",TrafficStats.getTotalTxBytes());
-    map.put("time",System.currentTimeMillis());
+    map.put("time",SystemClock.elapsedRealtime());
     return map;
   }
 
@@ -346,7 +383,7 @@ public class SettingsFacade extends RpcReceiver {
       return null;
     Map<String,Long> map = new HashMap<>();
     map.put("bytes",TrafficStats.getMobileRxBytes());
-    map.put("time",System.currentTimeMillis());
+    map.put("time",SystemClock.elapsedRealtime());
     return map;
   }
 
@@ -356,7 +393,68 @@ public class SettingsFacade extends RpcReceiver {
       return null;
     Map<String,Long> map = new HashMap<>();
     map.put("bytes",TrafficStats.getMobileTxBytes());
-    map.put("time",System.currentTimeMillis());
+    map.put("time",SystemClock.elapsedRealtime());
+    return map;
+  }
+
+  @Rpc(description = "get qpython Rx bytes")
+  public Map<String,Long> getQPyRxBytes(){
+    if(unTrafficSupport())
+      return null;
+    Map<String,Long> map = new HashMap<>();
+    map.put("bytes",TrafficStats.getUidRxBytes(qpython_uid));
+    map.put("time",SystemClock.elapsedRealtime());
+    return map;
+  }
+
+  @Rpc(description = "get qpython Tx bytes")
+  public Map<String,Long> getQPyTxBytes(){
+    if(unTrafficSupport())
+      return null;
+    Map<String,Long> map = new HashMap<>();
+    map.put("bytes",TrafficStats.getUidTxBytes(qpython_uid));
+    map.put("time",SystemClock.elapsedRealtime());
+    return map;
+  }*/
+
+  @Rpc(description = "Get transmit/receive traffic statistics since startup .")
+  public Map<String,Long> getTrafficStats(
+          @RpcParameter(name = "flags") @RpcDefault("7") Integer flags
+          // Total = 1 ; Mobile = 2 ; QPython = 4
+          ){
+    if(unTrafficSupport())
+      return null;
+    Map<String,Long> map = new HashMap<>();
+    if(flags % 2 == 1){
+      map.put("TotalRxBytes",TrafficStats.getTotalRxBytes());
+      map.put("TotalTxBytes",TrafficStats.getTotalTxBytes());
+    }
+    if((flags >> 1) % 2 == 1){
+      map.put("MobileRxBytes",TrafficStats.getMobileRxBytes());
+      map.put("MobileTxBytes",TrafficStats.getMobileTxBytes());
+    }
+    if((flags >> 2) % 2 == 1){
+      map.put("QPythonRxBytes",TrafficStats.getUidRxBytes(qpython_uid));
+      map.put("QPythonTxBytes",TrafficStats.getUidTxBytes(qpython_uid));
+    }
+    map.put("StartupTime",SystemClock.elapsedRealtime());
+    return map;
+  }
+
+  @Rpc(description = "get qpython Tx bytes")
+  public Map<String,Long> getAppTxBytes(@RpcParameter(name = "packageName") String packageName){
+    List<PackageInfo> packageInfos = context.getPackageManager().getInstalledPackages(PackageManager.GET_UNINSTALLED_PACKAGES);
+    Integer uid = null;
+    for (PackageInfo info : packageInfos) {
+      if(Objects.equals(info.packageName, packageName))
+        uid = info.applicationInfo.uid;
+      break;
+    }
+    if(uid == null)
+      return null;
+    Map<String,Long> map = new HashMap<>();
+    map.put("bytes",TrafficStats.getUidTxBytes(uid));
+    map.put("time",SystemClock.elapsedRealtime());
     return map;
   }
 
@@ -365,8 +463,7 @@ public class SettingsFacade extends RpcReceiver {
       return false;
     else if(TRAFFIC_SUPPORT < 0)
       return true;
-    int uid = context.getApplicationInfo().uid;
-  if(TrafficStats.getUidRxBytes(uid) == TrafficStats.UNSUPPORTED || TrafficStats.getUidTxBytes(uid) == TrafficStats.UNSUPPORTED){
+  if(TrafficStats.getUidRxBytes(qpython_uid) == TrafficStats.UNSUPPORTED || TrafficStats.getUidTxBytes(qpython_uid) == TrafficStats.UNSUPPORTED){
     TRAFFIC_SUPPORT = -1;
     return true;
   } else {

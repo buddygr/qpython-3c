@@ -48,7 +48,7 @@ import android.view.SurfaceView;
 import android.view.WindowManager;
 
 import org.qpython.qsl4a.QSL4APP;
-import org.qpython.qsl4a.qsl4a.FutureActivityTaskExecutor;
+import org.qpython.qsl4a.qsl4a.future.FutureActivityTaskExecutor;
 import org.qpython.qsl4a.qsl4a.future.FutureActivityTask;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
@@ -59,7 +59,6 @@ import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;

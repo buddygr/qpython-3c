@@ -85,7 +85,7 @@ public class EventServer extends SimpleServer implements EventFacade.EventObserv
 
   @Override
   public void onEventReceived(Event event) {
-    Object result = null;
+    Object result;
     try {
       result = JsonBuilder.build(event);
     } catch (JSONException e) {

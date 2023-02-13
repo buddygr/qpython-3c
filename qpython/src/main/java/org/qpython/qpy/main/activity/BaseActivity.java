@@ -162,7 +162,7 @@ public class BaseActivity extends AppCompatActivity {
     public void onFeedback(String feedback) {
 
         String app = getString(R.string.app_name);
-        int ver = NUtil.getVersinoCode(getApplicationContext());
+        int ver = NUtil.getVersionCode(getApplicationContext());
         String subject = MessageFormat.format(getString(com.quseit.android.R.string.feeback_email_title), app, ver, Build.PRODUCT);
 
         String lastError = "";

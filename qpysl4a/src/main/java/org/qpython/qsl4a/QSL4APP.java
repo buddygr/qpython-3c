@@ -2,7 +2,7 @@ package org.qpython.qsl4a;
 
 import com.quseit.base.MyApp;
 
-import org.qpython.qsl4a.qsl4a.FutureActivityTaskExecutor;
+import org.qpython.qsl4a.qsl4a.future.FutureActivityTaskExecutor;
 import org.qpython.qsl4a.qsl4a.LogUtil;
 import org.qpython.qsl4a.qsl4a.interpreter.InterpreterConfiguration;
 import org.qpython.qsl4a.qsl4a.interpreter.InterpreterConstants;

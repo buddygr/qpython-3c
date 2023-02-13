@@ -42,16 +42,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.qpython.qsl4a.QSL4APP;
-import org.qpython.qsl4a.qsl4a.util.FileUtils;
-import org.qpython.qsl4a.qsl4a.FutureActivityTaskExecutor;
 import org.qpython.qsl4a.qsl4a.LogUtil;
 import org.qpython.qsl4a.qsl4a.NotificationIdFactory;
 import org.qpython.qsl4a.qsl4a.future.FutureActivityTask;
+import org.qpython.qsl4a.qsl4a.future.FutureActivityTaskExecutor;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
 import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
 import org.qpython.qsl4a.qsl4a.rpc.RpcOptional;
 import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
+import org.qpython.qsl4a.qsl4a.util.FileUtils;
 import org.qpython.qsl4a.qsl4a.util.HtmlUtil;
 import org.qpython.qsl4a.qsl4a.util.SPFUtils;
 
@@ -92,7 +92,7 @@ public class AndroidFacade extends RpcReceiver {
   public final Service mService;
   public final Handler mHandler;
   private final Intent mIntent;
-  private final FutureActivityTaskExecutor mTaskQueue;
+  public final FutureActivityTaskExecutor mTaskQueue;
 
   private final Vibrator mVibrator;
   private final NotificationManager mNotificationManager;
@@ -172,7 +172,7 @@ public class AndroidFacade extends RpcReceiver {
         try {
           startActivityForResult(intent, 1024);
         } catch (Exception e) {
-          intent.putExtra("EXCEPTION", e.getMessage());
+          intent.putExtra("EXCEPTION", e.toString());
           setResult(intent);
         }
       }
@@ -208,7 +208,7 @@ public class AndroidFacade extends RpcReceiver {
           startActivityForResult(intent, requestCode);
         } catch (Exception e) {
           if(intent!=null) {
-            intent.putExtra("EXCEPTION", e.getMessage());
+            intent.putExtra("EXCEPTION", e.toString());
             setResult(intent);
           }
         }
@@ -456,6 +456,7 @@ public class AndroidFacade extends RpcReceiver {
   }
 
   public void doStartActivity(final Intent intent, Boolean wait) throws Exception {
+    Exception[] except = new Exception[1];
     if (wait == null || !wait) {
       startActivity(intent);
     } else {
@@ -466,7 +467,11 @@ public class AndroidFacade extends RpcReceiver {
         public void onCreate() {
           super.onCreate();
           intent.setFlags(intent.getFlags() | intentFlags);
-          startActivity(intent);
+          try {
+            startActivity(intent);
+          } catch (Exception exception) {
+            except[0] = exception;
+          }
         }
 
         @Override
@@ -490,10 +495,14 @@ public class AndroidFacade extends RpcReceiver {
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
+      if(except[0]!=null) {
+        throw except[0];
+      }
     }
   }
 
   public void doStartActivity(final Intent intent, Boolean wait,int flags) throws Exception {
+    Exception[] except = new Exception[1];
     if (wait == null || !wait) {
       startActivity(intent);
     } else {
@@ -504,7 +513,11 @@ public class AndroidFacade extends RpcReceiver {
         public void onCreate() {
           super.onCreate();
           intent.setFlags(intent.getFlags() | intentFlags);
-          startActivity(intent);
+          try {
+            startActivity(intent);
+          } catch (Exception exception) {
+            except[0]=exception;
+          }
         }
 
         @Override
@@ -527,6 +540,9 @@ public class AndroidFacade extends RpcReceiver {
         task.getResult();
       } catch (Exception e) {
         throw new RuntimeException(e);
+      }
+      if(except[0]!=null) {
+        throw except[0];
       }
     }
   }
@@ -577,10 +593,10 @@ public class AndroidFacade extends RpcReceiver {
           @RpcParameter(name = "flags", description = "Intent flags") @RpcOptional Integer flags)
           throws JSONException {
     Intent intent = buildIntent(action, uri, type, extras, packagename, classname, categories);
-    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    if (flags != null) {
-      intent.setFlags(flags);
+    if (flags == null) {
+      flags = intentFlags;
     }
+    intent.setFlags(flags);
     return intent;
   }
 

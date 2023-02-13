@@ -114,7 +114,10 @@ public class ScriptExec {
             new AlertDialog.Builder(context, R.style.MyDialog)
                     .setTitle(R.string.notice)
                     .setMessage(R.string.project_main_error)
-                    .setPositiveButton(R.string.close, (dialog1, which) ->  dialog1.dismiss())
+                    .setPositiveButton(R.string.close, (dialog1, which) ->  {})
+                    .setNegativeButton(R.string.script,((dialog1, which) -> {
+                        playScript(context,project,args,notify);
+                    }))
                     .create()
                     .show();
         }

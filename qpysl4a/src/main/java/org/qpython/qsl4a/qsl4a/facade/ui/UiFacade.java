@@ -33,7 +33,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.qpython.qsl4a.QSL4APP;
 import org.qpython.qsl4a.R;
-import org.qpython.qsl4a.qsl4a.FutureActivityTaskExecutor;
+import org.qpython.qsl4a.qsl4a.future.FutureActivityTaskExecutor;
 import org.qpython.qsl4a.qsl4a.facade.EventFacade;
 import org.qpython.qsl4a.qsl4a.facade.FacadeManager;
 import org.qpython.qsl4a.qsl4a.interpreter.html.HtmlActivityTask;

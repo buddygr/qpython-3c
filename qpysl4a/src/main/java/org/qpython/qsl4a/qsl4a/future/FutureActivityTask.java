@@ -17,9 +17,8 @@
 package org.qpython.qsl4a.qsl4a.future;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
@@ -27,56 +26,63 @@ import android.view.Menu;
 import android.view.View;
 import android.view.Window;
 
-import org.qpython.qsl4a.R;
-
 /**
- * Encapsulates an {@link Activity} and a {@link FutureObject}.
+ * Encapsulates an {@link Activity} and a {#link FutureObject}.
  * 
  * @author Damon Kohler (damonkohler@gmail.com)
+ *
+ * 乘着船  修改  2022
  */
 public abstract class FutureActivityTask<T> {
 
-	final private String TAG = "FutureActivityTask";
+	//final private String TAG = "FutureActivityTask";
 	private final FutureResult<T> mResult = new FutureResult<T>();
 	private Activity mActivity;
 
-	public void setActivity(Activity activity) {
-		mActivity = activity;
+    public void setActivity(Activity activity) {
+      mActivity = activity;
 	}
 
 	public Activity getActivity() {
-		return mActivity;
+      return mActivity;
 	}
 
+	public void setTaskDescription(String title){
+      mActivity.setTaskDescription(new ActivityManager.TaskDescription(title));
+    }
+
+     public void setTaskDescription(int title){
+      setTaskDescription(mActivity.getString(title));
+   }
+
 	public void onCreate() {
-		Log.d(TAG, "onCreate");
-		mActivity.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-		//mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
-        mActivity.setContentView(R.layout.activity_run_splash);
+		//Log.d(TAG, "onCreate");
+        mActivity.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        //mActivity.setContentView(R.layout.activity_run_splash);
 	}
 
   public void onStart() {
-		Log.d(TAG, "onStart");
+		//Log.d(TAG, "onStart");
 
   }
 
   public void onResume() {
-		Log.d(TAG, "onResume");
+		//Log.d(TAG, "onResume");
 
   }
 
   public void onPause() {
-		Log.d(TAG, "onPause");
+		//Log.d(TAG, "onPause");
 
   }
 
   public void onStop() {
-		Log.d(TAG, "onStop");
+		//Log.d(TAG, "onStop");
 
   }
 
   public void onDestroy() {
-		Log.d(TAG, "onDestroy");
+		//Log.d(TAG, "onDestroy");
 
   }
 
@@ -104,12 +110,22 @@ public abstract class FutureActivityTask<T> {
     mActivity.finish();
   }
 
-  public void startActivity(Intent intent) {
-    mActivity.startActivity(intent);
+  public void startActivity(Intent intent) throws Exception{
+      try {
+        mActivity.startActivity(intent);
+      } catch (Exception e){
+        mActivity.finish();
+        throw e;
+      }
   }
 
-  public void startActivityForResult(Intent intent, int requestCode) {
-    mActivity.startActivityForResult(intent, requestCode);
+  public void startActivityForResult(Intent intent, int requestCode) throws Exception{
+      try {
+        mActivity.startActivityForResult(intent, requestCode);
+      } catch (Exception e) {
+        mActivity.finish();
+        throw e;
+      }
   }
 
   public boolean onKeyDown(int keyCode, KeyEvent event) {

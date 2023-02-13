@@ -72,9 +72,9 @@ public class USBHostSerialFacade extends RpcReceiver {
   private static final String DEFAULT_HASHCODE = "";
 
   private Map<String, UsbSerialConnection> connections = new HashMap<String, UsbSerialConnection>();
-  private AndroidFacade mAndroidFacade;
-  private Service mService;
-  private UsbManager mUsbManager;
+  private final AndroidFacade mAndroidFacade;
+  private final Service mService;
+  private final UsbManager mUsbManager;
   private USBHostSerialReceiver mReceiver;
 
   // USB

@@ -38,11 +38,11 @@ import org.qpython.qpy.main.app.App;
 import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.main.event.Bean;
 import org.qpython.qpy.main.utils.Utils;
+import org.qpython.qpy.texteditor.EditorActivity;
 import org.qpython.qpysdk.utils.FileHelper;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.Objects;
 
 
 /**
@@ -79,15 +79,15 @@ public class QWebViewActivity extends BaseActivity {
             Log.d(TAG, "BroadcastReceiver:"+act);
 
             switch (act != null ? act : "") {
-                case "pipconsole": {
+                /*case "pipconsole": {
                     String[] args = {getApplicationContext().getFilesDir() + "/bin/pip_console.py", getApplicationContext().getFilesDir().toString()};
                     ScriptExec.getInstance().execPyInConsole((Activity) context, args);
 
                     break;
-                }
+                }*/
                 case "pipinstall": {
                     String src = intent.getExtras().getString(QWebViewActivity.SRC);
-                    String[] args = {getApplicationContext().getFilesDir() + "/bin/pip"+ (NAction.isQPy3(getApplicationContext())?"3":""), "install", url, "-i", src, getApplicationContext().getFilesDir().toString()};
+                    String[] args = {getApplicationContext().getFilesDir() + "/bin/pip", "install", url, "-i", src, getApplicationContext().getFilesDir().toString()};
                     ScriptExec.getInstance().execPyInConsole((Activity) context, args);
                     break;
                 }
@@ -281,13 +281,23 @@ public class QWebViewActivity extends BaseActivity {
             if (i.getData() != null) {
                 url = i.getDataString();
                 Log.d(TAG, "accessUrl:"+url);
-
             } else {
-                url = i.getStringExtra(URL) == null ?
-                        i.getStringExtra(Intent.EXTRA_TEXT) == null ?
-                                "file:///android_asset/html/index.html"
-                                : i.getStringExtra(Intent.EXTRA_TEXT)
-                        : i.getStringExtra(URL);
+                if(i.getStringExtra(URL) != null)
+                    url = i.getStringExtra(URL);
+                else if(i.getStringExtra(Intent.EXTRA_TEXT) != null){
+                    url = i.getStringExtra(Intent.EXTRA_TEXT);
+                    if(url.indexOf("http")!=0) {
+                        EditorActivity.start(this, url);
+                        finish();
+                    }
+                } else {
+                    url = "file:///android_asset/html/index.html";
+                    if(Objects.equals(i.getAction(), Intent.ACTION_SEND)){
+                        i.setClass(getApplicationContext(),EditorActivity.class);
+                        startActivity(i);
+                        finish();
+                    }
+                }
             }
 
             loadurl(binding.wv, url);
@@ -299,7 +309,6 @@ public class QWebViewActivity extends BaseActivity {
             if (i.getData() != null) {
                 url = i.getDataString();
                 Log.d(TAG, "accessUrl:"+url);
-
             }
 
             loadurl(binding.wv, url);

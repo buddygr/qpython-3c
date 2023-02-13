@@ -31,6 +31,7 @@ import org.qpython.qpy.console.ScriptExec;
 import org.qpython.qpy.databinding.LayoutEditorBinding;
 import org.qpython.qpy.databinding.SearchTopBinding;
 import org.qpython.qpy.main.activity.QWebViewActivity;
+import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.main.widget.Indent;
 import org.qpython.qpy.main.widget.ShortcutLayout;
 import org.qpython.qpy.texteditor.common.Constants;
@@ -53,19 +54,15 @@ import static android.content.Context.MODE_PRIVATE;
 
 /**
  * @author River
- * @modify 乘着船 2022
+ * @modify 乘着船 2022 - 2023
  */
 
 public class TedFragment extends Fragment implements Constants, TextWatcher, Indent {
     public static final String TAG                = "TED";
     public static final int    LOGIN_REQUEST_CODE = 5106;
-    public static final int    OPEN_REQUEST_CODE  = 5233;
+    public static final int    OPEN_REQUEST_CODE  = 5233;//
 
-
-    private static final String Apache_License  = "Apache_License";
-    private static final String The_MIT_License = "The_MIT_License";
-
-    final int DOC_FLAG = 10001;
+    //final int DOC_FLAG = 10001;
 
     protected boolean mInUndo;
     protected boolean mDoNotBackup;
@@ -76,6 +73,8 @@ public class TedFragment extends Fragment implements Constants, TextWatcher, Ind
     private LayoutEditorBinding binding;
     private SearchTopBinding    searchTopBinding;
     private ShortcutLayout      shortcutLayout;
+
+    private String path = CONF.SCOPE_STORAGE_PATH + "/snippets3/";
 
     public static TedFragment newInstance(String content) {
         TedFragment myFragment = new TedFragment();
@@ -320,11 +319,7 @@ public class TedFragment extends Fragment implements Constants, TextWatcher, Ind
      * Create a list of snippet
      */
     public void SnippetsList() {
-        //boolean isQpy3 = NAction.isQPy3(getContext());
         List<String> listItems = new ArrayList<>();
-        String baseDir = Environment.getExternalStorageDirectory().getAbsolutePath()
-                + "/" + QPyConstants.BASE_PATH;
-        String path = baseDir + /*(isQpy3 ? */"/snippets3/"/* : "/snippets/")*/;
         String filename;
         File folder = new File(path);
         if (folder.exists()) {
@@ -358,10 +353,6 @@ public class TedFragment extends Fragment implements Constants, TextWatcher, Ind
      * @param snippetName Apache_License/The_MIT_License/WEB_PROJECT/CONSOLE_PROJECT/KIVY_PROJECT
      */
     public void insertSnippet(String snippetName) throws IOException {
-       // boolean isQPy3 = NAction.isQPy3(getContext());
-        String baseDir = Environment.getExternalStorageDirectory().getAbsolutePath()
-                + "/" + QPyConstants.BASE_PATH;
-        String path = baseDir + /*(isQPy3 ?*/ "/snippets3/"/* : "/snippets/")*/;
         String s;
         s = readFile(path + snippetName);
         /*

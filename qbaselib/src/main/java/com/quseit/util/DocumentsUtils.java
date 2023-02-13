@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.provider.DocumentsContract;
 import android.support.v4.provider.DocumentFile;
 import android.util.Log;
 

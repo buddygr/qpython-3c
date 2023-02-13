@@ -44,11 +44,11 @@ public class AndroidProxy {
    *          indicates whether RPC security protocol should be enabled.
    */
   public AndroidProxy(Service service, Intent intent, boolean requiresHandshake) {
-    if (requiresHandshake) {
+    //if (requiresHandshake) {
       mSecret = UUID.randomUUID();
-    } else {
-      mSecret = null;
-    }
+   // } else {
+      //mSecret = null;
+    //}
     mFacadeManagerFactory =
         new FacadeManagerFactory(FacadeConfiguration.getSdkLevel(), service, intent,
             FacadeConfiguration.getFacadeClasses());
@@ -84,9 +84,9 @@ public class AndroidProxy {
   }
 
   public String getSecret() {
-    if (mSecret == null) {
+    /*if (mSecret == null) {
       return null;
-    }
+    }*/
     return mSecret.toString();
   }
 

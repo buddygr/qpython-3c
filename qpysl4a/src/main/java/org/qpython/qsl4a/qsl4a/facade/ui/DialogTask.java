@@ -16,8 +16,11 @@
 
 package org.qpython.qsl4a.qsl4a.facade.ui;
 
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Dialog;
 
+import org.qpython.qsl4a.R;
 import org.qpython.qsl4a.qsl4a.facade.EventFacade;
 import org.qpython.qsl4a.qsl4a.future.FutureActivityTask;
 
@@ -27,6 +30,12 @@ abstract class DialogTask extends FutureActivityTask<Object> {
 
   protected Dialog mDialog;
   private EventFacade mEventFacade;
+
+  @Override
+  public void onCreate(){
+    super.onCreate();
+    setTaskDescription(R.string.dialog_activity);
+  }
 
   public EventFacade getEventFacade() {
     return mEventFacade;
@@ -55,7 +64,7 @@ abstract class DialogTask extends FutureActivityTask<Object> {
   }
 
   /**
-   * Dismiss the {@link Dialog} and close {@link Sl4aActivity}.
+   * Dismiss the {@link Dialog} and close {#link Sl4aActivity}.
    */
   public void dismissDialog() {
     if (mDialog != null) {

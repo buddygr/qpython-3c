@@ -624,7 +624,7 @@ public class NUtil {
      * @param context
      * @return
      */
-    public static int getVersinoCode(Context context){
+    public static int getVersionCode(Context context){
         int intVersioinCode=0;
         try {
             PackageInfo info = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);

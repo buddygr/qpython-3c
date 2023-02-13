@@ -64,7 +64,7 @@ public class Service extends CacheKey {
         List<LibModel> libList = getObject(new TypeToken<ArrayList<LibModel>>() {
         }.getType(), LIB);
         if (libList == null || forceRefresh) {
-            toSubscribe(NAction.isQPy3(App.getContext()) ? request.getLibs3() : request.getLibs(), subscriber);
+            toSubscribe(NAction.isQPy3() ? request.getLibs3() : request.getLibs(), subscriber);
             try {
                 ACache.get(App.getContext()).put(CacheKey.LIB_LAST_REFRESH, DateTimeHelper.getDate());
             } catch (Exception exception) {

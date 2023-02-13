@@ -456,7 +456,7 @@
     <string name="click_ball">单击或长按小圆球</string>
     <string name="send_control_key">发送Control键</string>
     <string name="send_fn_key">发送Fn键</string>
-    <string name="project_main_error">项目的main.py不存在</string>
+    <string name="project_main_error">项目的main.py不存在。\n您可以选择按脚本模式执行。</string>
     <string name="screen_record">录屏</string>
     <string name="click_force_open">单击强制打开</string>
     <string name="browser_console">QPython浏览器终端</string>
@@ -481,7 +481,7 @@
     <string name="float_view_permission">需要悬浮窗权限。</string>
     <string name="lang_flag">zh</string>
     <string name="lang_env">zh_CN</string>
-    <string name="qsl4a_future">QSL4A未来小程序</string>
+    <string name="qsl4a_future">QSL4A守护小程序</string>
     <string name="shortcut_permission">建议到系统设置里，手动打开创建快捷方式权限和通知权限。</string>
     <string name="open_source_protocol">开源协议</string>
     <string name="main_window">QPython 主窗口</string>
@@ -531,4 +531,6 @@
     <string name="optimize_1">移除assert和__debug__依赖声明</string>
     <string name="optimize_2">在等级1的改变基础上，同时丢弃文档字符串</string -->
     <string name="edit_to_new_path">您可以将其编辑为新路径。</string>
+    <string name="app_name">QPython 3C</string>
+    <string name="qpypi_up">扩展</string>
 </resources>

@@ -17,13 +17,9 @@
 
 package org.qpython.qsl4a.qsl4a.facade.ui;
 
-import android.R;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.graphics.Bitmap;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.RequiresApi;
@@ -41,6 +37,7 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
 import org.json.JSONArray;
+import org.qpython.qsl4a.R;
 import org.qpython.qsl4a.qsl4a.facade.EventFacade;
 import org.qpython.qsl4a.qsl4a.future.FutureActivityTask;
 import org.xmlpull.v1.XmlPullParser;
@@ -81,7 +78,7 @@ public class FullScreenTask extends FutureActivityTask<Object> implements OnClic
 
   @Override
   public void onCreate() {
-    // super.onCreate();
+    //super.onCreate();
     final Activity activity = getActivity();
     if (mHandler == null) {
       mHandler = new Handler();
@@ -97,14 +94,16 @@ public class FullScreenTask extends FutureActivityTask<Object> implements OnClic
       String E = e.toString();
       mInflater.getErrors().add(E);
       mView = defaultView(E);
-      mInflater.setIdList(R.id.class);
+      mInflater.setIdList(android.R.id.class);
     }
     //activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
     activity.setTheme(mTheme);
     activity.setContentView(mView);
     activity.setTitle(mTitle);
-    if (!mTitle.equals(""))
-      activity.setTaskDescription(new ActivityManager.TaskDescription(mTitle));
+    if(mTitle.equals(""))
+      setTaskDescription(R.string.future_activity);
+    else
+      setTaskDescription(mTitle);
     mInflater.setClickListener(mView, this, this, this);
     mShowLatch.countDown();
   }

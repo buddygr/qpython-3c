@@ -38,6 +38,7 @@ import org.qpython.qpy.utils.FileUtils;
 import org.qpython.qpysdk.QPyConstants;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -56,7 +57,15 @@ public class ExplorerFragment extends Fragment {
     private static final String STORAGE_FOLDER = "/storage";
     private static final String MNT_FOLDER = "/mnt";
     //private static final String EMULATED_FOLDER = STORAGE_FOLDER + "/emulated";
-    private static final String SDCARD = "/sdcard";
+    private static final String SDCARD;
+    static {
+        String curPath = "/sdcard";
+        try {
+            curPath = (new File(curPath)).getCanonicalPath();
+        } catch (Exception ignored) {}
+        SDCARD = curPath;
+    }
+
     private static String ANDROID_DATA;
     private static String TOP_FOLDER;
     private static final String EXT_PATH = Environment.getExternalStorageDirectory().toString();

@@ -26,16 +26,12 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
 
-import org.qpython.qsl4a.qsl4a.activity.FutureActivity;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
-import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
-import org.qpython.qsl4a.qsl4a.rpc.RpcDeprecated;
 import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
 import org.qpython.qsl4a.qsl4a.rpc.RpcStartEvent;
 import org.qpython.qsl4a.qsl4a.rpc.RpcStopEvent;

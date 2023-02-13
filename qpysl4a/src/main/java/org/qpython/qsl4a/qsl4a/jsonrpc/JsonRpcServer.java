@@ -76,14 +76,14 @@ public class JsonRpcServer extends SimpleServer {
       String method = request.getString("method");
       JSONArray params = request.getJSONArray("params");
 
-      // First RPC must be _authenticate //if a handshake was specified.
+      // First RPC must be _authenticate , a handshake was specified.
       if (unpass) {
         if (method.equals("_authenticate") && mHandshake.equals(params.getString(0))) {
           unpass = false;
           send(writer, JsonRpcResult.result(id, true));
           continue;
         } else {
-          SecurityException exception = new SecurityException("Authentication failed!");
+          SecurityException exception = new SecurityException("Authentication Failed !");
           send(writer, JsonRpcResult.error(id, exception));
           shutdown();
           throw exception;

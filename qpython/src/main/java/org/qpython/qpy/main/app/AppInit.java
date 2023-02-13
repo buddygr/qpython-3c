@@ -3,7 +3,7 @@ package org.qpython.qpy.main.app;
 import android.content.Context;
 import android.util.Log;
 
-import org.qpython.qpy.BuildConfig;
+//import org.qpython.qpy.BuildConfig;
 import org.qpython.qpy.codeshare.ShareCodeUtil;
 //import com.hipipal.qpyplus.wxapi.WXAPIManager;
 

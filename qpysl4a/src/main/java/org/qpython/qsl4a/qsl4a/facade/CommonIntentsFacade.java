@@ -148,6 +148,26 @@ public class CommonIntentsFacade extends RpcReceiver {
     mAndroidFacade.startActivity(Intent.ACTION_VIEW, uri, type, extras, wait, null, null);
   }
 
+    @Rpc(description = "Start activity with send action by URI (i.e. browser, contacts, etc.).")
+    public void send(
+            @RpcParameter(name = "uri") String uri,
+            @RpcParameter(name = "type", description = "MIME type/subtype of the URI") @RpcOptional String type,
+            @RpcParameter(name = "extras", description = "a Map of extras to add to the Intent") @RpcOptional JSONObject extras,
+            @RpcParameter(name = "wait") @RpcDefault ("true") @RpcOptional Boolean wait)
+            throws Exception {
+        mAndroidFacade.startActivity(Intent.ACTION_SEND, uri, type, extras, wait, null, null);
+    }
+
+    @Rpc(description = "Start activity with send action by text .")
+    public void sendText(
+            @RpcParameter(name = "text") String text,
+            @RpcParameter(name = "wait") @RpcDefault ("true") @RpcOptional Boolean wait)
+            throws Exception {
+        JSONObject extras = new JSONObject();
+        extras.put(Intent.EXTRA_TEXT, text);
+        mAndroidFacade.startActivity(Intent.ACTION_SEND, null, "text/plain", extras, wait, null, null);
+    }
+
     @Rpc(description = "Convert normal path to content:// or file:// .")
     public String pathToUri(
             @RpcParameter(name = "path") String path) {
@@ -193,18 +213,24 @@ public class CommonIntentsFacade extends RpcReceiver {
            //   uri = Uri.fromFile(file);
           //}
           intent.setDataAndType(uri, type);
-          try {
-              mAndroidFacade.doStartActivity(intent,wait,Intent.FLAG_ACTIVITY_NEW_TASK);
-          } catch (Exception e) {
-              e.printStackTrace();
-    }
+          mAndroidFacade.doStartActivity(intent,wait,Intent.FLAG_ACTIVITY_NEW_TASK);
   }
 
   @Rpc(description = "Opens a map search for query (e.g. pizza, 123 My Street).")
   public void viewMap(@RpcParameter(name = "query, e.g. pizza, 123 My Street") String query,
-                      @RpcParameter(name = "wait") @RpcOptional Boolean wait)
+                      @RpcParameter(name = "wait") @RpcOptional @RpcDefault("true") Boolean wait)
       throws Exception {
-    view("geo:0,0?q=" + query, null, null, wait);
+      if(query == null)
+          query = "";
+      String[] tmp = query.split(",",1);
+      try{
+          for(byte i = 0;i < 2;i++)
+              Double.parseDouble(tmp[i]);
+          }
+      catch (Exception ignored){
+          query = "0,0?q=" + query;
+      }
+    view("geo:" + query, null, null, wait);
   }
 
   @Rpc(description = "Opens the list of contacts.")
@@ -238,9 +264,10 @@ public class CommonIntentsFacade extends RpcReceiver {
         }
         intent.setClassName(context,"org.qpython.qpy.main.activity.QWebViewActivity");
         intent.setDataAndType(uri, "text/html");
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT|Intent.FLAG_ACTIVITY_MULTIPLE_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+        int flag = Intent.FLAG_ACTIVITY_NEW_DOCUMENT|Intent.FLAG_ACTIVITY_MULTIPLE_TASK|Intent.FLAG_ACTIVITY_NEW_TASK;
+        intent.setFlags(flag);
         intent.putExtra("title",title);
-        mAndroidFacade.doStartActivity(intent,wait,Intent.FLAG_ACTIVITY_NEW_TASK);
+        mAndroidFacade.doStartActivity(intent,wait,flag);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)

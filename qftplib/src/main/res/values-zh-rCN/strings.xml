@@ -18,7 +18,6 @@
 </string>
 <string name="advancedsettings_label">高级设置...</string>
 <string name="portnumber_label">端口号</string>
-<string name="portnumber_default">2121</string>
 <string name="chroot_label">停留在文件夹中</string>
 <string name="chroot_default">/</string>
 <string name="acceptwifi_label">接受来自 WiFi 连接</string>

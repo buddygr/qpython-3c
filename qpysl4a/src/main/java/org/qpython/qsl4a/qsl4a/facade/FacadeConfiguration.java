@@ -93,6 +93,7 @@ public class FacadeConfiguration {
       sFacadeClassList.add(DocumentFileFacade.class);
       sFacadeClassList.add(HarmonyOsFacade.class);
       sFacadeClassList.add(UiConfig.class);
+      sFacadeClassList.add(FtpFacade.class);
 
     for (Class<? extends RpcReceiver> recieverClass : sFacadeClassList) {
       for (MethodDescriptor rpcMethod : MethodDescriptor.collectFrom(recieverClass)) {

@@ -46,19 +46,19 @@ public class App extends QSL4APP {
     private static DefaultDownloader downloader;
 
     //保存user信息
-    private static SharedPreferences      mPreferences;
+    //private static SharedPreferences      mPreferences;
 
     private static Retrofit.Builder retrofitBuilder;
 
     private static Service mService;//本地retrofit方法
 
-    public static OkHttpClient getOkHttpClient() {
+    /*public static OkHttpClient getOkHttpClient() {
         return okHttpClient;
     }
 
     public static HttpLoggingInterceptor getInterceptor() {
         return interceptor;
-    }
+    }*/
 
     public static Gson getGson() {
         return gson;
@@ -72,13 +72,13 @@ public class App extends QSL4APP {
         return mService;
     }
 
-    public static String getScriptPath() {
+    /*public static String getScriptPath() {
         return sScriptPath;
     }
 
     public static String getProjectPath() {
         return sProjectPath;
-    }
+    }*/
 
     public static Context getContext() {
         return sContext;
@@ -180,7 +180,7 @@ public class App extends QSL4APP {
         sScriptPath = String.format("%s/%s", basePath, "scripts");
 
         initLayoutDir();
-        mPreferences = this.getSharedPreferences("user", 0);
+        //mPreferences = this.getSharedPreferences("user", 0);
         CrashHandler.getInstance().init(this);
         AppInit.init(this);
 

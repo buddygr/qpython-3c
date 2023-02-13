@@ -33,7 +33,6 @@ import org.qpython.qpy.databinding.ActivityMainBinding;
 import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.main.auxActivity.ProtectActivity;
 import org.qpython.qpy.main.auxActivity.ScreenRecordActivity;
-import org.qpython.qpy.main.fragment.SettingFragment;
 import org.qpython.qpy.main.utils.Bus;
 import org.qpython.qpy.texteditor.EditorActivity;
 import org.qpython.qpy.texteditor.TedLocalActivity;

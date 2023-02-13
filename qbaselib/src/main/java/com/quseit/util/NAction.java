@@ -347,7 +347,7 @@ public class NAction {
 
 		}
 		return "uid="+NAction.getUID(context)+"&token="+NAction.getToken(context)+"&userno="+NAction.getUserNoId(context)+"&lang="+NUtil.getLang()+
-				"&ver="+NUtil.getVersinoCode(context)+"&code="+NAction.getCode(context)+"&sdk="+sdk+"&appid="+context.getPackageName();
+				"&ver="+NUtil.getVersionCode(context)+"&code="+NAction.getCode(context)+"&sdk="+sdk+"&appid="+context.getPackageName();
 	}
 
 	// ftp
@@ -384,18 +384,8 @@ public class NAction {
 	}
 
 
-	public static boolean isQPy3(Context context) {
+	public static boolean isQPy3() {
 		return true;
-		/*String code = NAction.getCode(context);
-		if (code.contains("qpy3")) {
-			return true;
-		}
-
-		if (NAction.getQPyInterpreter(context).startsWith("3.")) {
-			return true;
-		} else {
-			return false;
-		}*/
 	}
 
 	public static boolean isQPyInterpreterSet(Context context) {
@@ -403,12 +393,13 @@ public class NAction {
 		return !qpyInterVal.equals("");
 	}
 	public static String getQPyInterpreter(Context context) {
-		String qpyInterVal = NStorage.getSP(context, "conf.default_qpy_interpreter");
+		return "3.x";
+		/*String qpyInterVal = NStorage.getSP(context, "conf.default_qpy_interpreter");
         if (!qpyInterVal.startsWith("3.")) {
         	qpyInterVal = "2.x";
         }
 
-        return qpyInterVal;
+        return qpyInterVal;*/
 	}
 
 	public static void setQPyInterpreter(Context context, String qpyInterVal) {

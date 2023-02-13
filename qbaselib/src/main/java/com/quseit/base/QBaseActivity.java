@@ -203,7 +203,7 @@ public abstract class QBaseActivity extends Activity {
 					pq.deleteAllStat_0_Log();
 					// }
 
-					int localVersion = NUtil.getVersinoCode(context);
+					int localVersion = NUtil.getVersionCode(context);
 
 					try {
 						List<String> ks = Utils.copyIterator(result.keys());

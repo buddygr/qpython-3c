@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
 
+import org.swiftp.Defaults;
 import org.swiftp.FTPServerService;
 import org.swiftp.Globals;
 import org.swiftp.R;
@@ -151,7 +152,7 @@ public class ServerPreferenceFragment extends PreferenceFragment implements
 
         EditTextPreference portnum_pref = (EditTextPreference) findPreference("portNum");
         portnum_pref.setSummary(settings.getString("portNum",
-                resources.getString(R.string.portnumber_default)));
+                getString(R.string.portnumber_default)));
         portnum_pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {

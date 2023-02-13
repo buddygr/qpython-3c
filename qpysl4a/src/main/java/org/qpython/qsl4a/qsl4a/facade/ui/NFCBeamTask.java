@@ -55,7 +55,7 @@ import android.view.KeyEvent;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import org.qpython.qsl4a.qsl4a.activity.FutureActivity;
+import org.qpython.qsl4a.qsl4a.future.FutureActivity;
 
 /**
  * Wrapper class for progress dialog running in separate thread

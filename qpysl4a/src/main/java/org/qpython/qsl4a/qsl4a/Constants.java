@@ -28,7 +28,7 @@ public interface Constants {
       "com.googlecode.android_scripting.action.ACTION_LAUNCH_SCRIPT_FOR_RESULT";
   public static final String ACTION_LAUNCH_INTERPRETER =
       "com.googlecode.android_scripting.action.LAUNCH_INTERPRETER";
-  public static final String ACTION_EDIT_SCRIPT =
+  /*public static final String ACTION_EDIT_SCRIPT =
       "com.googlecode.android_scripting.action.EDIT_SCRIPT";
   public static final String ACTION_SAVE_SCRIPT =
       "com.googlecode.android_scripting.action.SAVE_SCRIPT";
@@ -44,7 +44,7 @@ public interface Constants {
   public static final String ACTION_ACTIVITY_RESULT =
       "com.googlecode.android_scripting.action.ACTIVITY_RESULT";
   public static final String ACTION_LAUNCH_SERVER =
-      "com.googlecode.android_scripting.action.LAUNCH_SERVER";
+      "com.googlecode.android_scripting.action.LAUNCH_SERVER";*/
 
   public static final String EXTRA_RESULT = "SCRIPT_RESULT";
   public static final String EXTRA_SCRIPT_PATH =
@@ -54,7 +54,7 @@ public interface Constants {
   public static final String EXTRA_INTERPRETER_NAME =
       "com.googlecode.android_scripting.extra.INTERPRETER_NAME";
 
-  public static final String EXTRA_USE_EXTERNAL_IP =
+  /*public static final String EXTRA_USE_EXTERNAL_IP =
       "com.googlecode.android_scripting.extra.USE_PUBLIC_IP";
   public static final String EXTRA_USE_SERVICE_PORT =
       "com.googlecode.android_scripting.extra.USE_SERVICE_PORT";
@@ -75,7 +75,9 @@ public interface Constants {
       "com.googlecode.android_scripting.extra.EXTRA_TRIGGER_ID";
   public static final String EXTRA_LAUNCH_IN_BACKGROUND =
       "com.googlecode.android_scripting.extra.EXTRA_LAUNCH_IN_BACKGROUND";
-  public static final String EXTRA_TASK_ID = "com.googlecode.android_scripting.extra.EXTRA_TASK_ID";
+  public static final String EXTRA_TASK_ID = "com.googlecode.android_scripting.extra.EXTRA_TASK_ID";*/
+  String EXTRA_TASK_ID = "QSL4A_TASK_ID";
+  String EXTRA_TASK_TITLE = "QSL4A_TASK_TITLE";
 
   // BluetoothDeviceManager
   public static final String EXTRA_DEVICE_ADDRESS =
@@ -96,6 +98,6 @@ public interface Constants {
 
   // Preference Keys
 
-  public static final String FORCE_BROWSER = "helpForceBrowser";
-  public final static String HIDE_NOTIFY = "hideServiceNotifications";
+  /*public static final String FORCE_BROWSER = "helpForceBrowser";
+  public final static String HIDE_NOTIFY = "hideServiceNotifications";*/
 }

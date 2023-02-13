@@ -10,6 +10,7 @@ import static org.qpython.qpy.texteditor.androidlib.data.FileUtils.renameItem;
 import static org.qpython.qpy.texteditor.common.Constants.ACTION_WIDGET_OPEN;
 import static org.qpython.qpy.texteditor.common.Constants.EXTRA_FORCE_READ_ONLY;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -46,6 +47,7 @@ import com.quseit.util.NStorage;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONException;
 import org.qpython.qpy.R;
 import org.qpython.qpy.console.ScriptExec;
 import org.qpython.qpy.databinding.DrawerEditorBinding;
@@ -63,6 +65,7 @@ import org.qpython.qpy.texteditor.widget.crouton.Crouton;
 import org.qpython.qpy.texteditor.widget.crouton.Style;
 import org.qpython.qpysdk.QPyConstants;
 import org.qpython.qpysdk.utils.Utils;
+import org.qpython.qsl4a.qsl4a.jsonrpc.JsonBuilder;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -96,7 +99,7 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
     private static final String PROJECT_ACTION = "project";
 
     private static final String EXTRA_PROJECT_PATH = "project_path";
-    private static final String EXTRA_TEXT         = "EXTRA_TEXT";
+    private static final String EXTRA_TEXT         = Intent.EXTRA_TEXT;
     public static final  String EXTRA_TITLE        = "EXTRA_TITLE";
 
     protected String mCurrentFilePath;
@@ -213,10 +216,33 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
     }
 
     private void initView() {
+        Intent intent = getIntent();
         setSupportActionBar(binding.lt.toolbar);
         binding.lt.toolbar.setNavigationIcon(R.drawable.ic_back);
 
-        switch (getIntent().getAction() == null ? DEFAULT_ACTION : getIntent().getAction()) {
+        String action = intent.getAction();
+        Uri uri = intent.getData();
+        if(action == null)
+            action = DEFAULT_ACTION;
+        else if(action.equals(QR_CODE_ACTION)){
+            mCurrentFileName = intent.getStringExtra(EXTRA_TITLE);
+            action = TEXT_ACTION;
+        } else if(action.equals(Intent.ACTION_SEND)){
+            if(uri == null) {
+                if(intent.getStringExtra(EXTRA_TEXT)==null) {
+                    mCurrentFileName = "Intent";
+                    try {
+                        action = JsonBuilder.build(intent).toString();
+                    } catch (JSONException e) {
+                        action = e.toString();
+                    }
+                    intent.putExtra(EXTRA_TEXT, action);
+                }
+                action = TEXT_ACTION;
+            } else
+                action = Intent.ACTION_VIEW;
+        }
+        switch (action) {
             case DEFAULT_ACTION:
                 textFragment = TedFragment.newInstance(openLastFile());
                 if (!projPath.isEmpty()) {
@@ -228,21 +254,21 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
                 }
                 break;
             case TEXT_ACTION:
-                textFragment = TedFragment.newInstance(getIntent().getStringExtra(EXTRA_TEXT));
+                textFragment = TedFragment.newInstance(intent.getStringExtra(EXTRA_TEXT));
                 binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                 mDirty = true;
                 break;
-            case QR_CODE_ACTION:
-                textFragment = TedFragment.newInstance(getIntent().getStringExtra(EXTRA_TEXT));
+            /*case QR_CODE_ACTION:
+                textFragment = TedFragment.newInstance(intent.getStringExtra(EXTRA_TEXT));
                 binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-                mCurrentFileName = getIntent().getStringExtra(EXTRA_TITLE);
+                mCurrentFileName = intent.getStringExtra(EXTRA_TITLE);
                 mDirty = true;
-                break;
+                break;*/
             case FILE_ACTION:
                 try {
-                    String uri = getIntent().getDataString();
+                    //uri = intent.getData();
                     if (uri != null) {
-                        File file = new File(new URI(uri));
+                        File file = new File(uri.getPath());
                         textFragment = TedFragment.newInstance(doOpenFile(file, false));
                         binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                     } else {
@@ -250,11 +276,11 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
 
                         return;
                     }
-                } catch (URISyntaxException ignore) {
+                } catch (Exception ignore) {
                 }
                 break;
             case PROJECT_ACTION:
-                projPath = getIntent().getStringExtra(EXTRA_PROJECT_PATH);
+                projPath = intent.getStringExtra(EXTRA_PROJECT_PATH);
                 fileTreeAdapter = new EditorFileTreeAdapter(projPath);
                 binding.leftDrawer.setLayoutManager(new LinearLayoutManager(this));
                 binding.leftDrawer.setAdapter(fileTreeAdapter);
@@ -263,7 +289,7 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
             case Intent.ACTION_EDIT:
                 if (textFragment == null) textFragment = TedFragment.newInstance("");
                 binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-                Uri uri = getIntent().getData();
+                //uri = intent.getData();
                 if (uri == null) {
                     doDefaultAction();
                 } else if ("file".equals(uri.getScheme())) {
@@ -277,8 +303,8 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
                 if (textFragment == null) textFragment = TedFragment.newInstance("");
                 try {
                     binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-                    File file = new File(new URI(getIntent().getData().toString()));
-                    doOpenFile(file, getIntent().getBooleanExtra(EXTRA_FORCE_READ_ONLY, false));
+                    File file = new File(new URI(intent.getData().toString()));
+                    doOpenFile(file, intent.getBooleanExtra(EXTRA_FORCE_READ_ONLY, false));
                 } catch (URISyntaxException e) {
                     Crouton.showText(this, R.string.toast_intent_invalid_uri, Style.ALERT);
                     return;
@@ -324,6 +350,7 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
     }
 
 
+    @SuppressLint("Range")
     private void openFromOther(Uri uri) {
         Cursor returnCursor =
                 getContentResolver().query(uri, null, null, null, null);
@@ -880,7 +907,6 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
     }
 
     protected void newScript() {
-        final boolean isQpy3 = NAction.isQPy3(getApplicationContext());
 
         new EnterDialog(this)
                 .setTitle(getString(R.string.new_script))

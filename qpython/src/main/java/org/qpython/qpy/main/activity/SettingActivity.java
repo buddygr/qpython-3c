@@ -9,11 +9,17 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
 
 import org.qpython.qpy.R;
 import org.qpython.qpy.main.fragment.SettingFragment;
 import org.qpython.qpy.main.service.FTPServerService;
+import org.qpython.qsl4a.qsl4a.facade.FtpFacade;
 import org.swiftp.Globals;
+
+import java.net.InetAddress;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class SettingActivity extends AppCompatActivity {
@@ -27,14 +33,37 @@ public class SettingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_setting);
         fragment = new SettingFragment();
         getFragmentManager().beginTransaction()
                 .replace(R.id.setting_fragment, fragment)
                 .commit();
-        Globals.setContext(getApplicationContext());
+        //Globals.setContext(getApplicationContext());
+        setContentView(R.layout.activity_setting);
+        checkAction();
         init();
         //Thread.setDefaultUncaughtExceptionHandler((t, e) -> SettingActivity.restartApp(SettingActivity.this));
+    }
+
+    private void checkAction(){
+        String action = getIntent().getAction();
+        if(action!=null) {
+            //setTheme(android.R.style.Theme_NoDisplay);
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    Intent intent = new Intent();
+                    if (action.equals(FTPServerService.ACTION_STARTED)) {
+                        fragment.startServer();
+                        intent.putExtra("path",FtpFacade.ftpGet());
+                        setResult(RESULT_OK,intent);
+                    } else if (action.equals(FTPServerService.ACTION_STOPPED)) {
+                        fragment.stopServer();
+                        setResult(RESULT_OK,null);
+                    }
+                    SettingActivity.this.finish();
+                }
+            }, 500);
+        };
     }
 
     public static void restartApp(Context context) {

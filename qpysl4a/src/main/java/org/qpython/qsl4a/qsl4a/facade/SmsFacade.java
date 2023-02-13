@@ -27,7 +27,7 @@ import android.support.v4.content.ContextCompat;
 import android.telephony.gsm.SmsManager;
 
 import org.qpython.qsl4a.QSL4APP;
-import org.qpython.qsl4a.qsl4a.FutureActivityTaskExecutor;
+import org.qpython.qsl4a.qsl4a.future.FutureActivityTaskExecutor;
 import org.qpython.qsl4a.qsl4a.LogUtil;
 import org.qpython.qsl4a.qsl4a.facade.ui.AlertDialogTask;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;

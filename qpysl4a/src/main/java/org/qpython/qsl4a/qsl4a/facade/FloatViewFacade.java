@@ -1,11 +1,14 @@
 package org.qpython.qsl4a.qsl4a.facade;
 
+import android.app.AlertDialog;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
 import android.view.WindowManager;
 import android.widget.Button;
 
@@ -17,6 +20,7 @@ import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
 import org.qpython.qsl4a.qsl4a.rpc.RpcOptional;
 import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class FloatViewFacade extends RpcReceiver {
@@ -28,16 +32,6 @@ public class FloatViewFacade extends RpcReceiver {
   private final String protectActivity = "org.qpython.qpy.main.auxActivity.ProtectActivity";
   private final Context context;
 
-  private final String[] argName = new String[] {
-          "x","y","width","height","textSize", //Integer型(可以设为上次)
-          "index", //Integer型(索引，不可设为上次)
-          "text","html", //字符型(二选一)
-          "backColor","textColor", //字符型(二选一)
-          "clickRemove", //布尔型
-          "flag", //Integer型(索引，不可设为上次)
-          "script","arg" //字符型(无前则无后)
-  };
-
   //按钮数组
   public static final ArrayList<Button> buttons = new ArrayList<>();
   //参数数组
@@ -48,6 +42,7 @@ public class FloatViewFacade extends RpcReceiver {
   public static final ArrayList<String> operations = new ArrayList<>();
   //窗口管理器
   public static WindowManager windowManager;
+  //操作句柄
   public static Handler handler;
 
   public FloatViewFacade(FacadeManager manager) {
@@ -65,68 +60,32 @@ public class FloatViewFacade extends RpcReceiver {
     if (args == null) {
       args = new JSONObject();
     }
-    Intent intent = new Intent();
-    intent.setClassName(mService.getPackageName(),floatViewActivity);
-    String ArgName;
-    int index = -1;
-    for(byte i=0;i<5;i++) {
-      ArgName = argName[i];
-      try {
-        intent.putExtra(ArgName, args.getInt(ArgName));
-        continue;
-      } catch (Exception ignored) {}
-      try {
-        if(args.getString(ArgName).equalsIgnoreCase("last")){
-          intent.putExtra(ArgName,Integer.MIN_VALUE);
-        }
-      } catch (Exception ignored) {}
-    }
-    ArgName = argName[5];
+    int index;
     try {
-      index = args.getInt(ArgName);
-      intent.putExtra(ArgName, index);
-    } catch (Exception ignored) {}
-    for(byte i=6;i<8;i++) {
-      ArgName = argName[i];
-      try {
-        intent.putExtra(ArgName, args.getString(ArgName));
-        break;
-      } catch (Exception ignored) {}
-    }
-    for(byte i=8;i<10;i++) {
-      ArgName = argName[i];
-      try {
-        intent.putExtra(ArgName, args.getString(ArgName));
-      } catch (Exception ignored) {}
-    }
-    ArgName = argName[10];
-    try {
-      intent.putExtra(ArgName, args.getBoolean(ArgName));
-    } catch (Exception ignored) {}
-    ArgName = argName[11];
-    try {
-      intent.putExtra(ArgName, args.getInt(ArgName));
-    } catch (Exception ignored) {}
-    for(byte i=12;i<14;i++) {
-      ArgName = argName[i];
-      try {
-        intent.putExtra(ArgName, args.getString(ArgName));
-      } catch (Exception e) {
-        break;
+      index = args.getInt("index");
+      if(index < 0 || index > buttons.size()){
+        index = buttons.size();
+        args.put("index",index);
       }
+    } catch (Exception e){
+      index = buttons.size();
+      args.put("index",index);
     }
-    //intent.setFlags(Intent.FLAG_FROM_BACKGROUND | Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
-    intent.setAction(Intent.ACTION_VIEW);
     if(handler == null) {
+      Intent intent = new Intent();
+      intent.setClassName(mService.getPackageName(),floatViewActivity);
+      intent.setAction(Intent.ACTION_VIEW);
+      intent.putExtra("args",args.toString());
       mAndroidFacade.startActivity(intent);
     } else {
       Message msg = new Message();
-      msg.obj = intent;
+      msg.obj = args;
       handler.sendMessage(msg);
     }
-    if(index >= 0 && index < buttons.size())
+    if(index >= buttons.size())
+      return buttons.size() + 1;
+    else
       return buttons.size();
-    else return buttons.size() + 1;
     }
 
   @Rpc(description = "Return Float View Result.")

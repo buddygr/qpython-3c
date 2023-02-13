@@ -87,6 +87,20 @@ public class PreferencesFacade extends RpcReceiver {
     return getPref(filename).getAll();
   }
 
+  @Rpc(description = "Remove a value from shared preferences")
+  public void prefRemoveValue(
+          @RpcParameter(name = "key") String key,
+          @RpcParameter(name = "filename", description = "Desired preferences file. If not defined, uses the default Shared Preferences.") @RpcOptional String filename) {
+    SharedPreferences p;
+    if (filename == null || filename.equals("")) {
+      //throw new IOException("Can't write to default preferences.");
+      p = PreferenceManager.getDefaultSharedPreferences(context);
+    } else p = getPref(filename);
+    Editor e = p.edit();
+    e.remove(key);
+    e.apply();
+  }
+
   private SharedPreferences getPref(String filename) {
     if (filename == null || filename.equals("")) {
       return PreferenceManager.getDefaultSharedPreferences(mService);

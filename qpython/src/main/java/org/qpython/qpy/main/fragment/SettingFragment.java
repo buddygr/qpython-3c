@@ -15,6 +15,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.os.PowerManager;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
@@ -32,8 +34,10 @@ import android.widget.Toast;
 import com.quseit.util.NAction;
 import com.quseit.util.NStorage;
 
+import org.json.JSONObject;
 import org.qpython.qpy.R;
 import org.qpython.qpy.main.activity.HomeMainActivity;
+import org.qpython.qpy.main.activity.SettingActivity;
 import org.qpython.qpy.main.app.App;
 import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.main.auxActivity.ProtectActivity;
@@ -43,8 +47,10 @@ import org.qpython.qpy.texteditor.ui.view.EnterDialog;
 import org.qpython.qpysdk.QPySDK;
 import org.qpython.qpysdk.utils.Utils;
 import org.qpython.qsl4a.QPyScriptService;
+import org.qpython.qsl4a.qsl4a.facade.FtpFacade;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 
 public class SettingFragment extends PreferenceFragment {
@@ -75,7 +81,7 @@ public class SettingFragment extends PreferenceFragment {
     }
 
     private SwitchPreference log, app;
-    private BroadcastReceiver ftpServerReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver ftpServerReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.v(TAG, "FTPServerService action received: " + intent.getAction());
@@ -537,7 +543,11 @@ public class SettingFragment extends PreferenceFragment {
                             return true;
                         }
                         File chrootTest = new File(name);
-                        if (!chrootTest.isDirectory() || !chrootTest.canRead()) {
+                        try {
+                            if (!(chrootTest.isDirectory() && chrootTest.canRead()))
+                                throw new Exception("Invalid Path");
+                            name = chrootTest.getCanonicalPath();
+                        } catch (Exception e) {
                             Toast.makeText(getActivity(), R.string.dir_not_valid, Toast.LENGTH_SHORT).show();
                             return false;
                         }
@@ -568,11 +578,15 @@ public class SettingFragment extends PreferenceFragment {
                             return true;
                         }
                         File customTest = new File(name);
-                        if (!(customTest.isDirectory() && customTest.canRead())) {
+                        try {
+                            if (!(customTest.isDirectory() && customTest.canRead()))
+                                throw new Exception("Invalid Path");
+                            name = customTest.getCanonicalPath();
+                        } catch (Exception e) {
                             Toast.makeText(getActivity(), R.string.dir_not_valid, Toast.LENGTH_SHORT).show();
                             return false;
                         }
-                        CONF.CUSTOM_PATH = customTest.getAbsolutePath();
+                        CONF.CUSTOM_PATH = name;
                         preference.setSummary(CONF.CUSTOM_PATH);
                         updatePreference(preference);
                         return true;
@@ -707,7 +721,7 @@ public class SettingFragment extends PreferenceFragment {
         System.exit(0);
     }
 
-    private void startServer() {
+    public void startServer() {
         Context context = getActivity();
         Intent serverService = new Intent(context, FTPServerService.class);
         if (!FTPServerService.isRunning()) {
@@ -716,7 +730,7 @@ public class SettingFragment extends PreferenceFragment {
         }
     }
 
-    private void stopServer() {
+    public void stopServer() {
         Context context = getActivity();
         Intent serverService = new Intent(context, FTPServerService.class);
         context.stopService(serverService);

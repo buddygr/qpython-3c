@@ -18,6 +18,7 @@ package org.qpython.qsl4a.qsl4a;
 
 import android.app.Application;
 
+import org.qpython.qsl4a.qsl4a.future.FutureActivityTaskExecutor;
 import org.qpython.qsl4a.qsl4a.interpreter.InterpreterConfiguration;
 import org.qpython.qsl4a.qsl4a.trigger.TriggerRepository;
 

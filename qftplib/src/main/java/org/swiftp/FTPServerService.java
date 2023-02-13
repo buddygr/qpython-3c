@@ -138,7 +138,10 @@ public abstract class FTPServerService extends Service implements Runnable {
                 for (NetworkInterface intf : Collections.list(NetworkInterface.getNetworkInterfaces())) {
                     if (intf.getName().equals("wlan0")){
                         for (InetAddress addr : Collections.list(intf.getInetAddresses())) {
-                            if (!addr.isLoopbackAddress() && addr.getHostAddress().contains(".")){
+                            String hostAddr = addr.getHostAddress();
+                            if(hostAddr == null)
+                                continue;
+                            if (!addr.isLoopbackAddress() && hostAddr.contains(".")){
                                 ip = addr;
                                 break;
                             }

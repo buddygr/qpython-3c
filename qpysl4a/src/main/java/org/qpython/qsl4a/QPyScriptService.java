@@ -115,7 +115,7 @@ public class QPyScriptService extends Service {
             SPFUtils.setSP(getApplicationContext(), "sl4a.port", "" + mProxy.getAddress().getPort());
             SPFUtils.setSP(getApplicationContext(), "sl4a.secue", mProxy.getSecret());
 
-            Log.d(TAG, "startMyMain:" + mProxy.getAddress().getHostName() + ":" + mProxy.getAddress().getPort() + ":" + mProxy.getSecret());
+            //Log.d(TAG, "startMyMain:" + mProxy.getAddress().getHostName() + ":" + mProxy.getAddress().getPort() + ":" + mProxy.getSecret());
             mLatch.countDown();
         } catch (Exception ignored) {
 

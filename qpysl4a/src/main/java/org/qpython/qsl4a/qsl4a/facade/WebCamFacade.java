@@ -49,7 +49,7 @@ import android.view.SurfaceHolder.Callback;
 
 import org.json.JSONArray;
 import org.qpython.qsl4a.QSL4APP;
-import org.qpython.qsl4a.qsl4a.FutureActivityTaskExecutor;
+import org.qpython.qsl4a.qsl4a.future.FutureActivityTaskExecutor;
 import org.qpython.qsl4a.qsl4a.LogUtil;
 import org.qpython.qsl4a.qsl4a.SingleThreadExecutor;
 import org.qpython.qsl4a.qsl4a.SimpleServer.SimpleServerObserver;

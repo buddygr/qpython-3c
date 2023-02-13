@@ -32,7 +32,7 @@ public class Defaults {
 	protected static String settingsName = "SwiFTP";
 	//protected static String username = "user";
 	//protected static String password = "";
-	protected static int portNumber = 2121;
+    protected static int portNumber = 0;//2121;
 //	protected static int ipRetrievalAttempts = 5;
 	public static final int tcpConnectionBacklog = 5;
 	public static final String chrootDir = "/";

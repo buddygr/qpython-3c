@@ -5,4 +5,7 @@
     <string name="float_view_not_exist">Float View Index Not Exist .</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="daemon_activity">QSL4A DaemonActivity</string>
+    <string name="dialog_activity">QSL4A DialogActivity</string>
+    <string name="future_activity">QSL4A FutureActivity</string>
 </resources>

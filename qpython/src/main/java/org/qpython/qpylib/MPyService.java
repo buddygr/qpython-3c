@@ -74,11 +74,11 @@ public class MPyService extends Service {
 
                         } else {
                             // Compatibility Mode
-                            if (pycode != null && pycode.contains("#qpy:console\n") || NAction.isQPy3(getApplicationContext())) {
+                            //if (pycode != null && pycode.contains("#qpy:console\n") || NAction.isQPy3(getApplicationContext())) {
                                 runMode = 3;
-                            } else {
-                                runMode = 1;
-                            }
+                            //} else {
+                            //  runMode = 1;
+                            //}
                             String script = CONF.SCOPE_STORAGE_PATH + "/cache/last.py";
                             FileHelper.putFileContents(this, script, pycode);
                             ScriptExec.getInstance().playScript(MPyService.this, script, null, false);

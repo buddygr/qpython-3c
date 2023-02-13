@@ -56,8 +56,9 @@ In order to benefit those guys who have the same issue with QPython, we suggest 
 
 ### Chinese QPythonista Community
 
-- [在segmentfault提问 - Chinese](https://segmentfault.com/t/qpython)
-- [在贴吧讨论 - Chinese](https://tieba.baidu.com/f?ie=utf-8&kw=qpython)
+- 在QQ群讨论 : 540717901
+- [在segmentfault提问](https://segmentfault.com/t/qpython)
+- [在贴吧讨论](https://tieba.baidu.com/f?ie=utf-8&kw=qpython)
 
 ### Report issues
 
