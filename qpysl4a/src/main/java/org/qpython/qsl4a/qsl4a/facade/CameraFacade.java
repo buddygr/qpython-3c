@@ -63,14 +63,13 @@ import java.util.concurrent.CountDownLatch;
 public class CameraFacade extends RpcReceiver {
 
   private final Service mService;
-  private Parameters mParameters;
 
   private final String sdcard;
   private final AndroidFacade mAndroidFacade;
   private final Context context;
   private final String qpyProvider;
 
-  private class BooleanResult {
+  private static class BooleanResult {
     boolean mmResult = false;
   }
 

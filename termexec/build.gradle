@@ -16,12 +16,9 @@ repositories {
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.minSdkVersion
-        versionCode 1
-        versionName "1.0"
         ndk {
             abiFilters 'armeabi-v7a',"arm64-v8a"
 

@@ -17,6 +17,7 @@
 package org.qpython.qsl4a.qsl4a.facade;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
@@ -224,6 +225,7 @@ public class MediaRecorderFacade extends RpcReceiver {
   }
 
   //乘着船 添加
+  @SuppressLint("Range")
   @Rpc(description = "Record Audio with system soundrecorder .")
   public String recordAudio(
   ) throws Exception {

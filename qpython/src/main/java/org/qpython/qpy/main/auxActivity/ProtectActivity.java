@@ -7,12 +7,12 @@ import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
 import org.qpython.qpy.R;
+import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.main.utils.Utils;
 
 import java.util.Objects;
@@ -22,6 +22,7 @@ public class ProtectActivity extends Activity
         private static WindowManager windowManager;
         @SuppressLint("StaticFieldLeak")
         private static Button floatButton;
+
         public static void DoProtect(Context context){
             context.startActivity(new Intent(context, ProtectActivity.class)); //启动保护
         }
@@ -33,7 +34,7 @@ public class ProtectActivity extends Activity
             }
         }
         public static void CheckProtect(Context context){
-            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("qpython_protect",false))
+            if (CONF.PREF.getBoolean("qpython_protect",false))
                 DoProtect(context);
             else UndoProtect();
         }

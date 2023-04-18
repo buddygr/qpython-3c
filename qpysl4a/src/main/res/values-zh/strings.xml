@@ -5,7 +5,15 @@
     <string name="float_view_not_exist">悬浮窗索引不存在。</string>
     <string name="ok">确认</string>
     <string name="cancel">取消</string>
-    <string name="daemon_activity">QSL4A守护小程序</string>
+    <string name="daemon">守护</string>
+    <string name="activity">小程序</string>
     <string name="dialog_activity">QSL4A对话小程序</string>
     <string name="future_activity">QSL4A未来小程序</string>
+    <string name="share">分享</string>
+    <string name="video">视频</string>
+    <string name="browser">浏览器</string>
+    <string name="launch">启动</string>
+    <string name="open">打开</string>
+    <string name="normal">一般</string>
+    <string name="click_daemon">点击多任务列表的“守护+数字”解锁进程</string>
 </resources>

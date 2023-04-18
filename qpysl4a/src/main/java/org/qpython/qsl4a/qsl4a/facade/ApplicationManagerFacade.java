@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 
 
+import org.qpython.qsl4a.R;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
 import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
@@ -112,7 +113,7 @@ public class ApplicationManagerFacade extends RpcReceiver {
       }
       intent.setClassName(packagename, classname);
     }
-    mAndroidFacade.doStartActivity(intent,wait);
+    mAndroidFacade.doStartActivity(intent,wait, R.string.launch);
   }
 
   @Rpc(description = "Returns a list of packages running activities or services.", returns = "List of packages running activities.")

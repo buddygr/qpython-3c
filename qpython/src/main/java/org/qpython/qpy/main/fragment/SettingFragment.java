@@ -24,6 +24,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
@@ -48,10 +49,13 @@ import org.qpython.qpysdk.QPySDK;
 import org.qpython.qpysdk.utils.Utils;
 import org.qpython.qsl4a.QPyScriptService;
 import org.qpython.qsl4a.qsl4a.facade.FtpFacade;
+import org.swiftp.Globals;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class SettingFragment extends PreferenceFragment {
     private static final String TAG = "SettingFragment";
@@ -61,20 +65,6 @@ public class SettingFragment extends PreferenceFragment {
     private Preference        mPassWordPref, username_pref, portnum_pref, chroot_pref, lastlog, ipaddress, qpyCustom;//, pyOptimize;
     private CheckBoxPreference sl4a, running_state, root, display_pwd, qpy_protect, screen_on;//, notebook_run;
     private PowerManager.WakeLock wakeLock;
-    /* private PreferenceScreen py_inter,notebook_page;
-    private Preference py3,py2, notebook_res, py2compatible
-    private Preference update_qpy3,update_qpy2compatible;
-
-    private static String[] PY_OPTIMIZE_LIST;
-    private String[] PY_OPTIMIZE(){
-        if (PY_OPTIMIZE_LIST==null)
-        PY_OPTIMIZE_LIST = new String[]{
-            "0 - " + getString(R.string.none),
-            "1 - " + getString(R.string.optimize_1),
-            "2 - " + getString(R.string.optimize_2)
-        };
-        return PY_OPTIMIZE_LIST;
-    }*/
 
     private void viewWebSite(int resId) {
         startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(getString(resId))));
@@ -118,7 +108,7 @@ public class SettingFragment extends PreferenceFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.qpython_setting);
-        settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        settings = CONF.PREF;
         resources = getResources();
         initSettings();
         initListener();
@@ -143,15 +133,24 @@ public class SettingFragment extends PreferenceFragment {
     }
 
     private boolean showIpAddress(){
-        InetAddress ip;
+        if(Globals.getContext()==null) {
+            Globals.setContext(getActivity());
+            FTPServerService.loadPort(getActivity());
+        }
+        ArrayList<String> ip;
         try {
             ip = FTPServerService.getWifiAndApIp();
         } catch (NullPointerException e) {
             ip = null;
-
         }
         if (ip!=null) {
-            ipaddress.setSummary(ip.getHostAddress());
+            StringBuilder iptext = new StringBuilder();
+            for(String addr:ip){
+                if(iptext.length()>0)
+                    iptext.append(", ");
+                iptext.append(addr);
+            }
+            ipaddress.setSummary(ip.toString());
             return true;
         } else {
             ipaddress.setSummary(R.string.ip_address_need_wifi_or_ap);
@@ -248,16 +247,20 @@ public class SettingFragment extends PreferenceFragment {
     }
 
     private void setFtpAddress() {
-        InetAddress address = FTPServerService.getWifiAndApIp();
+        String[] address = FTPServerService.getIpPortString();
         if (address == null) {
             Log.v(TAG, "Unable to retreive wifi ip address");
             running_state.setSummary(org.swiftp.R.string.cant_get_url);
             Toast.makeText(getActivity(),"FTP: "+getString(R.string.ip_address_need_wifi_or_ap),Toast.LENGTH_LONG).show();
         } else {
-            String iptext = "ftp://" + address.getHostAddress() + ":"
-                    + FTPServerService.getPort() + "/";
+            StringBuilder iptext = new StringBuilder();
+            for(String ip:address){
+                if(iptext.length()>0)
+                    iptext.append(", ");
+                iptext.append(ip);
+            }
             String summary = getString(R.string.running_summary_started,
-                    iptext);
+                    Arrays.toString(address));
             running_state.setSummary(summary);
         }
     }

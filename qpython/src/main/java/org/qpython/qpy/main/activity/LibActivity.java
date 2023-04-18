@@ -126,7 +126,7 @@ public class LibActivity extends AppCompatActivity {
             public void onTabSelected(TabLayout.Tab tab) {
                 binding.vp.setCurrentItem(tab.getPosition());
                 position = tab.getPosition();
-                QPyExtFragment.viewPage(LibActivity.this,position);
+                QPyExtFragment.viewPage(position);
             }
 
             @Override

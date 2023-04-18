@@ -1,5 +1,7 @@
 package org.qpython.qpy.main.app;
 
+import android.content.SharedPreferences;
+
 import org.qpython.qpysdk.QPyConstants;
 
 public class CONF implements QPyConstants {
@@ -42,5 +44,7 @@ public class CONF implements QPyConstants {
             return new String[]{CONF.SCOPE_STORAGE_PATH, QPyConstants.LEGACY_PATH};
         else return new String[]{CONF.SCOPE_STORAGE_PATH, QPyConstants.LEGACY_PATH, CONF.CUSTOM_PATH};
     }
+
+    public static SharedPreferences PREF;
 
 }

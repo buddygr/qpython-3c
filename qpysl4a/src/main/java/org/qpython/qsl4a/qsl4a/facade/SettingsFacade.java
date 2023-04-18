@@ -16,8 +16,11 @@
 
 package org.qpython.qsl4a.qsl4a.facade;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.app.KeyguardManager;
 import android.app.NotificationManager;
 import android.app.Service;
 
@@ -357,65 +360,16 @@ public class SettingsFacade extends RpcReceiver {
     return SystemClock.elapsedRealtimeNanos();
   }
 
-  /*@Rpc(description = "get total Rx bytes")
-  public Map<String,Long> getTotalRxBytes(){
-    if(unTrafficSupport())
-      return null;
-    Map<String,Long> map = new HashMap<>();
-    map.put("bytes",TrafficStats.getTotalRxBytes());
-    map.put("time",SystemClock.elapsedRealtime());
-    return map;
+  @RequiresApi(api = Build.VERSION_CODES.M)
+  @Rpc(description = "Show Screen Lock .")
+  public Boolean showScreenLock() {
+    KeyguardManager mKeyguardMgr = context.getSystemService(KeyguardManager.class);
+    Intent intent = mKeyguardMgr.createConfirmDeviceCredentialIntent(null,null);
+    if (intent != null) {
+      intent = mAndroidFacade.startActivityForResultCode(intent);
+      return intent.getIntExtra("RESULT_CODE", -1023) == RESULT_OK;
+    } else return null;
   }
-
-  @Rpc(description = "get total Tx bytes")
-  public Map<String,Long> getTotalTxBytes(){
-    if(unTrafficSupport())
-      return null;
-    Map<String,Long> map = new HashMap<>();
-    map.put("bytes",TrafficStats.getTotalTxBytes());
-    map.put("time",SystemClock.elapsedRealtime());
-    return map;
-  }
-
-  @Rpc(description = "get mobile Rx bytes")
-  public Map<String,Long> getMobileRxBytes(){
-    if(unTrafficSupport())
-      return null;
-    Map<String,Long> map = new HashMap<>();
-    map.put("bytes",TrafficStats.getMobileRxBytes());
-    map.put("time",SystemClock.elapsedRealtime());
-    return map;
-  }
-
-  @Rpc(description = "get mobile Tx bytes")
-  public Map<String,Long> getMobileTxBytes(){
-    if(unTrafficSupport())
-      return null;
-    Map<String,Long> map = new HashMap<>();
-    map.put("bytes",TrafficStats.getMobileTxBytes());
-    map.put("time",SystemClock.elapsedRealtime());
-    return map;
-  }
-
-  @Rpc(description = "get qpython Rx bytes")
-  public Map<String,Long> getQPyRxBytes(){
-    if(unTrafficSupport())
-      return null;
-    Map<String,Long> map = new HashMap<>();
-    map.put("bytes",TrafficStats.getUidRxBytes(qpython_uid));
-    map.put("time",SystemClock.elapsedRealtime());
-    return map;
-  }
-
-  @Rpc(description = "get qpython Tx bytes")
-  public Map<String,Long> getQPyTxBytes(){
-    if(unTrafficSupport())
-      return null;
-    Map<String,Long> map = new HashMap<>();
-    map.put("bytes",TrafficStats.getUidTxBytes(qpython_uid));
-    map.put("time",SystemClock.elapsedRealtime());
-    return map;
-  }*/
 
   @Rpc(description = "Get transmit/receive traffic statistics since startup .")
   public Map<String,Long> getTrafficStats(

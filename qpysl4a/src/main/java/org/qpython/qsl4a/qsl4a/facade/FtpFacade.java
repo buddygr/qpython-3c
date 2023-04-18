@@ -33,8 +33,6 @@ import org.swiftp.FTPServerService;
 import org.swiftp.Globals;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
 
 public class FtpFacade extends RpcReceiver {
 
@@ -55,8 +53,9 @@ public class FtpFacade extends RpcReceiver {
   }
 
   @Rpc(description = "FTP Start Service .")
-  public String ftpStart() throws Exception {
-    return sendMessage(FTPServerService.ACTION_STARTED).getStringExtra("path");
+  public String[] ftpStart() throws Exception {
+    sendMessage(FTPServerService.ACTION_STARTED);
+    return ftpGet();
   }
 
   @Rpc(description = "FTP Stop Service .")
@@ -64,11 +63,11 @@ public class FtpFacade extends RpcReceiver {
     sendMessage(FTPServerService.ACTION_STOPPED);
   }
 
-  private Intent sendMessage(String action) throws Exception {
+  private void sendMessage(String action) throws Exception {
     Intent intent = new Intent();
     intent.setClassName(context.getPackageName(),SettingActivity);
     intent.setAction(action);
-    return mAndroidFacade.startActivityForResult(intent);
+    mAndroidFacade.startActivityForResult(intent);
   }
 
   @Rpc(description = "FTP Server is Running .")
@@ -77,24 +76,14 @@ public class FtpFacade extends RpcReceiver {
   }
 
   @Rpc(description = "FTP Server get IP address .")
-  public static String ftpGet() {
-    InetAddress addr = FTPServerService.getWifiAndApIp();
-    String hostAddr;
-    int port;
+  public static String[] ftpGet() {
+    int port = FTPServerService.getPort();
+    if(port == 0)
+      FTPServerService.loadPort(context);
+    String[] addr = FTPServerService.getIpPortString();
     if(addr == null)
-      hostAddr = "0.0.0.0";
-    else
-      hostAddr = addr.getHostAddress();
-    port = FTPServerService.getPort();
-    if(port == 0) {
-      String portS = preference.getString(context.getString(org.swiftp.R.string.key_port_num),"");
-      if (!portS.equals("")) {
-        port = Integer.valueOf(portS);
-      } else {
-        port =org.swiftp.Defaults.getPortNumber();
-      }
-    }
-    return "ftp://" + hostAddr + ":" + port + "/";
+      addr = new String[]{"ftp://0.0.0.0:"+port+"/"};
+    return addr;
   }
 
   @Rpc(description = "FTP Server set port,username,password .")

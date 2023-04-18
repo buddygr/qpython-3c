@@ -113,7 +113,7 @@ public abstract class QBaseActivity extends Activity {
 
 	// //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	protected void checkUpdate(final Context context, final boolean auto) {
+	/*protected void checkUpdate(final Context context, final boolean auto) {
 		String upVer = NAction.getExtP(this, "conf_update_ver");
 
 		if (upVer.equals(""))
@@ -155,7 +155,7 @@ public abstract class QBaseActivity extends Activity {
 
 			// Log.d(TAG, "up logs:"+logs);
 
-			/* 手机客户信息 */
+			/ * 手机客户信息 * /
 			String collectInfos = NAction.getExtP(context, "conf_get_log_cls");
 			if (collectInfos.equals("")) {
 				collectInfos = BASE_CONF.COLLECT_INFO;
@@ -284,9 +284,8 @@ public abstract class QBaseActivity extends Activity {
 
 				}
 			});
-		}
-	}
 
+		}*/
 
 	protected void alertUpdateDialog2(String desc) {
 		try {

@@ -124,9 +124,7 @@ public class ScriptExec {
     }
 
     public String[] getPyEnv(Context context, String path, String term, String pyPath) {
-        //boolean isQPy3 =  NAction.isQPy3(context);
-        //SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String pyVer = CONF.pyVer;//QPyConstants.py3Ver;
+        String pyVer = CONF.pyVer;
         File filesDir = context.getFilesDir();
         File externalStorage = new File(CONF.SCOPE_STORAGE_PATH);
         File externalLegacyStorage = new File(QPyConstants.LEGACY_PATH);

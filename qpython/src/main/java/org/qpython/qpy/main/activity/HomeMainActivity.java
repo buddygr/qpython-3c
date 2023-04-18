@@ -1,6 +1,6 @@
 package org.qpython.qpy.main.activity;
 
-//Edit by 乘着船 2022
+//Edit by 乘着船 2022 - 2023
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -10,18 +10,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.text.Spanned;
 import android.widget.Toast;
 
 import com.quseit.util.FileHelper;
-import com.quseit.util.NAction;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
@@ -33,16 +29,16 @@ import org.qpython.qpy.databinding.ActivityMainBinding;
 import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.main.auxActivity.ProtectActivity;
 import org.qpython.qpy.main.auxActivity.ScreenRecordActivity;
+import org.qpython.qpy.main.fragment.QPyExtFragment;
 import org.qpython.qpy.main.utils.Bus;
 import org.qpython.qpy.texteditor.EditorActivity;
 import org.qpython.qpy.texteditor.TedLocalActivity;
-import org.qpython.qpysdk.QPySDK;
 import org.qpython.qsl4a.QPyScriptService;
 import org.qpython.qsl4a.qsl4a.facade.AndroidFacade;
+import org.qpython.qsl4a.qsl4a.facade.CommonIntentsFacade;
 import org.qpython.qsl4a.qsl4a.facade.QPyInterfaceFacade;
 import org.qpython.qsl4a.qsl4a.util.HtmlUtil;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -50,9 +46,7 @@ import java.util.TimerTask;
 
 public class HomeMainActivity extends BaseActivity {
 
-    private QPySDK qpysdk;
     private ActivityMainBinding binding;
-    private static SharedPreferences PREF;
 
     private static String CONSOLE_SETTING = "HomeMainActivity_ConsoleMenu";
     private static Spanned[] consoleItem;
@@ -67,7 +61,6 @@ public class HomeMainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        PREF = PreferenceManager.getDefaultSharedPreferences(this);
         setHandler();
         setConsoleMenu();
         startMain();
@@ -79,36 +72,12 @@ public class HomeMainActivity extends BaseActivity {
         initListener();
         startPyService();
         Bus.getDefault().register(this);
-        openQpySDK();
+        QPyExtFragment.openQpySDK(this);
         setTaskDescription(new ActivityManager.TaskDescription(getString(R.string.aux_window)));
         ProtectActivity.CheckProtect(this);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    public void getPyVer(boolean once) {
-        if (CONF.pyVer.startsWith("py")) return;
-        if (qpysdk==null)
-            qpysdk = new QPySDK(HomeMainActivity.this, HomeMainActivity.this);
-        if(once && qpysdk.needUpdateRes())
-        {
-            initQPy();
-            qpysdk = null;
-            return;
-        }
-        String[] pyVer;
-        try {
-            pyVer = qpysdk.getPyVer();
-            CONF.pyVerComplete = pyVer[1];
-            CONF.pyVer = pyVer[0];
-            //可以消除终端中文输入的某些bug，虽然不知道为什么
-            if (once) startShell("init.sh");
-            else runShortcut(getIntent());
-        }
-        catch (Exception e){
-            if (once) initQPy();
-        }
-        qpysdk = null;
-    }
+
 
     @Override
     protected void onResume() {
@@ -122,7 +91,7 @@ public class HomeMainActivity extends BaseActivity {
         runShortcut(intent);
     }
 
-    private void startShell(String name){
+    public void startShell(String name){
         TermActivity.startShell(this,name);
     }
 
@@ -233,7 +202,7 @@ public class HomeMainActivity extends BaseActivity {
 
     private void handleNotification(Bundle bundle) {
         if (bundle == null) return;
-        if (!bundle.getBoolean("force") && !PREF.getBoolean(getString(R.string.key_hide_push), true)) {
+    if (!bundle.getBoolean("force") && !CONF.PREF.getBoolean(getString(R.string.key_hide_push), true)) {
             return;
         }
         String type = bundle.getString("type", "");
@@ -254,7 +223,7 @@ public class HomeMainActivity extends BaseActivity {
     }
 
     private void handleNotification() {
-        if (!PREF.getBoolean(getString(R.string.key_hide_push), true)) {
+        if (!CONF.PREF.getBoolean(getString(R.string.key_hide_push), true)) {
             return;
         }
         SharedPreferences sharedPreferences = getSharedPreferences(CONF.NOTIFICATION_SP_NAME, MODE_PRIVATE);
@@ -295,96 +264,7 @@ public class HomeMainActivity extends BaseActivity {
         startService(intent);
     }
 
-    private void openQpySDK() {
-        //Log.d("HomeMainActivity", "openQpySDK");
 
-        String[] permssions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-
-        if (PREF.getString("security_tip","").equals(getString(R.string.security_version)))
-        {
-            QpySdkAgree(permssions);
-        } else {
-            if (qpysdk==null)
-                qpysdk = new QPySDK(HomeMainActivity.this, HomeMainActivity.this);
-            File filesDir = HomeMainActivity.this.getFilesDir();
-            qpysdk.extractRes("resource", filesDir,true);
-            CONF.pyVer = "-1";
-            String content = FileHelper.getFileContents(filesDir+"/text/"+getString(R.string.lang_flag)+"/security_tip");
-            new AlertDialog.Builder(HomeMainActivity.this, R.style.MyDialog)
-                    .setTitle(R.string.notice)
-                    .setMessage(content)
-                    .setPositiveButton(R.string.agree, (dialog1, which) -> {
-                        PREF.edit().putString("security_tip",getString(R.string.security_version)).apply();
-                        QpySdkAgree(permssions);
-                    })
-                    .setNegativeButton(R.string.disagree, (dialog1, which) -> finish())
-                    .setOnCancelListener(dialog1 -> finish())
-                    .create()
-                    .show();
-        }
-    }
-
-    private void QpySdkAgree(String[] permssions){
-        checkPermissionDo(permssions, new BaseActivity.PermissionAction() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            @Override
-            public void onGrant() {
-                //这里只执行一次做为初始化
-                CONF.CUSTOM_PATH = PREF.getString(getString(R.string.qpy_custom_dir_key),CONF.LEGACY_PATH);
-
-                if ( NAction.isQPyInterpreterSet(HomeMainActivity.this) ) {
-                    getPyVer(true);
-                } else {
-                    NAction.setQPyInterpreter(HomeMainActivity.this, "3.x");
-                    initQPy();
-                }
-            }
-
-            @Override
-            public void onDeny() {
-                Toast.makeText(HomeMainActivity.this,  getString(R.string.grant_storage_hint), Toast.LENGTH_SHORT).show();
-            }
-
-        });
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    private void initQPy(){
-        /*if (qpysdk==null)
-            qpysdk = new QPySDK(HomeMainActivity.this, HomeMainActivity.this);*/
-        //new Thread(() -> {
-            File filesDir = HomeMainActivity.this.getFilesDir();
-        if (!CONF.pyVer.equals("-1"))
-            qpysdk.extractRes("resource", filesDir,true);
-        /*try {
-            FileUtils.chmod(new File(this.getFilesDir()+"/bin/qpython.sh"),0777);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
-        //}).start();
-        //Toast.makeText(this,getString(R.string.extract_resource),Toast.LENGTH_LONG).show();
-        //NAction.startInstalledAppDetailsActivity(this);
-        new AlertDialog.Builder(HomeMainActivity.this, R.style.MyDialog)
-                .setTitle(R.string.notice)
-                .setMessage(
-                        getString(R.string.welcome)+"\n\n"+
-                                getString(R.string.shortcut_permission))
-                .setPositiveButton(R.string.setting, (dialog1, which) -> {
-                    NAction.startInstalledAppDetailsActivity(this);
-                    getPyVer(false);
-                })
-                .setNegativeButton(R.string.ignore, (dialog1, which) -> getPyVer(false))
-                .setOnCancelListener(cancel -> getPyVer(false))
-                .create()
-                .show();
-        ScriptExec.getInstance().playScript(this,
-                "setup", null,false);
-        try {
-            checkOtherPermission();
-        } catch (Exception e) {
-            Toast.makeText(this,e.toString(),Toast.LENGTH_LONG).show();
-        }
-    }
 
     @Subscribe
     public void startQrCodeActivity(StartQrCodeActivityEvent event) {
@@ -403,7 +283,7 @@ public class HomeMainActivity extends BaseActivity {
         });
     }
 
-    private void runShortcut(Intent intent) {
+    public void runShortcut(Intent intent) {
         String action = intent.getAction();
         if (action!=null && action.equals(Intent.ACTION_VIEW)){
         String path = intent.getStringExtra("path");

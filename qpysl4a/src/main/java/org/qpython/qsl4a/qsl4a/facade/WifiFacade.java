@@ -205,7 +205,7 @@ public class WifiFacade extends RpcReceiver {
   public String wifiGetApState() {
     try {
       Method method = mWifi.getClass().getMethod("getWifiApState");
-      int i = (Integer) method.invoke(mWifi);
+      int i = (int) method.invoke(mWifi);
       switch (i) {
         case 10:
           return "disabling";

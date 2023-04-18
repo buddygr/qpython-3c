@@ -35,21 +35,26 @@ public class StringUtils {
                     j++;
                 i=j;
                 sb = new StringBuilder();
-            } else if (c=='"' || c=='\''){
-                sb.append(argString,i,j);
-                j++;  i=j;
+            } else if (c=='"' || c=='\'') {
+                sb.append(argString, i, j);
+                j++;
+                i = j;
+                if (j >= l)
+                    continue;
                 d = argString.charAt(j);
-                while(d != c){
-                    if(d=='\\' && c=='"' && j<l-1){
-                        sb.append(argString,i,j);
+                while (d != c) {
+                    if (d == '\\' && c == '"' && j < l - 1) {
+                        sb.append(argString, i, j);
                         j++;
-                        sb.append(argString,j,j+1);
-                        j++;  i=j;
-                    }else j++;
+                        sb.append(argString, j, j + 1);
+                        j++;
+                        i = j;
+                    } else j++;
                     d = argString.charAt(j);
                 }
-                sb.append(argString,i,j);
-                j++;  i=j;
+                sb.append(argString, i, j);
+                j++;
+                i = j;
             } else {
                 j++;
             }

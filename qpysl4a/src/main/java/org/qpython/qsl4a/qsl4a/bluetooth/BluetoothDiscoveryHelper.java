@@ -23,6 +23,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
+import org.qpython.qsl4a.qsl4a.facade.BluetoothFacade;
+
 import java.util.Set;
 
 public class BluetoothDiscoveryHelper {
@@ -48,6 +50,12 @@ public class BluetoothDiscoveryHelper {
   private class BluetoothReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
+      try {
+        BluetoothFacade.checkBluetoothPermission();
+      } catch (Exception exception) {
+        exception.printStackTrace();
+      }
+
       final String action = intent.getAction();
 
       if (BluetoothDevice.ACTION_FOUND.equals(action)) {
@@ -63,7 +71,9 @@ public class BluetoothDiscoveryHelper {
     }
   }
 
-  public void startDiscovery() {
+  public void startDiscovery() throws Exception {
+    BluetoothFacade.checkBluetoothPermission();
+
     BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
     if (bluetoothAdapter.isDiscovering()) {

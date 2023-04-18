@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 
+import org.qpython.qsl4a.R;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
 import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
@@ -32,7 +33,7 @@ public class VideoFacade extends RpcReceiver {
     intent.putExtra("path", path);
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
     intent.setAction(Intent.ACTION_VIEW);
-    mAndroidFacade.doStartActivity(intent,wait,Intent.FLAG_ACTIVITY_NEW_TASK);
+    mAndroidFacade.doStartActivity(intent,wait, R.string.video);
     }
 
   @Override

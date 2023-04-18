@@ -2,13 +2,10 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
     }
     buildTypes {
         release {
@@ -47,6 +44,6 @@ dependencies {
     //api rootProject.ext.libSupportV7
     api rootProject.ext.libGoogleGuava
     implementation 'com.google.zxing:core:3.4.1'
-    compile project(path: ':qbaselib')
+    api project(path: ':qbaselib')
 }
 

@@ -250,7 +250,7 @@ public class QWebViewActivity extends BaseActivity {
         wv.setWebChromeClient(null);
         wv.setWebViewClient(null);
         wv.destroy();
-        wv = null;
+        //wv = null;
         unregisterReceiver(webviewActivityReceiver);
         if (launchScript != null && !launchScript.equals("")) {
             endWebSrv(launchScript);
@@ -260,7 +260,6 @@ public class QWebViewActivity extends BaseActivity {
 
     protected void endWebSrv(String script) {
         QBaseApp.getInstance().getAsyncHttpClient().get(Utils.getSrv(script) + "/__exit", new AsyncHttpResponseHandler() {
-
             @Override
             public void onSuccess(int i, Header[] headers, byte[] bytes) {
 
@@ -270,7 +269,6 @@ public class QWebViewActivity extends BaseActivity {
             public void onFailure(int i, Header[] headers, byte[] bytes, Throwable throwable) {
 
             }
-
         });
     }
 
@@ -405,23 +403,6 @@ public class QWebViewActivity extends BaseActivity {
                 startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
             }
 
-            // For Android 3.0+
-            public void openFileChooser(ValueCallback uploadMsg, String acceptType) {
-                mUploadMessage = uploadMsg;
-                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-                i.addCategory(Intent.CATEGORY_OPENABLE);
-                i.setType("*/*");
-                startActivityForResult(Intent.createChooser(i, "File Browser"), FILECHOOSER_RESULTCODE);
-            }
-
-            // For Android 4.1
-            public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
-                mUploadMessage = uploadMsg;
-                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-                i.addCategory(Intent.CATEGORY_OPENABLE);
-                i.setType("*/*");
-                startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
-            }
         });
 
         ws.setLoadWithOverviewMode(true);
@@ -506,21 +487,21 @@ public class QWebViewActivity extends BaseActivity {
         }
     }
 
-    class QPyLib {
+    /*class QPyLib {
         public QPyLib(Context context) {
         }
 
         @JavascriptInterface
         public void processHTML(String cookie, String data) {
-            // LogUtil.d(TAG, "processHTML called(cookie):"+cookie);
-            // LogUtil.d(TAG, "processHTML called(data):"+data);
+            LogUtil.d(TAG, "processHTML called(cookie):"+cookie);
+            LogUtil.d(TAG, "processHTML called(data):"+data);
             wvCookie = cookie;
             wvDocument = data;
 
         }
     }
 
-    /*@Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(CreateNotebookDownloadFinishEvent event) {
         String notebook = event.fileName;
         Toast.makeText(this, notebook+" is downloaded", Toast.LENGTH_SHORT).show();

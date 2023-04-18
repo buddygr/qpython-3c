@@ -20,11 +20,13 @@ import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -48,6 +50,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.qpython.qpy.R;
 import org.qpython.qpy.console.ScriptExec;
 import org.qpython.qpy.databinding.DrawerEditorBinding;
@@ -76,7 +79,9 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 
@@ -231,16 +236,17 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
             if(uri == null) {
                 if(intent.getStringExtra(EXTRA_TEXT)==null) {
                     mCurrentFileName = "Intent";
-                    try {
-                        action = JsonBuilder.build(intent).toString();
-                    } catch (JSONException e) {
-                        action = e.toString();
-                    }
+                    action = intentToString(intent);
                     intent.putExtra(EXTRA_TEXT, action);
                 }
                 action = TEXT_ACTION;
             } else
                 action = Intent.ACTION_VIEW;
+        }else if(action.equals(Intent.ACTION_SEND_MULTIPLE)) {
+            mCurrentFileName = "Intent";
+            action = intentToString(intent);
+            intent.putExtra(EXTRA_TEXT, action);
+            action = TEXT_ACTION;
         }
         switch (action) {
             case DEFAULT_ACTION:
@@ -323,6 +329,36 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
                 .add(R.id.content_frame, textFragment, "TED")
                 .commit();
         updateTitle();
+    }
+
+    private String intentToString(Intent intent){
+        String result;
+        try {
+            result = JsonBuilder.build(intent).toString();
+        } catch (JSONException e) {
+            return e.toString();
+        }
+        Bundle extras = intent.getExtras();
+        Map<String,String> types = new HashMap<>();
+        for (String key : extras.keySet()) {
+            Object extra = extras.get(key);
+            String clas = getClassType(extra);
+            String show;
+            if(extra instanceof ArrayList){
+                ArrayList<?> array = (ArrayList<?>) extra;
+                if(array.size()>0)
+                    show = clas + "<" + getClassType(array.get(0)) + ">";
+                else show = clas + "<Empty>";
+            } else show = clas.toString();
+            types.put(key,show);
+        }
+        if(types.isEmpty())
+            return result;
+        return result + " # ExtraTypes=" + types;
+    }
+
+    private String getClassType(Object clas) {
+        return clas.getClass().toString().replace("class ","");
     }
 
     private void initListener() {

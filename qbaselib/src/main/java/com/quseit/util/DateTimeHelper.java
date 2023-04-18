@@ -43,7 +43,7 @@ public class DateTimeHelper {
         return timeStr;
     }
 
-    public static String getStandardTime(long timestamp) {
+    /*public static String getStandardTime(long timestamp) {
         SimpleDateFormat sdf = new SimpleDateFormat("MM月dd日 HH:mm");
         Date date = new Date(timestamp * 1000);
         sdf.format(date);
@@ -55,7 +55,7 @@ public class DateTimeHelper {
         Date date = new Date(timestamp * 1000);
         sdf.format(date);
         return sdf.format(date);
-    }
+    }*/
 
     public static final String getDateAsDirName() {
         Calendar cal = Calendar.getInstance();

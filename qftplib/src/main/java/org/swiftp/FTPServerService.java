@@ -131,28 +131,40 @@ public abstract class FTPServerService extends Service implements Runnable {
         }
     }
 
-    public static InetAddress getWifiAndApIp(){
-        InetAddress ip = getWifiIp();
-        if (ip==null){
-            try {
-                for (NetworkInterface intf : Collections.list(NetworkInterface.getNetworkInterfaces())) {
-                    if (intf.getName().equals("wlan0")){
-                        for (InetAddress addr : Collections.list(intf.getInetAddresses())) {
-                            String hostAddr = addr.getHostAddress();
-                            if(hostAddr == null)
-                                continue;
-                            if (!addr.isLoopbackAddress() && hostAddr.contains(".")){
-                                ip = addr;
-                                break;
-                            }
-                        }
+    public static ArrayList<String> getWifiAndApIp(){
+        ArrayList<String> ip = new ArrayList<>();
+        InetAddress addrWifi = getWifiIp();
+        String hostAddr;
+        if(addrWifi!=null)
+            ip.add(addrWifi.getHostAddress());
+        try {
+            for (NetworkInterface intf : Collections.list(NetworkInterface.getNetworkInterfaces())) {
+                for (InetAddress addr : Collections.list(intf.getInetAddresses())) {
+                    hostAddr = addr.getHostAddress();
+                    if(hostAddr == null || addr.isLoopbackAddress() || ip.contains(hostAddr))
+                            continue;
+                    if (hostAddr.contains(".")){
+                        ip.add(hostAddr);
                         break;
                     }
                 }
+            }
             } catch (SocketException ignored) {
             }
-        }
+        if(ip.size()==0)
+            ip = null;
         return ip;
+    }
+
+    public static String[] getIpPortString(){
+        ArrayList<String> address = getWifiAndApIp();
+        if(address == null)
+            return null;
+        String[] ipPort = new String[address.size()];
+        for(int i = 0; i<ipPort.length; i++){
+            ipPort[i] = "ftp://" + address.get(i) + ":" + port + "/";
+        }
+        return ipPort;
     }
 
     public static boolean isWifiEnabled() {
@@ -162,11 +174,7 @@ public abstract class FTPServerService extends Service implements Runnable {
         }
         @SuppressLint("WifiManagerLeak") WifiManager wifiMgr = (WifiManager) myContext
                 .getSystemService(Context.WIFI_SERVICE);
-        if (wifiMgr.getWifiState() == WifiManager.WIFI_STATE_ENABLED) {
-            return true;
-        } else {
-            return false;
-        }
+        return wifiMgr.getWifiState() == WifiManager.WIFI_STATE_ENABLED;
     }
 
     public static boolean isWifiAndApEnabled(){
@@ -181,7 +189,7 @@ public abstract class FTPServerService extends Service implements Runnable {
         } else {
             try {
                 Method method = wifiMgr.getClass().getMethod("getWifiApState");
-                return (Integer) method.invoke(wifiMgr) == WIFI_AP_STATE_ENABLED;
+                return (int) method.invoke(wifiMgr) == WIFI_AP_STATE_ENABLED;
             } catch (Exception e){
                 return false;
             }
@@ -303,14 +311,7 @@ public abstract class FTPServerService extends Service implements Runnable {
 
     private boolean loadSettings() {
         myLog.l(Log.DEBUG, "Loading settings");
-        settings = PreferenceManager.getDefaultSharedPreferences(this);
-        //port = Integer.valueOf(settings.getString("portNum", "2121"));
-        String portS = settings.getString(getString(R.string.key_port_num),"");
-        if (!portS.equals("")) {
-        	port = Integer.valueOf(portS);
-        } else {
-        	port = Defaults.portNumber;
-        }
+        loadPort(this);
 
         myLog.l(Log.DEBUG, "Using port " + port);
 
@@ -356,6 +357,17 @@ public abstract class FTPServerService extends Service implements Runnable {
         }
         // We reach here if the settings were not sane
         return false;
+    }
+
+    public static void loadPort(Context context){
+        settings = PreferenceManager.getDefaultSharedPreferences(context);
+        //port = Integer.valueOf(settings.getString("portNum", "2121"));
+        String portS = settings.getString(context.getString(R.string.key_port_num),"");
+        if (!portS.equals("")) {
+            port = Integer.valueOf(portS);
+        } else {
+            port = Defaults.portNumber;
+        }
     }
 
     // This opens a listening socket on all interfaces.

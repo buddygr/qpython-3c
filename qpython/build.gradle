@@ -9,13 +9,12 @@ static def releaseTime() {
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
     flavorDimensions "default"
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 373
-        versionName "3.7.3"
+        versionCode 374
+        versionName "3.7.4"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
 

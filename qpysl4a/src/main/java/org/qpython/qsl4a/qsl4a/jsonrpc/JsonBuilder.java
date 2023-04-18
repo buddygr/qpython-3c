@@ -55,9 +55,9 @@ public class JsonBuilder {
         if (data instanceof Integer) {
             return data;
         }
-        if (data instanceof Float) {
+        /*if (data instanceof Float) {
             return data;
-        }
+        }*/
         if (data instanceof Double) {
             return data;
         }

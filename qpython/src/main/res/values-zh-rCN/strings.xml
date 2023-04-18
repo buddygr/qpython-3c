@@ -482,7 +482,7 @@
     <string name="lang_flag">zh</string>
     <string name="lang_env">zh_CN</string>
     <string name="qsl4a_future">QSL4A守护小程序</string>
-    <string name="shortcut_permission">建议到系统设置里，手动打开创建快捷方式权限和通知权限。</string>
+    <string name="shortcut_permission">建议到系统设置里，手动打开创建快捷方式、通知等权限。</string>
     <string name="open_source_protocol">开源协议</string>
     <string name="main_window">QPython 主窗口</string>
     <string name="aux_window">QPython 辅窗口</string>

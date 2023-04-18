@@ -104,32 +104,7 @@ public class BaseActivity extends AppCompatActivity {
         mActionMap.remove(action);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    public void checkOtherPermission() throws Exception {
-        List<String> unPermissionList = new ArrayList<String>();
-        PackageManager pm = this.getPackageManager();
-        PackageInfo info;
-        String[] packagePermissions;
 
-            info = pm.getPackageInfo(this.getPackageName(), PackageManager.GET_PERMISSIONS);
-            packagePermissions = info.requestedPermissions;
-            if (packagePermissions != null) {
-                for (String packagePermission : packagePermissions) {
-                    if (ContextCompat.checkSelfPermission(this, packagePermission) !=
-                            PackageManager.PERMISSION_GRANTED) {
-                        unPermissionList.add(packagePermission);//添加还未授予的权限到unPermissionList中
-                    }
-                }
-
-        //有权限没有通过，需要申请
-        if (unPermissionList.size() > 0) {
-            ActivityCompat.requestPermissions(
-                    this,unPermissionList.toArray(new String[0]),100);
-        }
-    }
-        if (!Settings.canDrawOverlays(this))
-            startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())),100);
-    }
 
     public final void checkPermissionDo(String[] permissions, PermissionAction action) {
         if (Build.VERSION.SDK_INT >= 23) {

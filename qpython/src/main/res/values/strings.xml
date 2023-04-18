@@ -697,7 +697,7 @@
     <string name="lang_flag">en</string>
     <string name="lang_env">en_US</string>
     <string name="qsl4a_future">QSL4A DaemonActivity</string>
-    <string name="shortcut_permission">It is recommended to go to the system settings and manually open the create shortcut permission and notification permission.</string>
+    <string name="shortcut_permission">It is recommended to manually open the permissions such as creating shortcuts and notifications in the system settings.</string>
     <string name="open_source_protocol">Open Source Protocol</string>
     <string name="apache2">https://www.apache.org/licenses/LICENSE-2.0</string>
     <string name="main_window">QPython Main Window</string>

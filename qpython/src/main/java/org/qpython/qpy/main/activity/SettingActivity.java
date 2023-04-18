@@ -54,12 +54,10 @@ public class SettingActivity extends AppCompatActivity {
                     Intent intent = new Intent();
                     if (action.equals(FTPServerService.ACTION_STARTED)) {
                         fragment.startServer();
-                        intent.putExtra("path",FtpFacade.ftpGet());
-                        setResult(RESULT_OK,intent);
                     } else if (action.equals(FTPServerService.ACTION_STOPPED)) {
                         fragment.stopServer();
-                        setResult(RESULT_OK,null);
                     }
+                    setResult(RESULT_OK);
                     SettingActivity.this.finish();
                 }
             }, 500);

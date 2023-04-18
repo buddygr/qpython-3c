@@ -43,7 +43,7 @@ public class LogActivity extends BaseActivity {
         Intent intent = getIntent();
         String logPath = intent.getStringExtra(LOG_PATH);
         File logFile = new File(logPath);
-        @SuppressLint("SimpleDateFormat") String modifyTime = new SimpleDateFormat("yyyy-MM-dd,HH:mm:ss").format(logFile.lastModified());;
+        @SuppressLint("SimpleDateFormat") String modifyTime = new SimpleDateFormat("yyyy-MM-dd,HH:mm:ss").format(logFile.lastModified());
         binding.title.setText(getString(R.string.last_modify_time));
         binding.path.setText(logPath);
         binding.time.setText(modifyTime);

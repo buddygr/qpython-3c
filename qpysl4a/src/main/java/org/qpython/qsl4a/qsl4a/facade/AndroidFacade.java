@@ -42,6 +42,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.qpython.qsl4a.QSL4APP;
+import org.qpython.qsl4a.R;
 import org.qpython.qsl4a.qsl4a.LogUtil;
 import org.qpython.qsl4a.qsl4a.NotificationIdFactory;
 import org.qpython.qsl4a.qsl4a.future.FutureActivityTask;
@@ -86,7 +87,7 @@ public class AndroidFacade extends RpcReceiver {
    * be obtained.
    */
   public interface Resources {
-    int getLogo48();
+    //int getLogo48();
   }
 
   public final Service mService;
@@ -99,12 +100,12 @@ public class AndroidFacade extends RpcReceiver {
 
   private final Resources mResources;
   private ClipboardManager mClipboard = null;
+  private static int deamonCount = 0;
   public final Context context;
   public final String qpyProvider;
-
   public static Handler handler;
 
-  private final int intentFlags = Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION  | Intent.FLAG_GRANT_WRITE_URI_PERMISSION ;
+  public final int intentFlags = Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION  | Intent.FLAG_GRANT_WRITE_URI_PERMISSION ;
 
   @Override
   public void shutdown() {
@@ -237,6 +238,8 @@ public class AndroidFacade extends RpcReceiver {
   // complex/nested types being passed in.
   public static void putExtrasFromJsonObject(JSONObject extras, Intent intent) throws JSONException {
     JSONArray names = extras.names();
+    if(names==null)
+      return;
     for (int i = 0; i < names.length(); i++) {
       String name = names.getString(i);
       Object data = extras.get(name);
@@ -246,9 +249,9 @@ public class AndroidFacade extends RpcReceiver {
       if (data instanceof Integer) {
         intent.putExtra(name, (Integer) data);
       }
-      if (data instanceof Float) {
+     /* if (data instanceof Float) {
         intent.putExtra(name, (Float) data);
-      }
+      }*/
       if (data instanceof Double) {
         intent.putExtra(name, (Double) data);
       }
@@ -455,7 +458,7 @@ public class AndroidFacade extends RpcReceiver {
     return startActivityForResult(intent);
   }
 
-  public void doStartActivity(final Intent intent, Boolean wait) throws Exception {
+  public void doStartActivity(final Intent intent, Boolean wait,int description) throws Exception {
     Exception[] except = new Exception[1];
     if (wait == null || !wait) {
       startActivity(intent);
@@ -466,6 +469,9 @@ public class AndroidFacade extends RpcReceiver {
         @Override
         public void onCreate() {
           super.onCreate();
+          if(deamonCount==0)
+            Toast.makeText(context,R.string.click_daemon,Toast.LENGTH_SHORT).show();
+          setTaskDescription(context.getString(description)+context.getString(R.string.daemon)+(++deamonCount));
           intent.setFlags(intent.getFlags() | intentFlags);
           try {
             startActivity(intent);
@@ -501,52 +507,6 @@ public class AndroidFacade extends RpcReceiver {
     }
   }
 
-  public void doStartActivity(final Intent intent, Boolean wait,int flags) throws Exception {
-    Exception[] except = new Exception[1];
-    if (wait == null || !wait) {
-      startActivity(intent);
-    } else {
-      FutureActivityTask<Intent> task = new FutureActivityTask<Intent>() {
-        private boolean mSecondResume = false;
-
-        @Override
-        public void onCreate() {
-          super.onCreate();
-          intent.setFlags(intent.getFlags() | intentFlags);
-          try {
-            startActivity(intent);
-          } catch (Exception exception) {
-            except[0]=exception;
-          }
-        }
-
-        @Override
-        public void onResume() {
-          if (mSecondResume) {
-            finish();
-          }
-          mSecondResume = true;
-        }
-
-        @Override
-        public void onDestroy() {
-          setResult(null);
-        }
-
-      };
-      mTaskQueue.execute(task,flags);
-
-      try {
-        task.getResult();
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-      if(except[0]!=null) {
-        throw except[0];
-      }
-    }
-  }
-
   /**
    * packagename and classname, if provided, are used in a 'setComponent' call.
    */
@@ -561,7 +521,7 @@ public class AndroidFacade extends RpcReceiver {
           @RpcParameter(name = "classname", description = "name of class. If used, requires packagename to be useful") @RpcOptional String classname)
           throws Exception {
     final Intent intent = buildIntent(action, uri, type, extras, packagename, classname, null);
-    doStartActivity(intent, wait);
+    doStartActivity(intent, wait, R.string.normal);
   }
 
   @Rpc(description = "Send a broadcast.")
@@ -605,7 +565,7 @@ public class AndroidFacade extends RpcReceiver {
           @RpcParameter(name = "intent", description = "Intent in the format as returned from makeIntent") Intent intent,
           @RpcParameter(name = "wait", description = "block until the user exits the started activity") @RpcOptional Boolean wait)
           throws Exception {
-    doStartActivity(intent, wait);
+    doStartActivity(intent, wait, R.string.normal);
   }
 
   @Rpc(description = "Send Broadcast Intent")

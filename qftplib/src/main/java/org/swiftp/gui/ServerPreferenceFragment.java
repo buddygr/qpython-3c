@@ -27,6 +27,7 @@ import org.swiftp.R;
 
 import java.io.File;
 import java.net.InetAddress;
+import java.util.ArrayList;
 
 /**
  * Created by Hmei on 2017-06-07.
@@ -50,14 +51,18 @@ public class ServerPreferenceFragment extends PreferenceFragment implements
             if (intent.getAction().equals(FTPServerService.ACTION_STARTED)) {
                 running_state.setChecked(true);
                 // Fill in the FTP server address
-                InetAddress address = FTPServerService.getWifiAndApIp();
+                String[] address = FTPServerService.getIpPortString();
                 if (address == null) {
                     Log.v(TAG, "Unable to retreive wifi ip address");
                     running_state.setSummary(R.string.cant_get_url);
                     return;
                 }
-                String iptext = "ftp://" + address.getHostAddress() + ":"
-                        + FTPServerService.getPort() + "/";
+                StringBuilder iptext = new StringBuilder();
+                for(String ip : address){
+                    if(iptext.length()>0)
+                        iptext.append(", ");
+                    iptext.append(ip);
+                }
                 Resources resources = getResources();
                 String summary = resources.getString(R.string.running_summary_started,
                         iptext);

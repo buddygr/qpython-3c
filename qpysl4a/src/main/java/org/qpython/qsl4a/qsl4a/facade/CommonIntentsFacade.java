@@ -1,12 +1,15 @@
 package org.qpython.qsl4a.qsl4a.facade;
 
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.app.Service;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ShortcutInfo;
 import android.content.pm.ShortcutManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Icon;
@@ -24,8 +27,10 @@ import com.google.zxing.RGBLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.qpython.qsl4a.R;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
 import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
@@ -33,6 +38,8 @@ import org.qpython.qsl4a.qsl4a.rpc.RpcOptional;
 import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Hashtable;
 
 /**
@@ -161,24 +168,23 @@ public class CommonIntentsFacade extends RpcReceiver {
     @Rpc(description = "Start activity with send action by text .")
     public void sendText(
             @RpcParameter(name = "text") String text,
+            @RpcParameter(name = "extras", description = "put extras") @RpcOptional JSONObject extras,
             @RpcParameter(name = "wait") @RpcDefault ("true") @RpcOptional Boolean wait)
             throws Exception {
-        JSONObject extras = new JSONObject();
+      if(extras==null)
+        extras = new JSONObject();
+      if(!extras.has(Intent.EXTRA_TEXT))
         extras.put(Intent.EXTRA_TEXT, text);
         mAndroidFacade.startActivity(Intent.ACTION_SEND, null, "text/plain", extras, wait, null, null);
     }
 
-    @Rpc(description = "Convert normal path to content:// or file:// .")
+    @Rpc(description = "Convert normal path to content:// .")
     public String pathToUri(
-            @RpcParameter(name = "path") String path) {
-        File file = new File(path);
-        Uri uri;
-        //if (Build.VERSION.SDK_INT>=24) {
-            uri = FileProvider.getUriForFile(context,qpyProvider,file);
-        //} else {
-        //   uri = Uri.fromFile(file);
-        //}
-        return uri.toString();
+            @RpcParameter(name = "path") String path,
+            @RpcParameter(name = "File Provider") @RpcDefault("true") Boolean fileProvider) throws Exception {
+      if(fileProvider)
+        return getPathUri(path).toString();
+      else return getMediaUri(path,getPathType(path,null)).toString();
     }
 
   @Rpc(description = "Open a file with path")
@@ -187,34 +193,120 @@ public class CommonIntentsFacade extends RpcReceiver {
           @RpcParameter(name = "type", description = "a MIME type of a file") @RpcOptional String type,
           @RpcParameter(name = "wait") @RpcDefault("true") Boolean wait)
           throws Exception {
-          MimeTypeMap mime = MimeTypeMap.getSingleton();
-          if (type == null) {
-            /* 获取文件的后缀名 */
-          int dotIndex = path.lastIndexOf(".");
-          if (dotIndex < 0) {
-            type = "*/*";  //找不到扩展名
-          } else {
-            try {
-              type = mime.getMimeTypeFromExtension( path.substring( dotIndex + 1 ).toLowerCase() );
-              if (type == null) {
-                type = "*/*";  //找不到打开方式
-              }
-            } catch (Exception e) {
-              type="*/*";  //出现错误
-            }
-          }}
-          Intent intent = new Intent();
-          intent.setAction(android.content.Intent.ACTION_VIEW);
-          File file = new File(path);
-          Uri uri;
-          //if (Build.VERSION.SDK_INT>=24) {
-              uri = FileProvider.getUriForFile(context,qpyProvider,file);
-         // } else {
-           //   uri = Uri.fromFile(file);
-          //}
-          intent.setDataAndType(uri, type);
-          mAndroidFacade.doStartActivity(intent,wait,Intent.FLAG_ACTIVITY_NEW_TASK);
+          Intent intent = new Intent(android.content.Intent.ACTION_VIEW);
+          intent.setDataAndType(getPathUri(path), getPathType(path,type));
+          mAndroidFacade.doStartActivity(intent,wait, R.string.open);
   }
+
+    @Rpc(description = "Send file(s) with path")
+    public void sendFile(
+            @RpcParameter(name = "path(s)") Object path,
+            @RpcParameter(name = "type", description = "a MIME type of a file") @RpcOptional String type,
+            @RpcParameter(name = "extras", description = "put extras") @RpcOptional JSONObject extras,
+            @RpcParameter(name = "wait") @RpcDefault("true") Boolean wait)
+            throws Exception {
+        if (extras == null)
+            extras = new JSONObject();
+        Intent intent;
+        if(path instanceof String)
+            intent = sendFile1((String) path,type,extras);
+        else if(path instanceof JSONArray){
+            JSONArray paths = (JSONArray) path;
+             if (paths.length() > 0)
+                intent = sendFiles(paths,type,extras);
+            else return;
+        } else return;
+        mAndroidFacade.doStartActivity(intent,wait,R.string.share);
+    }
+
+    private Intent sendFile1(String path, String type, JSONObject extras) throws Exception {
+      // One File
+        Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+        type = getPathType(path,type);
+        intent.setType(type);
+        AndroidFacade.putExtrasFromJsonObject(extras,intent);
+        if (!intent.hasExtra(Intent.EXTRA_STREAM)) {
+            intent.putExtra(Intent.EXTRA_STREAM, getMediaUri(path,type));
+        }
+        return intent;
+    }
+
+    private Intent sendFiles(JSONArray paths, String type, JSONObject extras) throws Exception {
+        // Files List
+        Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+        type = getPathType((String) paths.get(0),type);
+        intent.setType(type);
+        ArrayList<Uri> uris = new ArrayList<>();
+        for(int i=0;i<paths.length();i++) {
+            uris.add(getMediaUri((String) paths.get(i),type));
+        }
+        AndroidFacade.putExtrasFromJsonObject(extras,intent);
+        if (!intent.hasExtra(Intent.EXTRA_STREAM))
+            intent.putExtra(Intent.EXTRA_STREAM,uris);
+        return intent;
+    }
+
+    private Uri getPathUri(String path){
+        return FileProvider.getUriForFile(context,qpyProvider,new File(path));
+    }
+
+    private String getPathType(String path,String type){
+      if(type!=null)
+          return type;
+      MimeTypeMap mime = MimeTypeMap.getSingleton();
+      /* 获取文件的后缀名 */
+        int dotIndex = path.lastIndexOf(".");
+        if (dotIndex < 0) {
+            return  "*/*";  //找不到扩展名
+        } else {
+            try {
+                type = mime.getMimeTypeFromExtension( path.substring( dotIndex + 1 ).toLowerCase() );
+                    if (type == null) {
+                        return "*/*";  //找不到打开方式
+                    }
+            } catch (Exception e) {
+                    return "*/*";  //出现错误
+            }
+        }
+        return type;
+    }
+
+    @SuppressLint({"Recycle", "Range"})
+    private Uri getMediaUri(String path,String type) {
+      File file = new File(path);
+        try {
+            path = file.getCanonicalPath();
+        } catch (IOException e) {
+            return getPathUri(path);
+        }
+        if(type.startsWith("image"))
+          type = "images/media";
+      else if(type.startsWith("video"))
+          type = "video/media";
+      else if(type.startsWith("audio"))
+          type = "audio/media";
+      else type = "file";
+        Uri baseUri = Uri.parse("content://media/external/" + type);
+        Cursor cursor = context.getContentResolver().query(baseUri,
+                new String[]{"_id"},"_data=?",
+                new String[]{path},null);
+        Uri uri = null;
+        if(cursor!=null){
+            if(cursor.moveToFirst()){
+                int id = cursor.getInt(cursor.getColumnIndex("_id"));
+                uri = Uri.withAppendedPath(baseUri,""+id);
+            }
+            cursor.close();
+        }
+        if(uri == null){
+            ContentValues values = new ContentValues();
+            values.put("_data",path);
+            uri = context.getContentResolver().insert(baseUri,values);
+        }
+        if(uri == null)
+            uri = getPathUri(path);
+        return uri;
+    }
 
   @Rpc(description = "Opens a map search for query (e.g. pizza, 123 My Street).")
   public void viewMap(@RpcParameter(name = "query, e.g. pizza, 123 My Street") String query,
@@ -260,14 +352,13 @@ public class CommonIntentsFacade extends RpcReceiver {
             intent.putExtra("src",path);
         } else {
             uri=Uri.fromFile(new File(path));
-            intent.putExtra("LOG_PATH",path);
+            intent.putExtra("src",uri.toString());
         }
         intent.setClassName(context,"org.qpython.qpy.main.activity.QWebViewActivity");
         intent.setDataAndType(uri, "text/html");
-        int flag = Intent.FLAG_ACTIVITY_NEW_DOCUMENT|Intent.FLAG_ACTIVITY_MULTIPLE_TASK|Intent.FLAG_ACTIVITY_NEW_TASK;
-        intent.setFlags(flag);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
         intent.putExtra("title",title);
-        mAndroidFacade.doStartActivity(intent,wait,flag);
+        mAndroidFacade.doStartActivity(intent,wait,R.string.browser);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
