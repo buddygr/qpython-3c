@@ -2,7 +2,6 @@ package org.qpython.qpy.main.activity;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -84,7 +83,7 @@ public class AboutActivity extends BaseActivity {
             //progressDialog.show();
             ScriptExec.getInstance().playScript(this,
                     getFilesDir().getAbsolutePath()+"/bin/updateQPython.py",
-                    null, false);
+                    null);
         });
 
         binding.tvBackupDownload.setOnClickListener(v ->

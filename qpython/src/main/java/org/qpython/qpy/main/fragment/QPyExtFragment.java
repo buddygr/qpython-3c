@@ -126,7 +126,7 @@ public class QPyExtFragment extends Fragment {
                 .create()
                 .show();
         ScriptExec.getInstance().playScript(activity,
-                "setup", null,false);
+                "setup", null);
         try {
             checkOtherPermission();
         } catch (Exception e) {

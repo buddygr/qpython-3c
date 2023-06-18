@@ -29,7 +29,6 @@ import org.qpython.qpysdk.QPyConstants;
 import org.qpython.qpysdk.utils.Utils;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -81,12 +80,12 @@ public class AppListActivity extends BaseActivity implements LoaderManager.Loade
         adapter.setCallback(new AppListAdapter.Callback() {
             @Override
             public void runScript(QPyScriptModel item) {
-                ScriptExec.getInstance().playScript(AppListActivity.this, item.getPath(), null, false);
+                ScriptExec.getInstance().playScript(AppListActivity.this, item.getPath(), null);
             }
 
             @Override
             public void runProject(QPyScriptModel item) {
-                ScriptExec.getInstance().playProject(AppListActivity.this, item.getPath(), false);
+                ScriptExec.getInstance().playProject(AppListActivity.this, item.getPath());
             }
 
             @Override

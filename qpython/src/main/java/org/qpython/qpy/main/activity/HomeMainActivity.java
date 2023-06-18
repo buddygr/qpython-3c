@@ -33,16 +33,12 @@ import org.qpython.qpy.main.fragment.QPyExtFragment;
 import org.qpython.qpy.main.utils.Bus;
 import org.qpython.qpy.texteditor.EditorActivity;
 import org.qpython.qpy.texteditor.TedLocalActivity;
-import org.qpython.qsl4a.QPyScriptService;
 import org.qpython.qsl4a.qsl4a.facade.AndroidFacade;
-import org.qpython.qsl4a.qsl4a.facade.CommonIntentsFacade;
 import org.qpython.qsl4a.qsl4a.facade.QPyInterfaceFacade;
 import org.qpython.qsl4a.qsl4a.util.HtmlUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class HomeMainActivity extends BaseActivity {
 
@@ -70,7 +66,7 @@ public class HomeMainActivity extends BaseActivity {
 
     private void startMain() {
         initListener();
-        startPyService();
+        //JsonRpcServer.startService(this);
         Bus.getDefault().register(this);
         QPyExtFragment.openQpySDK(this);
         setTaskDescription(new ActivityManager.TaskDescription(getString(R.string.aux_window)));
@@ -96,7 +92,7 @@ public class HomeMainActivity extends BaseActivity {
     }
 
     private void playPy(String name){
-        ScriptExec.getInstance().playQScript(HomeMainActivity.this,
+        ScriptExec.getInstance().playScript(HomeMainActivity.this,
                 CONF.binDir+name+".py", null);
     }
 
@@ -105,13 +101,13 @@ public class HomeMainActivity extends BaseActivity {
         binding.ivScan.setOnClickListener(v -> Bus.getDefault().post(new StartQrCodeActivityEvent()));
 
         binding.llTerminal.setOnClickListener(v -> {
-            startPyService();
+            //JsonRpcServer.startService(this);
             TermActivity.startActivity(HomeMainActivity.this);
             sendEvent(getString(R.string.event_term));
         });
 
         binding.llTerminal.setOnLongClickListener(v -> {
-            startPyService();
+            //JsonRpcServer.startService(this);
 
             List<Spanned> list = new ArrayList<>();
             for(byte i = 0;i < consoleItem.length;i++)
@@ -182,7 +178,7 @@ public class HomeMainActivity extends BaseActivity {
             sendEvent(getString(R.string.event_file));
         });
         binding.llQpyApp.setOnClickListener(v -> {
-            startPyService();
+            //JsonRpcServer.startService(this);
             AppListActivity.start(this, AppListActivity.TYPE_SCRIPT);
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             sendEvent(getString(R.string.event_top));
@@ -258,14 +254,6 @@ public class HomeMainActivity extends BaseActivity {
         super.onPause();
     }
 
-    private void startPyService() {
-        // confirm the SL4A Service is started
-        Intent intent = new Intent(this, QPyScriptService.class);
-        startService(intent);
-    }
-
-
-
     @Subscribe
     public void startQrCodeActivity(StartQrCodeActivityEvent event) {
         String[] permissions = {Manifest.permission.CAMERA};
@@ -290,9 +278,9 @@ public class HomeMainActivity extends BaseActivity {
         String arg = intent.getStringExtra("arg");
         boolean isProj = intent.getBooleanExtra("isProj", false);
         if (isProj) {
-            ScriptExec.getInstance().playProject(this, path, arg,false);
+            ScriptExec.getInstance().playProject(this, path, arg);
         } else {
-            ScriptExec.getInstance().playScript(this, path, arg, false);
+            ScriptExec.getInstance().playScript(this, path, arg);
         }
     }}
 
@@ -300,12 +288,12 @@ public class HomeMainActivity extends BaseActivity {
         if(SplashActivity.delay > 100){
             if(CONF.pyVer.isEmpty())
                 return;
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    runShortcut(getIntent());
-                }
-            },500);
+            //new Timer().schedule(new TimerTask() {
+            //    @Override
+            //    public void run() {
+            runShortcut(getIntent());
+            //    }
+            //},500);
             SplashActivity.delay = 100;
         } else runShortcut(getIntent());
     }
@@ -327,8 +315,8 @@ public class HomeMainActivity extends BaseActivity {
                 String[] string = (String[]) msg.obj;
                 ScriptExec.getInstance().playScript(
                         HomeMainActivity.this,
-                        string[0],string[1],
-                        false);
+                        string[0],string[1]
+                );
             }
         };
         AndroidFacade.handler = QPyInterfaceFacade.handler;

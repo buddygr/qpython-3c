@@ -159,7 +159,6 @@
     <string name="install_with_python_s_pypi">QPYPI客户端</string>
     <string name="py_pi">你可以管理、通过从QPYPI或者Python的PYPI来安装或升级Python包，支持清华和北外源。</string>
     <string name="download_fail">下载失败</string>
-    <string name="activity_shortcut_create">终端快捷方式</string>
     <string name="activity_term_here_title">在此处运行终端</string>
     <string name="addshortcut_button_find_command">查找命令</string>
     <string name="addshortcut_button_text_icon">文字图标</string>
@@ -533,4 +532,5 @@
     <string name="edit_to_new_path">您可以将其编辑为新路径。</string>
     <string name="app_name">QPython 3C</string>
     <string name="qpypi_up">扩展</string>
+    <string name="sl4a_start">启动SL4A服务……</string>
 </resources>

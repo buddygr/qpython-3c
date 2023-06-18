@@ -7,8 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.qpython.qsl4a.qsl4a.util.FileUtils;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
@@ -18,6 +16,8 @@ import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
 import org.qpython.qsl4a.qsl4a.util.SPFUtils;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -28,7 +28,7 @@ public class QPyInterfaceFacade extends RpcReceiver {
     private final AndroidFacade mAndroidFacade;
     private final Context context;
     public static Handler handler;
-    private static JSONObject SharedVariable;
+    private static Map<String,String> SharedVariable;
 
     public QPyInterfaceFacade(FacadeManager manager) {
         super(manager);
@@ -184,28 +184,29 @@ public class QPyInterfaceFacade extends RpcReceiver {
         }*/
 
     @Rpc(description = "set Java Shared Variable .")
-    public void sharedVariableSet(
+    public String sharedVariableSet(
             @RpcParameter(name = "key") String key,
             @RpcParameter(name = "value") String value
-    ) throws JSONException {
+    ) {
         if(SharedVariable==null)
-            SharedVariable=new JSONObject();
-        SharedVariable.put(key,value);
+            SharedVariable=new HashMap<>();
+        return SharedVariable.put(key,value);
     }
 
     @Rpc(description = "get Java Shared Variable .")
     public String sharedVariableGet(
             @RpcParameter(name = "key") String key
-    ) throws JSONException {
-        return SharedVariable.getString(key);
+    ) {
+        return SharedVariable.get(key);
     }
 
     @Rpc(description = "remove Java Shared Variable .")
-    public void sharedVariableRemove(
+    public String sharedVariableRemove(
             @RpcParameter(name = "key") String key
-    ) throws JSONException {
-        SharedVariable.remove(key);
-        if(SharedVariable.length()==0)
-            SharedVariable=null;
+    ) {
+        String result = SharedVariable.remove(key);
+        if(SharedVariable.size()==0)
+            SharedVariable = null;
+        return result;
     }
 }

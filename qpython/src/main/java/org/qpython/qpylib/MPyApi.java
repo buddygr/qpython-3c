@@ -116,9 +116,9 @@ public class MPyApi extends BaseActivity {
                 String type = intent.getStringExtra(QPyConstants.EXTRA_CONTENT_URL1);
                 String path = intent.getStringExtra(QPyConstants.EXTRA_CONTENT_URL2);
                 if (type.equals("script")) {
-                    ScriptExec.getInstance().playScript(this,path, null, true);
+                    ScriptExec.getInstance().playScript(this,path, null);
                 } else if (type.equals("project")) {
-                    ScriptExec.getInstance().playProject(this,path, false);
+                    ScriptExec.getInstance().playProject(this,path);
                 }
 
             } else if (bundle != null) {
@@ -131,7 +131,7 @@ public class MPyApi extends BaseActivity {
                         if (param != null && param.equals("fileapi")) {
                             runMode = 2;
                             String arg = bundle.getString("pyarg");
-                            ScriptExec.getInstance().playScript(this,pyfile, arg, false);
+                            ScriptExec.getInstance().playScript(this,pyfile, arg);
                         } else {
                             // Compatibility Mode
                             if (pycode.contains("#qpy:console\n") /*|| NAction.isQPy3(getApplicationContext())*/) {
@@ -141,7 +141,7 @@ public class MPyApi extends BaseActivity {
                             }
                             String script = CONF.SCOPE_STORAGE_PATH + "/cache/last.py";
                             FileHelper.putFileContents(this, script, pycode);
-                            ScriptExec.getInstance().playScript(this,script, null, false);
+                            ScriptExec.getInstance().playScript(this,script, null);
                         }
                     }
                 }

@@ -78,6 +78,7 @@ import org.qpython.qpy.texteditor.ui.view.EditorPopUp;
 import org.qpython.qpysdk.utils.AndroidCompat;
 import org.qpython.qsl4a.QPyScriptService;
 import org.qpython.qsl4a.qsl4a.StringUtils;
+import org.qpython.qsl4a.qsl4a.jsonrpc.JsonRpcServer;
 
 import java.io.File;
 import java.io.IOException;
@@ -86,6 +87,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import jackpal.androidterm.emulatorview.EmulatorView;
 import jackpal.androidterm.emulatorview.TermSession;
@@ -251,17 +254,32 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
         }
     };
 
-    private Handler mHandler = new Handler();
+    private final Handler mHandler = new Handler();
 
     public static void startActivity(Context context) {
         Intent intent = new Intent(context, TermActivity.class);
-        context.startActivity(intent);
+        startActivity(context,intent);
     }
 
     public static void startShell(Context context,String shell_type) {
         Intent intent = new Intent(context, TermActivity.class);
-        intent.putExtra(TYPE,shell_type);
-        context.startActivity(intent);
+        intent.putExtra(TYPE, shell_type);
+        startActivity(context,intent);
+    }
+
+    private static void startActivity(Context context,Intent intent){
+        if(JsonRpcServer.isServiceRunning()) {
+            context.startActivity(intent);
+        } else {
+            context.startService(new Intent(context, QPyScriptService.class));
+            Toast.makeText(context, R.string.sl4a_start, Toast.LENGTH_SHORT).show();
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    context.startActivity(intent);
+                }
+            },512);
+        }
     }
 
     protected static TermSession createTermSession(Context context, TermSettings settings, String initialCommand, String path) throws IOException {
@@ -310,13 +328,6 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
 
         TSIntent = new Intent(this, TermService.class);
         startService(TSIntent);
-
-        /*启动SL4A服务
-        try {
-            startService(new Intent(this, QPyScriptService.class));
-        } catch (Exception E) {
-            Toast.makeText(this,E.toString(),Toast.LENGTH_LONG).show();
-        }*/
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, TermDebug.LOG_TAG);

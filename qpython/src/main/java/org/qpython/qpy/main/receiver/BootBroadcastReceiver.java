@@ -3,10 +3,8 @@ package org.qpython.qpy.main.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.os.Build;
-
-import org.qpython.qsl4a.QPyScriptService;
+import android.util.Log;
 
 
 public class BootBroadcastReceiver extends BroadcastReceiver {
@@ -24,7 +22,7 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
         } else {
 
             try {
-                context.startService(new Intent(context, QPyScriptService.class));
+                //context.startService(new Intent(context, QPyScriptService.class));
             } catch (RuntimeException e) {
 
             }

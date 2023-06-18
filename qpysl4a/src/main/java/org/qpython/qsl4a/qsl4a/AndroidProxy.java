@@ -40,10 +40,8 @@ public class AndroidProxy {
    *          Android service (required to build facades).
    * @param intent
    *          the intent that launched the proxy/script.
-   * @param requiresHandshake
-   *          indicates whether RPC security protocol should be enabled.
    */
-  public AndroidProxy(Service service, Intent intent, boolean requiresHandshake) {
+  public AndroidProxy(Service service, Intent intent) {
     //if (requiresHandshake) {
       mSecret = UUID.randomUUID();
    // } else {
@@ -59,23 +57,22 @@ public class AndroidProxy {
     return mAddress;
   }
 
-  public InetSocketAddress startLocal() {
-    return startLocal(0);
+  public void startLocal() {
+    startLocal(0);
   }
 
-  public InetSocketAddress startLocal(int port) {
+  public void startLocal(int port) {
     mAddress = mJsonRpcServer.startLocal(port);
-    return mAddress;
   }
   
-  public InetSocketAddress startPublic() {
+  /*public InetSocketAddress startPublic() {
     return startPublic(0);
   }
 
   public InetSocketAddress startPublic(int port) {
     mAddress = mJsonRpcServer.startPublic(port);
     return mAddress;
-  }
+  }*/
 
   public void shutdown() {
 	  if (mJsonRpcServer!=null) {

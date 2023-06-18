@@ -49,6 +49,7 @@ import org.qpython.qpysdk.QPySDK;
 import org.qpython.qpysdk.utils.Utils;
 import org.qpython.qsl4a.QPyScriptService;
 import org.qpython.qsl4a.qsl4a.facade.FtpFacade;
+import org.qpython.qsl4a.qsl4a.jsonrpc.JsonRpcServer;
 import org.swiftp.Globals;
 
 import java.io.File;
@@ -205,7 +206,7 @@ public class SettingFragment extends PreferenceFragment {
         root.setChecked(isRoot);
         root.setSummary(isRoot ? R.string.enable_root : R.string.disable_root);
 
-        isRunning = isMyServiceRunning(QPyScriptService.class);
+        isRunning = JsonRpcServer.isServiceRunning();//isMyServiceRunning(QPyScriptService.class);
         sl4a.setChecked(isRunning);
         sl4a.setSummary(isRunning ? R.string.sl4a_running : R.string.sl4a_un_running);
 
@@ -352,10 +353,11 @@ public class SettingFragment extends PreferenceFragment {
 
         {
             boolean isCheck = (boolean) newValue;
+            Context context = getActivity();
             if (isCheck) {
-                getActivity().startService(new Intent(getActivity(), QPyScriptService.class));
+                context.startService(new Intent(context, QPyScriptService.class));
             } else {
-                getActivity().stopService(new Intent(getActivity(), QPyScriptService.class));
+                context.stopService(new Intent(context, QPyScriptService.class));
             }
             return true;
         });

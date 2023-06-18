@@ -236,10 +236,10 @@ public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppLis
                     }
                     QPyScriptModel model = (QPyScriptModel) dataList.get(position);
                     if (model.isProj()) {
-                        ScriptExec.getInstance().playProject(context, model.getPath(), args, false);
+                        ScriptExec.getInstance().playProject(context, model.getPath(), args);
                     } else {
                         ScriptExec.getInstance().playScript(context, model.getPath(),
-                                args, false);
+                                args);
                     }
                     return true;
                 })

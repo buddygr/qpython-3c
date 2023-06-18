@@ -317,7 +317,7 @@
         <activity
             android:name="org.qpython.qpy.console.shortcuts.AddShortcut"
             android:configChanges="orientation|keyboard|keyboardHidden"
-            android:label="@string/activity_shortcut_create"
+            android:label="@string/addshortcut_title"
             android:launchMode="singleTop"
             android:theme="@style/Theme.AppCompat">
             <intent-filter>

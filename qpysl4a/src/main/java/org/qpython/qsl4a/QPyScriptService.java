@@ -1,32 +1,29 @@
 package org.qpython.qsl4a;
 
+import android.annotation.SuppressLint;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
 import org.qpython.qsl4a.qsl4a.AndroidProxy;
-import org.qpython.qsl4a.qsl4a.interpreter.InterpreterConfiguration;
-import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiverManager;
 import org.qpython.qsl4a.qsl4a.util.SPFUtils;
 
 import java.util.concurrent.CountDownLatch;
 
 public class QPyScriptService extends Service {
     private static final String TAG = "QPyScriptService";
-    public static String scriptName;
+    //public static String scriptName;
 
     //private final static int NOTIFICATION_ID = NotificationIdFactory.create();
     private final CountDownLatch mLatch = new CountDownLatch(1);
     private final IBinder mBinder;
     @SuppressWarnings("unused")
     private       boolean killMe;
-    private InterpreterConfiguration mInterpreterConfiguration = null;
-    private RpcReceiverManager mFacadeManager;
+    //private InterpreterConfiguration mInterpreterConfiguration = null;
+    //private RpcReceiverManager mFacadeManager;
     private AndroidProxy       mProxy;
     @SuppressWarnings("unused")
     private int                mStartId;
@@ -40,7 +37,7 @@ public class QPyScriptService extends Service {
     }
     // ------------------------------------------------------------------------------------------------------
 
-    public static String getSP(Context context, String key) {
+    /*public static String getSP(Context context, String key) {
         String val;
         SharedPreferences obj = context.getSharedPreferences("qsl4a_db", 0);
         val = obj.getString(key, "");
@@ -55,7 +52,7 @@ public class QPyScriptService extends Service {
         wobj = obj.edit();
         wobj.putString(key, val);
         wobj.commit();
-    }
+    }*/
 
     // ------------------------------------------------------------------------------------------------------
 
@@ -106,9 +103,9 @@ public class QPyScriptService extends Service {
 
     // ------------------------------------------------------------------------------------------------------
 
-    private void startMyMain(final int startId) {
+    private void startMyMain() {
         try {
-            mProxy = new AndroidProxy(this, null, true);
+            mProxy = new AndroidProxy(this, null);
 
             mProxy.startLocal();
             SPFUtils.setSP(getApplicationContext(), "sl4a.hostname", mProxy.getAddress().getHostName());
@@ -122,7 +119,7 @@ public class QPyScriptService extends Service {
         }
     }
 
-    RpcReceiverManager getRpcReceiverManager() throws InterruptedException {
+    /*RpcReceiverManager getRpcReceiverManager() throws InterruptedException {
         mLatch.await();
 
         if (mFacadeManager == null) { // Facade manage may not be available on startup.
@@ -130,7 +127,7 @@ public class QPyScriptService extends Service {
                     .getRpcReceiverManagers().get(0);
         }
         return mFacadeManager;
-    }
+    }*/
 
     public class LocalBinder extends Binder {
         public QPyScriptService getService() {
@@ -138,6 +135,7 @@ public class QPyScriptService extends Service {
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
     public class startMyAsyncTask extends AsyncTask<Integer, Integer, Boolean> {
         @Override
         protected void onPreExecute() {
@@ -146,7 +144,7 @@ public class QPyScriptService extends Service {
         @Override
         protected Boolean doInBackground(Integer... params) {
             Log.d(TAG, "doInBackground");
-            startMyMain(params[0]);
+            startMyMain();
             return true;
         }
 

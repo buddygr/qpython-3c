@@ -2,7 +2,6 @@ package org.qpython.qpy.main.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
@@ -155,7 +154,7 @@ public class FloatViewActivity extends Activity
                                 //脚本参数
                                 //final String arg = getArg(args,"arg");
                                 ScriptExec.getInstance().playScript(FloatViewActivity.this,
-                                        script, getArg(args,"arg"),false);
+                                        script, getArg(args,"arg"));
                             }
                             if (clickRemove)
                                 FloatViewFacade.removeButton(index);

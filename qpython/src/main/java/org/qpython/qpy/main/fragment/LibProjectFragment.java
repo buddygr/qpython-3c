@@ -291,7 +291,7 @@ public class LibProjectFragment extends RefreshFragment {
                         } else if (item.getCat().equals("user")) {
                             path = PROJECT_DIR + dataList.get(menuBridge.getAdapterPosition()).getSmodule();
                         }
-                        ScriptExec.getInstance().playScript(getContext(), path, "", true);
+                        ScriptExec.getInstance().playScript(getContext(), path, "");
                         break;
                     case 1:
                         // detail

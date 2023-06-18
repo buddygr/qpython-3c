@@ -15,6 +15,7 @@ import android.support.v4.util.ArrayMap;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.quseit.util.NAction;
 import com.quseit.util.StringUtils;
@@ -28,6 +29,7 @@ import org.qpython.qpysdk.QPyConstants;
 import org.qpython.qpysdk.utils.FileHelper;
 import org.qpython.qpysdk.utils.StreamGobbler;
 import org.qpython.qsl4a.QPyScriptService;
+import org.qpython.qsl4a.qsl4a.jsonrpc.JsonRpcServer;
 import org.qpython.qsl4a.qsl4a.util.SPFUtils;
 
 import java.io.File;
@@ -39,6 +41,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,54 +64,55 @@ public class ScriptExec {
         return ScriptExecHolder.INSTANCE;
     }
 
-    public void playScript(Context context, String script, String arg, boolean notify) {
+    public void playScript(Context context, String script, String arg) {
 
         // confirm the SL4A Service is started
-        context.startService(new Intent(context, QPyScriptService.class));
+        if(JsonRpcServer.isServiceRunning()) {
 
-        String header_512 = FileHelper.getFileContents(script,512);
-        boolean isWeb   = header_512.contains("#qpy:webapp");
-        boolean isQApp  = header_512.contains("#qpy:quiet");
-        //boolean isKivy  = header_512.contains("#qpy:kivy");
-        //boolean isGame  = header_512.contains("#qpy:pygame");
-        boolean isDaemon = header_512.contains("#qpy:daemon");
+            String header_512 = FileHelper.getFileContents(script,512);
+            if (header_512.contains("#qpy:webapp")) {
+                playWebApp(context,  script, arg);
+            } else if (header_512.contains("#qpy:quiet")) {
+                playQScript(context, script, arg);
+            } else if (header_512.contains("#qpy:daemon")) {
+                playDScript(context, script, arg);
+            } else {
+                playCScript(context, script, arg);
+            }
 
-        //Log.d(TAG, "playScript:" + script+"|isWeb:"+isWeb+"|isQapp:"+isQApp+"|isKivy:"+isKivy+"|isGame:"+isGame+"|isDaemon:"+isDaemon);
-
-        if (isWeb) {
-            playWebApp(context,  script, arg);
-        } /*else if (isKivy) {
-            playKScript(context, script, arg, notify);
-        } */else if (isQApp) {
-            playQScript(context, script, arg);
-        } /*else if (isGame) {
-            playGScript(context, script, arg, notify);
-        } */else if (isDaemon) {
-            playDScript(context, script, arg, notify);
         } else {
-            playCScript(context, script, arg);
+
+            context.startService(new Intent(context, QPyScriptService.class));
+            Toast.makeText(context, R.string.sl4a_start, Toast.LENGTH_SHORT).show();
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    playScript(context, script, arg);
+                }
+            },512);
+
         }
     }
 
     /*
         Play project Without args
      */
-    public void playProject(Context context, String project, boolean notify) {
-        playProject(context, project, null, notify);
+    public void playProject(Context context, String project) {
+        playProject(context, project, null);
     }
 
     /*
         Play project with args
      */
 
-    public void playProject(Context context, String project, String args, boolean notify) {
+    public void playProject(Context context, String project, String args) {
         Log.d(TAG, "playProject:" + project);
 
         String script = project + "/main.py";
         File sf = new File(script);
         if (sf.exists()) {
 
-            playScript(context, script, args, notify);
+            playScript(context, script, args);
 
         } else {
 
@@ -116,7 +121,7 @@ public class ScriptExec {
                     .setMessage(R.string.project_main_error)
                     .setPositiveButton(R.string.close, (dialog1, which) ->  {})
                     .setNegativeButton(R.string.script,((dialog1, which) -> {
-                        playScript(context,project,args,notify);
+                        playScript(context,project,args);
                     }))
                     .create()
                     .show();
@@ -252,7 +257,7 @@ public class ScriptExec {
         Utils.backTaskNotify(context);
 
         Utils.logFile[0] = logFile;
-        playDScript(context, script, argv, false);
+        playDScript(context, script, argv);
         Utils.startWebActivityWithUrl(context, title, srv, script, isNoHead, isDrawer);
 //        QWebViewActivity.start(context, "main", title, srv, script);
     }
@@ -315,7 +320,7 @@ public class ScriptExec {
         Run Daemon Script
      */
 
-    public void playDScript(Context context, final String scriptPath, String argv1, boolean notify) {
+    public void playDScript(Context context, final String scriptPath, String argv1) {
         //String logFile = getLastLog();
 
         String[] mArgs = {scriptPath, " " + (argv1 != null ? argv1 : ""), logFile};
@@ -328,7 +333,7 @@ public class ScriptExec {
         Run Quiet Script
      */
     FileDescriptor mFd;
-    public int playQScript(Context context, final String script, String argv) {
+    public void playQScript(Context context, final String script, String argv) {
         ArrayList<String> mArguments = new ArrayList<>();
 
         String binaryPath = getPyBin(context, true);
@@ -387,7 +392,7 @@ public class ScriptExec {
             //context.updateNotify(msg);
         }).start();
 
-        return mPid.getAndSet(PID_INIT_VALUE);
+        mPid.getAndSet(PID_INIT_VALUE);
     }
     
 
