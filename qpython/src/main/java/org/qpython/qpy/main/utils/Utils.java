@@ -258,7 +258,7 @@ public class Utils extends org.qpython.qpysdk.utils.Utils {
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         Intent resultIntent = new Intent(context, HomeMainActivity.class);
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder builder ;
         String CHANNEL_ID = "background_service_"+id;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){        //Android 8.0适配

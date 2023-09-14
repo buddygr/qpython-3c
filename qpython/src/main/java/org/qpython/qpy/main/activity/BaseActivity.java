@@ -3,7 +3,6 @@ package org.qpython.qpy.main.activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -12,25 +11,23 @@ import android.os.Environment;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
-import com.quseit.util.NAction;
+import com.quseit.common.CrashHandler;
 import com.quseit.util.NUtil;
 
 import org.qpython.qpy.R;
 import org.qpython.qpy.console.ShellTermSession;
 import org.qpython.qpy.console.util.TermSettings;
+import org.qpython.qsl4a.qsl4a.util.PermissionUtil;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 //import com.umeng.analytics.MobclickAgent;
@@ -45,7 +42,7 @@ public class BaseActivity extends AppCompatActivity {
     //private ArrayList<String> mArguments = new ArrayList<>();
     //private InputStream  mIn;
     //private OutputStream mOut;
-    private Map<Integer, PermissionAction> mActionMap = new ArrayMap<>();
+    private final Map<Integer, PermissionAction> mActionMap = new ArrayMap<>();
     //private TermSettings     mSettings;
     private ShellTermSession session;
 
@@ -104,22 +101,16 @@ public class BaseActivity extends AppCompatActivity {
         mActionMap.remove(action);
     }
 
-
-
     public final void checkPermissionDo(String[] permissions, PermissionAction action) {
-        if (Build.VERSION.SDK_INT >= 23) {
-            boolean granted = true;
-            for (String permission : permissions) {
-                int checkPermission = ContextCompat.checkSelfPermission(this, permission);
-                granted = checkPermission == PackageManager.PERMISSION_GRANTED;
-            }
-            if (!granted) {
-                int code = permissions.hashCode() & 0xffff;
-                mActionMap.put(code, action);
-                ActivityCompat.requestPermissions(this, permissions, code);
-            } else {
-                action.onGrant();
-            }
+        boolean granted = true;
+        for (String permission : permissions) {
+            int checkPermission = ContextCompat.checkSelfPermission(this, permission);
+            granted = checkPermission == PackageManager.PERMISSION_GRANTED;
+        }
+        if (!granted) {
+            int code = permissions.hashCode() & 0xffff;
+            mActionMap.put(code, action);
+            ActivityCompat.requestPermissions(this, permissions, code);
         } else {
             action.onGrant();
         }
@@ -141,8 +132,8 @@ public class BaseActivity extends AppCompatActivity {
         String subject = MessageFormat.format(getString(com.quseit.android.R.string.feeback_email_title), app, ver, Build.PRODUCT);
 
         String lastError = "";
-        String code = NAction.getCode(getApplicationContext());
-        File log = new File(Environment.getExternalStorageDirectory() + "/" + code + "_last_err.log");
+        //String code = NAction.getCode(getApplicationContext());
+        File log = new File(CrashHandler.errlog);
         if (log.exists()) {
             lastError = com.quseit.util.FileHelper.getFileContents(log.getAbsolutePath());
         }
@@ -165,62 +156,10 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
-    /*protected boolean checkExpired(final String resource, String filesDir, String tag) {
-        ResourceManager resourceManager = new ResourceManager(this);
-        QPySDK qpysdk = new QPySDK(getBaseContext(),this);
-
-        String data_version = qpysdk.getVersion();
-        /*String disk_version = "0";
-
-        // If no version, no unpacking is necessary.
-        if (data_version == null) {
-            return false;
-        }* /
-
-        // Check the current disk version, if any.
-        String disk_version_fn = filesDir + "/lib/" + tag + "_" + resource + ".version";
-
-        String disk_version = qpysdk.readDiskVersion(disk_version_fn);
-
-        //LogUtil.d(TAG, "data_version:"+Math.round(Double.parseDouble(data_version))+"-disk_version:"+Math.round(Double.parseDouble(disk_version))+"-RET:"+(int)(Double.parseDouble(data_version)-Double.parseDouble(disk_version)));
-        if ( !disk_version.equals(data_version) || disk_version.equals("0")) {
-            try {
-                /*FileOutputStream os = new FileOutputStream(disk_version_fn);
-                try {
-                    os.write(data_version.getBytes());
-                    os.close();* /
-                qpysdk.writeDataVersion(disk_version_fn,data_version);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //Mint.logException(e)
-            } /*catch (FileNotFoundException e) {
-                e.printStackTrace();
-                //Mint.logException(e);
-
-            }* /
-            return true;
-        } else {
-            return false;
-        }
-    }*/
-
     public interface PermissionAction {
         void onGrant();
 
         void onDeny();
     }
-
-    /*public void ifLogin(Login afterLogin) {
-        if (!TextUtils.isEmpty(TokenManager.getToken())) {
-            afterLogin.process();
-        } else {
-            Toast.makeText(this, R.string.login_first, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public interface Login {
-        void process();
-    }*/
 
 }

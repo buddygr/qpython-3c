@@ -124,7 +124,7 @@ public final class MethodDescriptor {
   // problematic because you lose the ability to call the getXXX methods on the JSON array.
   @VisibleForTesting
   static Object convertParameter(final JSONArray parameters, int index, Type type)
-      throws JSONException, RpcError {
+      throws Exception, RpcError {
     try {
       // We must handle null and numbers explicitly because we cannot magically cast them. We
       // also need to convert implicitly from numbers to bools.
@@ -154,7 +154,7 @@ public final class MethodDescriptor {
     }
   }
 
-  public static Object buildIntent(JSONObject jsonObject) throws JSONException {
+  public static Object buildIntent(JSONObject jsonObject) throws Exception {
     Intent intent = new Intent();
     if (jsonObject.has("action")) {
       intent.setAction(jsonObject.getString("action"));

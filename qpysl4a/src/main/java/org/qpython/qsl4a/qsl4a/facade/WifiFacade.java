@@ -3,14 +3,12 @@ package org.qpython.qsl4a.qsl4a.facade;
 import android.Manifest;
 import android.app.Service;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.net.DhcpInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,6 +18,7 @@ import org.qpython.qsl4a.qsl4a.rpc.Rpc;
 import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
 import org.qpython.qsl4a.qsl4a.rpc.RpcOptional;
 import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
+import org.qpython.qsl4a.qsl4a.util.PermissionUtil;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -27,10 +26,8 @@ import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -73,13 +70,8 @@ public class WifiFacade extends RpcReceiver {
   }
 
   private void check_Access_Fine_Location_And_Wifi_Permission() throws Exception {
-    for (String i : new String[]{
-            Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.CHANGE_WIFI_STATE
-    }){
-    if (ActivityCompat.checkSelfPermission(mService, i) != PackageManager.PERMISSION_GRANTED) {
-      throw new Exception(i);
-    }
-  }}
+    PermissionUtil.checkPermission(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.CHANGE_WIFI_STATE});
+  }
 
   private static JSONObject buildJsonScanResult(ScanResult scanResult) throws JSONException {
     JSONObject result = new JSONObject();
@@ -290,56 +282,14 @@ public class WifiFacade extends RpcReceiver {
         JSONArray array = new JSONArray();
       for (InetAddress addr : Collections.list(intf.getInetAddresses())) {
           if (!addr.isLoopbackAddress()){
-            //map.put("addresses"+n, Arrays.toString(addr.getAddress()));
-            //map.put("hostAddress",addr.getHostAddress());
-            //map.put("hostName"+n,addr.getHostName());
-            //map.put("canonicalHostName"+n,addr.getCanonicalHostName());
-            //map.put("interface"+n,intf.toString());
-            //map.put("interfaceName",intf.getName());
-            //map.put("interfaceUp"+n,intf.isUp());
             array.put(addr.getHostAddress());
           }
       }
         if (array.length()>0)
           map.put(intf.getName(),array);
     }
-    /*WifiInfo info = mWifi.getConnectionInfo();
-    int ip = info.getIpAddress();
-    if (ipConvertToString) {
-      return intToIp(ip);
-    } else {
-      return String.valueOf(ip);
-    }*/
     return map;
   }
-
-  /*@Rpc(description = "wifi set ap enabled .")
-  public String[] wifiSetApEnabled(
-          @RpcParameter(name = "enabled") Boolean enabled
-  ) throws Exception {
-    if (Build.VERSION.SDK_INT<Build.VERSION_CODES.O){
-      throw new Exception("wifiSetApEnabled Need Android >= 8.0 .");
-    } else {
-    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-      throw new Exception("wifiSetApEnabled Need Location Permission .");
-    }
-    String[] rst=new String[2];
-    if (enabled) {
-      mWifi.startLocalOnlyHotspot(new WifiManager.LocalOnlyHotspotCallback(){
-        @Override
-        public void onStarted(WifiManager.LocalOnlyHotspotReservation reservation) {
-          WifiConfiguration wifiConfiguration = reservation.getWifiConfiguration();
-          rst[0] = wifiConfiguration.SSID;
-          rst[1] = wifiConfiguration.preSharedKey;
-        }
-      }, mHandler);
-    } else {
-      Method method = mWifi.getClass().getMethod("cancelLocalOnlyHotspotRequest");
-      method.setAccessible(true);
-      method.invoke(mWifi);
-      }
-    return rst;
-    }}*/
 
   @Override
   public void shutdown() {

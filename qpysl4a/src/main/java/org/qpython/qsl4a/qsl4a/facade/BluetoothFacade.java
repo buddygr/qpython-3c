@@ -20,16 +20,19 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
+import android.content.IntentFilter;
+import android.os.ParcelUuid;
 
-
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.qpython.qsl4a.codec.Base64Codec;
 import org.qpython.qsl4a.qsl4a.Constants;
 import org.qpython.qsl4a.qsl4a.LogUtil;
@@ -37,19 +40,22 @@ import org.qpython.qsl4a.qsl4a.MainThread;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
 import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
-import org.qpython.qsl4a.qsl4a.rpc.RpcMinSdk;
 import org.qpython.qsl4a.qsl4a.rpc.RpcOptional;
 import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
+import org.qpython.qsl4a.qsl4a.util.PermissionUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 
 
 /**
@@ -58,40 +64,39 @@ import java.util.concurrent.Callable;
  */
 // Discovery functions added by Eden Sayag
 
-@RpcMinSdk(5)
 public class BluetoothFacade extends RpcReceiver {
 
   // UUID for SL4A.
   private static final String DEFAULT_UUID = "457807c0-4897-11df-9879-0800200c9a66";
   private static final String SDP_NAME = "SL4A";
 
-  private Map<String, BluetoothConnection> connections = new HashMap<String, BluetoothConnection>();
-  private AndroidFacade mAndroidFacade;
-  private BluetoothAdapter mBluetoothAdapter;
+  private final Map<String, BluetoothConnection> connections = new HashMap<>();
+  private final AndroidFacade mAndroidFacade;
+  private final BluetoothAdapter mBluetoothAdapter;
   @SuppressLint("StaticFieldLeak")
   private static Context context;
+  private static JSONObject mDeviceList;
+  private static BroadcastReceiver mReceiver;
+  private static HashMap<String,ArrayList<Object>> mRssi;
+  private static int mRssiInterval;
 
   public BluetoothFacade(FacadeManager manager) {
     super(manager);
     mAndroidFacade = manager.getReceiver(AndroidFacade.class);
     context = mAndroidFacade.context;
-    mBluetoothAdapter = MainThread.run(manager.getService(), new Callable<BluetoothAdapter>() {
-      @Override
-      public BluetoothAdapter call() throws Exception {
-        return BluetoothAdapter.getDefaultAdapter();
-      }
-    });
+    mReceiver = new BluetoothReceiver();
+    mBluetoothAdapter = MainThread.run(manager.getService(), BluetoothAdapter::getDefaultAdapter);
+    mRssiInterval = 1000;
   }
 
   @Rpc(description = "Returns active Bluetooth connections.")
   public Map<String, String> bluetoothActiveConnections() {
-    Map<String, String> out = new HashMap<String, String>();
+    Map<String, String> out = new HashMap<>();
     for (Map.Entry<String, BluetoothConnection> entry : connections.entrySet()) {
       if (entry.getValue().isConnected()) {
         out.put(entry.getKey(), entry.getValue().getRemoteBluetoothAddress());
       }
     }
-
     return out;
   }
 
@@ -145,7 +150,7 @@ public class BluetoothFacade extends RpcReceiver {
   }
 
   public static void checkBluetoothPermission() throws Exception {
-    if(context == null)
+    if(mDeviceList != null)
       return;
     String[] permissions;
     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
@@ -153,11 +158,8 @@ public class BluetoothFacade extends RpcReceiver {
     } else {
       permissions = new String[]{Manifest.permission.BLUETOOTH};
     }
-    for(String permission:permissions){
-    if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-      throw new Exception("Need Permission of "+permission);
-    }}
-  context = null;
+    PermissionUtil.checkPermission(permissions);
+  mDeviceList = new JSONObject();
   }
 
   @Rpc(description = "Connect to a device over Bluetooth. Blocks until the connection is established or fails.", returns = "True if the connection was established successfully.")
@@ -280,6 +282,120 @@ public class BluetoothFacade extends RpcReceiver {
     }
   }
 
+  @Rpc(description = "bluetooth Get Bonded Devices")
+  public JSONObject bluetoothGetBondedDevices() throws Exception {
+    checkBluetoothPermission();
+    return getBondedDevices(true);
+  }
+
+  @Rpc(description = "bluetooth Get Bonded Devices Rssi")
+  public JSONObject bluetoothGetBondedDevicesRssi(
+    @RpcParameter(name = "interval") @RpcOptional Integer interval
+  ) throws Exception {
+    checkBluetoothPermission();
+    if(interval == null || interval == 0){
+      if(mRssi == null)
+        return null;
+      else return getBondedDevices(false);
+    } else {
+      if (interval < 0) {
+        if(mRssi!=null){
+          for (ArrayList<Object> device:mRssi.values()){
+            if(device.size()==4) {
+              ((BluetoothGatt) device.get(0)).close();
+              ((Timer) device.get(1)).cancel();
+            }
+            device.clear();
+          }
+          mRssi.clear();
+        }
+        mRssi = null;
+      } else {
+        mRssi = new HashMap<>();
+        mRssiInterval = interval;
+      }
+    }
+    return null;
+  }
+
+  @SuppressLint("MissingPermission")
+  private JSONObject getBondedDevices(boolean deviceData) throws JSONException {
+    Set<BluetoothDevice> mDevice = mBluetoothAdapter.getBondedDevices();
+    JSONObject result = new JSONObject();
+    for(BluetoothDevice bluetoothDevice : mDevice) {
+      JSONObject device;
+      if(deviceData)
+        device = putDeviceData(bluetoothDevice, result);
+      else {
+        device = new JSONObject();
+        result.put(bluetoothDevice.getAddress(),device);
+      }
+      if(mRssi != null)
+        getDeviceRssi(bluetoothDevice,device);
+    }
+    return result;
+  }
+
+  @SuppressLint("MissingPermission")
+    private void getDeviceRssi(BluetoothDevice bluetoothDevice,JSONObject device){
+    String address = bluetoothDevice.getAddress();
+    ArrayList<Object> lRssi;
+
+    if (mRssi.containsKey(address))
+      lRssi = mRssi.get(address);
+    else {
+      lRssi = new ArrayList<>();
+      mRssi.put(address,lRssi);
+    }
+
+    if (lRssi.size()==4) {
+    try {
+      device.put("time", (long) lRssi.get(2));
+      device.put("rssi", (int) lRssi.get(3));
+      } catch (Exception ignored) {}
+    } else if (lRssi.size()==0){
+
+     final BluetoothGatt bluetoothGatt = bluetoothDevice.connectGatt(
+      context, true, new BluetoothGattCallback() {
+
+        final ArrayList<Object> lRssi = mRssi.get(address);
+
+      /*@Override
+      public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+        super.onConnectionStateChange(gatt, status, newState);
+      }*/
+
+      @Override
+      public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
+        if (BluetoothGatt.GATT_SUCCESS == status) {
+          try {
+            lRssi.set(2, System.currentTimeMillis());
+            lRssi.set(3, rssi);
+          } catch (Exception ignored) {
+          }
+        }
+      }
+    });
+
+    lRssi.add(bluetoothGatt);
+    Timer timer = new Timer();
+    TimerTask task = new TimerTask() {
+      @Override
+      public void run() {
+        bluetoothGatt.readRemoteRssi();
+      }
+    };
+    timer.schedule(task, mRssiInterval, mRssiInterval);
+    lRssi.add(timer);
+    lRssi.add(null);
+    lRssi.add(null);
+  }}
+
+  @Rpc(description = "bluetooth Get Received Devices")
+  public JSONObject bluetoothGetReceivedDevices(){
+    return mDeviceList;
+  }
+
   @Rpc(description = "Gets the Bluetooth Visible device name")
   public String bluetoothGetLocalName() throws Exception {
     checkBluetoothPermission();
@@ -382,12 +498,22 @@ public class BluetoothFacade extends RpcReceiver {
   @Rpc(description = "Start the remote device discovery process. ", returns = "true on success, false on error")
   public Boolean bluetoothDiscoveryStart() throws Exception {
     checkBluetoothPermission();
+    IntentFilter intentFilter = new IntentFilter();
+    intentFilter.addAction(BluetoothDevice.ACTION_FOUND);//发现设备
+    intentFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);//配对
+    intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);//搜索结束
+    //注意，有些设备连接状态是这个广播，我就是栽在这里，一台设备是这里的回调，有些设备又是下面的广播回调,所以要做兼容...
+    intentFilter.addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
+    mDeviceList = new JSONObject();
+    context.registerReceiver(mReceiver, intentFilter);
     return mBluetoothAdapter.startDiscovery();
   }
 
   @Rpc(description = "Cancel the current device discovery process.", returns = "true on success, false on error")
   public Boolean bluetoothDiscoveryCancel() throws Exception {
     checkBluetoothPermission();
+    context.unregisterReceiver(mReceiver);
+    mDeviceList = null;
     return mBluetoothAdapter.cancelDiscovery();
   }
 
@@ -404,6 +530,67 @@ public class BluetoothFacade extends RpcReceiver {
     }
     connections.clear();
   }
+
+  @SuppressLint("MissingPermission")
+  private static JSONObject putDeviceData(BluetoothDevice bluetoothDevice,JSONObject targetObject) throws JSONException {
+    JSONObject device = new JSONObject();
+    device.put("name",bluetoothDevice.getName());
+    device.put("bondState",bluetoothDevice.getBondState());
+    device.put("type",bluetoothDevice.getType());
+    JSONArray uuid = new JSONArray();
+    ParcelUuid[] Uuids = bluetoothDevice.getUuids();
+    if (Uuids != null) {
+      for (ParcelUuid Uuid : bluetoothDevice.getUuids())
+        uuid.put(Uuid.toString());
+      device.put("uuid", uuid);
+    }
+    targetObject.put(bluetoothDevice.getAddress(),device);
+    return device;
+  }
+
+  private static void putDeviceData(BluetoothDevice bluetoothDevice,short rssi) throws JSONException {
+    JSONObject device = putDeviceData(bluetoothDevice,mDeviceList);
+    if(rssi!=Short.MIN_VALUE) {
+      device.put("rssi", rssi);
+      device.put("time",System.currentTimeMillis());
+    }
+  }
+
+  private static void putDeviceExcept(Exception exception){
+    try {
+      mDeviceList.put("EXCEPTION"+mDeviceList.length(),exception.toString());
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public static class BluetoothReceiver extends BroadcastReceiver {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      try {
+        checkBluetoothPermission();
+        if(mDeviceList==null)
+          mDeviceList=new JSONObject();
+      } catch (Exception exception) {
+        putDeviceExcept(exception);
+        return;
+      }
+
+      final String action = intent.getAction();
+
+      if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+        // Get the BluetoothDevice object from the Intent.
+        BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+        short rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI,Short.MIN_VALUE);
+        try {
+          putDeviceData(device,rssi);
+        } catch (Exception exception) {
+          putDeviceExcept(exception);
+        }
+      }
+    }
+  }
+
 }
 
 class BluetoothConnection {

@@ -1,20 +1,20 @@
-QPython 3C LICENSE
+QPython Plus LICENSE
 
 ===== ===== English Edition ===== ===== 
 
 Related to granting permissions:
-QPython3C will not collect any user information. You can grant corresponding permissions according to your own situation. Unauthorized permissions will lose their corresponding functions.
+QPython Plus will not collect any user information. You can grant corresponding permissions according to your own situation. Unauthorized permissions will lose their corresponding functions.
 
 Open source software security tips:
-If a security vulnerability occurs when using QPython3C, QPython3C developers may have no time or ability to fix it.
-If the QPython3C is not used properly, a large amount of important data may be lost.
+If a security vulnerability occurs when using QPython Plus, QPython Plus developers may have no time or ability to fix it.
+If the QPython Plus is not used properly, a large amount of important data may be lost.
 Continued use means users taking risks in terms of security vulnerabilities, data loss and etc, which has nothing to do with QPython developers.
 
 Open source and free but requires support:
 Open source software production requires investment cost. Please support more QPython developers.
-QPython3C is completely free for personal learning and research.
-The QPython3C is encouraged to be used free of charge for students without computers to carry out Python assisted exercises.
-At present, QPython3C and its source code are not allowed to be used commercially, if there is a commercial demand, it needs to be approved by QPython3C developers.
+QPython Plus is completely free for personal learning and research.
+The QPython Plus is encouraged to be used free of charge for students without computers to carry out Python assisted exercises.
+At present, QPython Plus and its source code are not allowed to be used commercially, if there is a commercial demand, it needs to be approved by QPython Plus developers.
 The rest follow the Apache 2.0 open source protocol.
 The developer reserves the right to stop maintaining the project.
 
@@ -24,26 +24,26 @@ Modify Author: 乘着船
 Welcome to give the thumbs-up, collection and/or insert coin .
 QPython developers may not have time to reply to every problem, or some problems QPython developers can't solve themselves now .
 
-Lite Python in QPython 3C is build on Termux .
+Lite Python in QPython Plus is build on Termux .
 
-It is strictly prohibited to use the original or modified version of QPython 3C for all kinds of illegal and immoral activities .
-Once it is found that QPython3C is used for network wall climbing, illegal intrusion into computer systems, or unauthorized use for commercialization, or other illegal acts not mentioned, and the circumstances are serious, QPython3C developers have the right to delete the project source code, installation packages, and tutorials, and reserve the right to investigate the legal liability of offenders.
+It is strictly prohibited to use the original or modified version of QPython Plus for all kinds of illegal and immoral activities .
+Once it is found that QPython Plus is used for network wall climbing, illegal intrusion into computer systems, or unauthorized use for commercialization, or other illegal acts not mentioned, and the circumstances are serious, QPython Plus developers have the right to delete the project source code, installation packages, and tutorials, and reserve the right to investigate the legal liability of offenders.
 
 ===== ===== 中文版 ===== ===== 
 
 授予权限相关：
-QPython3C不会收集任何用户信息，您可以根据自身情况授予相应权限，未被授予的权限将会失去对应功能。
+QPython Plus不会收集任何用户信息，您可以根据自身情况授予相应权限，未被授予的权限将会失去对应功能。
 
 开源软件安全提示：
-使用QPython3C如果出现安全漏洞，QPython3C开发者可能没时间也无力修复。
-如果QPython3C使用不当，可能会造成重要数据大量丢失。
+使用QPython Plus如果出现安全漏洞，QPythonPlus开发者可能没时间也无力修复。
+如果QPython Plus使用不当，可能会造成重要数据大量丢失。
 继续使用意味着使用者自行承担安全漏洞和数据丢失等方面的风险，与QPython开发者无关。
 
 开源免费但需要支持：
 开源软件制作需要投入成本，请多支持QPython开发者。
-QPython3C针对个人学习研究完全免费。
-鼓励QPython3C免费用于无电脑的学生进行Python辅助练习。
-目前QPython3C及其源代码均不允许商用，确有商用需求需经QPython3C开发者同意。
+QPython Plus针对个人学习研究完全免费。
+鼓励QPython Plus免费用于无电脑的学生进行Python辅助练习。
+目前QPython Plus及其源代码均不允许商用，确有商用需求需经QPython Plus开发者同意。
 此外其余部分遵循Apache2.0开源协议。
 开发者保留停止维护项目的权利。
 
@@ -52,11 +52,11 @@ QPython3C针对个人学习研究完全免费。
 修改作者:乘着船
 欢迎点赞收藏投币，不过QPython开发者不一定有时间回复每一个问题，或者有些问题QPython开发者自己也解决不了。
 
-QPython 3C 上的 精简版 Python 由 Termux 构建。
+QPython Plus 上的 精简版 Python 由 Termux 构建。
 
-严禁将 QPython 3C 原版或修改版 用于各类违法违背道德的活动。
-一旦发现QPython3C被用于网络翻墙、非法入侵计算机系统，或者未授权用于商业化，以及其他未提及的违法行为，情节严重时，QPython3C开发者有权删除该项目源代码、安装包、教程，并保留追究违法者法律责任的权利。
+严禁将 QPython Plus 原版或修改版 用于各类违法违背道德的活动。
+一旦发现QPython Plus被用于网络翻墙、非法入侵计算机系统，或者未授权用于商业化，以及其他未提及的违法行为，情节严重时，QPython Plus开发者有权删除该项目源代码、安装包、教程，并保留追究违法者法律责任的权利。
 
 ===== ===== ===== ===== =====
 
-by 乘着船 at 20220924
+by 乘着船 at 20230912

@@ -36,6 +36,7 @@ import android.os.Message;
 import android.os.StatFs;
 import android.os.Vibrator;
 import android.text.ClipboardManager;
+import android.util.Base64;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -58,6 +59,7 @@ import org.qpython.qsl4a.qsl4a.util.SPFUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -236,7 +238,7 @@ public class AndroidFacade extends RpcReceiver {
 
   // TODO(damonkohler): Pull this out into proper argument deserialization and support
   // complex/nested types being passed in.
-  public static void putExtrasFromJsonObject(JSONObject extras, Intent intent) throws JSONException {
+  public static void putExtrasFromJsonObject(JSONObject extras, Intent intent) throws Exception {
     JSONArray names = extras.names();
     if(names==null)
       return;
@@ -259,7 +261,7 @@ public class AndroidFacade extends RpcReceiver {
         intent.putExtra(name, (Long) data);
       }
       if (data instanceof String) {
-        intent.putExtra(name, (String) data);
+        putExtrasFromString(intent, name, data);
       }
       if (data instanceof Boolean) {
         intent.putExtra(name, (Boolean) data);
@@ -272,48 +274,50 @@ public class AndroidFacade extends RpcReceiver {
       }
       // Nested JSONArray. Doesn't support mixed types in single array
       if (data instanceof JSONArray) {
+        JSONArray jdata = (JSONArray) data;
         // Empty array. No way to tell what type of data to pass on, so skipping
-        if (((JSONArray) data).length() == 0) {
+        if (jdata.length() == 0) {
           LogUtil.e("Empty array not supported in JSONObject, skipping");
           continue;
         }
+        Object fdata = jdata.get(0);
         // Integer
-        if (((JSONArray) data).get(0) instanceof Integer) {
-          Integer[] integerArrayData = new Integer[((JSONArray) data).length()];
-          for (int j = 0; j < ((JSONArray) data).length(); ++j) {
-            integerArrayData[j] = ((JSONArray) data).getInt(j);
+        if (fdata instanceof Integer) {
+          Integer[] integerArrayData = new Integer[jdata.length()];
+          for (int j = 0; j < jdata.length(); ++j) {
+            integerArrayData[j] = jdata.getInt(j);
           }
           intent.putExtra(name, integerArrayData);
         }
         // Double
-        if (((JSONArray) data).get(0) instanceof Double) {
-          Double[] doubleArrayData = new Double[((JSONArray) data).length()];
-          for (int j = 0; j < ((JSONArray) data).length(); ++j) {
-            doubleArrayData[j] = ((JSONArray) data).getDouble(j);
+        if (fdata instanceof Double) {
+          Double[] doubleArrayData = new Double[jdata.length()];
+          for (int j = 0; j < jdata.length(); ++j) {
+            doubleArrayData[j] = jdata.getDouble(j);
           }
           intent.putExtra(name, doubleArrayData);
         }
         // Long
-        if (((JSONArray) data).get(0) instanceof Long) {
-          Long[] longArrayData = new Long[((JSONArray) data).length()];
-          for (int j = 0; j < ((JSONArray) data).length(); ++j) {
-            longArrayData[j] = ((JSONArray) data).getLong(j);
+        if (fdata instanceof Long) {
+          Long[] longArrayData = new Long[jdata.length()];
+          for (int j = 0; j < jdata.length(); ++j) {
+            longArrayData[j] = jdata.getLong(j);
           }
           intent.putExtra(name, longArrayData);
         }
         // String
-        if (((JSONArray) data).get(0) instanceof String) {
-          String[] stringArrayData = new String[((JSONArray) data).length()];
-          for (int j = 0; j < ((JSONArray) data).length(); ++j) {
-            stringArrayData[j] = ((JSONArray) data).getString(j);
+        if (fdata instanceof String) {
+          String[] stringArrayData = new String[jdata.length()];
+          for (int j = 0; j < jdata.length(); ++j) {
+            stringArrayData[j] = jdata.getString(j);
           }
           intent.putExtra(name, stringArrayData);
         }
         // Boolean
-        if (((JSONArray) data).get(0) instanceof Boolean) {
-          Boolean[] booleanArrayData = new Boolean[((JSONArray) data).length()];
-          for (int j = 0; j < ((JSONArray) data).length(); ++j) {
-            booleanArrayData[j] = ((JSONArray) data).getBoolean(j);
+        if (fdata instanceof Boolean) {
+          Boolean[] booleanArrayData = new Boolean[jdata.length()];
+          for (int j = 0; j < jdata.length(); ++j) {
+            booleanArrayData[j] = jdata.getBoolean(j);
           }
           intent.putExtra(name, booleanArrayData);
         }
@@ -321,34 +325,66 @@ public class AndroidFacade extends RpcReceiver {
     }
   }
 
+  private static void putExtrasFromString(Intent intent, String name, Object data) throws Exception {
+    String str = (String) data;
+    if(str.length()>5 && str.charAt(0) == 0 ){
+      int p = str.indexOf(0,1);
+      if(p<0)
+        throw new Exception("No type of special String : " + str);
+      String type = str.substring(1,p);
+      str = str.substring(p+1);
+      if(type.equals("uri"))
+        intent.putExtra(name, Uri.parse(str));
+      else if(type.equals("byte"))
+        intent.putExtra(name, Base64.decode(str, Base64.DEFAULT));
+      else intent.putExtra(name, str);
+    } else intent.putExtra(name, str);
+  }
+
+  private static void putStringToBundle(Bundle bundle, String name, Object data) throws Exception {
+    String str = (String) data;
+    if(str.length()>5 && str.charAt(0) == 0 ){
+      int p = str.indexOf(0,1);
+      if(p<0)
+        throw new Exception("No type of special String : " + str);
+      String type = str.substring(1,p);
+      str = str.substring(p+1);
+      if(type.equals("byte"))
+        bundle.putByteArray(name, Base64.decode(str, Base64.DEFAULT));
+      else bundle.putString(name, str);
+    } else bundle.putString(name, str);
+  }
+
   // Contributed by Emmanuel T
   // Nested Array handling contributed by Sergey Zelenev
   private static void putNestedJSONObject(JSONObject jsonObject, Bundle bundle)
-          throws JSONException {
+          throws Exception {
     JSONArray names = jsonObject.names();
+    if(names == null)
+      return;
     for (int i = 0; i < names.length(); i++) {
       String name = names.getString(i);
       Object data = jsonObject.get(name);
-      if (data == null) {
+      /*if (data == null) {
         continue;
-      }
+      }*/
       if (data instanceof Integer) {
-        bundle.putInt(name, ((Integer) data).intValue());
+        bundle.putInt(name, (Integer) data);
       }
-      if (data instanceof Float) {
+      /*if (data instanceof Float) {
         bundle.putFloat(name, ((Float) data).floatValue());
-      }
+      }*/
       if (data instanceof Double) {
-        bundle.putDouble(name, ((Double) data).doubleValue());
+        bundle.putDouble(name, (Double) data);
       }
       if (data instanceof Long) {
-        bundle.putLong(name, ((Long) data).longValue());
+        bundle.putLong(name, (Long) data);
       }
       if (data instanceof String) {
-        bundle.putString(name, (String) data);
+        putStringToBundle(bundle,name,data);
       }
       if (data instanceof Boolean) {
-        bundle.putBoolean(name, ((Boolean) data).booleanValue());
+        bundle.putBoolean(name, (Boolean) data);
       }
       // Nested JSONObject
       if (data instanceof JSONObject) {
@@ -359,47 +395,49 @@ public class AndroidFacade extends RpcReceiver {
       // Nested JSONArray. Doesn't support mixed types in single array
       if (data instanceof JSONArray) {
         // Empty array. No way to tell what type of data to pass on, so skipping
-        if (((JSONArray) data).length() == 0) {
+        JSONArray jdata = (JSONArray) data;
+        if (jdata.length() == 0) {
           LogUtil.e("Empty array not supported in nested JSONObject, skipping");
           continue;
         }
+        Object fdata = jdata.get(0);
         // Integer
-        if (((JSONArray) data).get(0) instanceof Integer) {
-          int[] integerArrayData = new int[((JSONArray) data).length()];
-          for (int j = 0; j < ((JSONArray) data).length(); ++j) {
-            integerArrayData[j] = ((JSONArray) data).getInt(j);
+        if (fdata instanceof Integer) {
+          int[] integerArrayData = new int[jdata.length()];
+          for (int j = 0; j < jdata.length(); ++j) {
+            integerArrayData[j] = jdata.getInt(j);
           }
           bundle.putIntArray(name, integerArrayData);
         }
         // Double
-        if (((JSONArray) data).get(0) instanceof Double) {
-          double[] doubleArrayData = new double[((JSONArray) data).length()];
-          for (int j = 0; j < ((JSONArray) data).length(); ++j) {
-            doubleArrayData[j] = ((JSONArray) data).getDouble(j);
+        if (fdata instanceof Double) {
+          double[] doubleArrayData = new double[jdata.length()];
+          for (int j = 0; j < jdata.length(); ++j) {
+            doubleArrayData[j] = jdata.getDouble(j);
           }
           bundle.putDoubleArray(name, doubleArrayData);
         }
         // Long
-        if (((JSONArray) data).get(0) instanceof Long) {
-          long[] longArrayData = new long[((JSONArray) data).length()];
-          for (int j = 0; j < ((JSONArray) data).length(); ++j) {
-            longArrayData[j] = ((JSONArray) data).getLong(j);
+        if (fdata instanceof Long) {
+          long[] longArrayData = new long[jdata.length()];
+          for (int j = 0; j < jdata.length(); ++j) {
+            longArrayData[j] = jdata.getLong(j);
           }
           bundle.putLongArray(name, longArrayData);
         }
         // String
-        if (((JSONArray) data).get(0) instanceof String) {
-          String[] stringArrayData = new String[((JSONArray) data).length()];
-          for (int j = 0; j < ((JSONArray) data).length(); ++j) {
-            stringArrayData[j] = ((JSONArray) data).getString(j);
+        if (fdata instanceof String) {
+          String[] stringArrayData = new String[jdata.length()];
+          for (int j = 0; j < jdata.length(); ++j) {
+            stringArrayData[j] = jdata.getString(j);
           }
           bundle.putStringArray(name, stringArrayData);
         }
         // Boolean
-        if (((JSONArray) data).get(0) instanceof Boolean) {
-          boolean[] booleanArrayData = new boolean[((JSONArray) data).length()];
-          for (int j = 0; j < ((JSONArray) data).length(); ++j) {
-            booleanArrayData[j] = ((JSONArray) data).getBoolean(j);
+        if (fdata instanceof Boolean) {
+          boolean[] booleanArrayData = new boolean[jdata.length()];
+          for (int j = 0; j < jdata.length(); ++j) {
+            booleanArrayData[j] = jdata.getBoolean(j);
           }
           bundle.putBooleanArray(name, booleanArrayData);
         }
@@ -417,7 +455,7 @@ public class AndroidFacade extends RpcReceiver {
   }
 
   private Intent buildIntent(String action, String uri, String type, JSONObject extras,
-                             String packagename, String classname, JSONArray categories) throws JSONException {
+                             String packagename, String classname, JSONArray categories) throws Exception {
     Intent intent = new Intent(action);
     intent.setDataAndType(uri != null ? Uri.parse(uri) : null, type);
     if (packagename != null && classname != null) {
@@ -447,7 +485,7 @@ public class AndroidFacade extends RpcReceiver {
           @RpcParameter(name = "extras", description = "a Map of extras to add to the Intent") @RpcOptional JSONObject extras,
           @RpcParameter(name = "packagename", description = "name of package. If used, requires classname to be useful") @RpcOptional String packagename,
           @RpcParameter(name = "classname", description = "name of class. If used, requires packagename to be useful") @RpcOptional String classname)
-          throws JSONException {
+          throws Exception {
     final Intent intent = buildIntent(action, uri, type, extras, packagename, classname, null);
     return startActivityForResult(intent);
   }
@@ -532,7 +570,7 @@ public class AndroidFacade extends RpcReceiver {
           @RpcParameter(name = "extras", description = "a Map of extras to add to the Intent") @RpcOptional JSONObject extras,
           @RpcParameter(name = "packagename", description = "name of package. If used, requires classname to be useful") @RpcOptional String packagename,
           @RpcParameter(name = "classname", description = "name of class. If used, requires packagename to be useful") @RpcOptional String classname)
-          throws JSONException {
+          throws Exception {
     final Intent intent = buildIntent(action, uri, type, extras, packagename, classname, null);
     try {
       mService.sendBroadcast(intent);
@@ -551,7 +589,7 @@ public class AndroidFacade extends RpcReceiver {
           @RpcParameter(name = "packagename", description = "name of package. If used, requires classname to be useful") @RpcOptional String packagename,
           @RpcParameter(name = "classname", description = "name of class. If used, requires packagename to be useful") @RpcOptional String classname,
           @RpcParameter(name = "flags", description = "Intent flags") @RpcOptional Integer flags)
-          throws JSONException {
+          throws Exception {
     Intent intent = buildIntent(action, uri, type, extras, packagename, classname, categories);
     if (flags == null) {
       flags = intentFlags;
@@ -684,7 +722,7 @@ public class AndroidFacade extends RpcReceiver {
             intent = new Intent (context,NotificationClickReceiver.class);
             intent.putExtra("path",uri);
             intent.putExtra("arg",arg);
-            contentIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            contentIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
           } catch (Exception e) {
             intent = new Intent();
             intent.setClassName(mService.getPackageName(), "org.qpython.qpylib.MPyApi");
@@ -707,7 +745,7 @@ public class AndroidFacade extends RpcReceiver {
       intent = new Intent();
     }
     if(contentIntent == null)
-        contentIntent = PendingIntent.getActivity(mService, NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        contentIntent = PendingIntent.getActivity(mService, NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     Notification notification = SPFUtils.getNotification(context, title, message, contentIntent,
             SPFUtils.getDrawableId(mService, "img_home_logo"), null);
 

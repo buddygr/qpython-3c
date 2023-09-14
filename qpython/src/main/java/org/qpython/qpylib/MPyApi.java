@@ -140,7 +140,7 @@ public class MPyApi extends BaseActivity {
                                 runMode = 1;
                             }
                             String script = CONF.SCOPE_STORAGE_PATH + "/cache/last.py";
-                            FileHelper.putFileContents(this, script, pycode);
+                            FileHelper.putFileContents(script, pycode);
                             ScriptExec.getInstance().playScript(this,script, null);
                         }
                     }

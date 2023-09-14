@@ -44,11 +44,14 @@ public class AppListActivity extends BaseActivity implements LoaderManager.Loade
 
     private List<AppModel> dataList;
     private AppListAdapter adapter;
+    public static String APP_LIST_SETTING;
+    protected static byte[] frequencyAppList = new byte[0];
 
     public static void start(Context context, String type) {
         Intent starter = new Intent(context, AppListActivity.class);
         starter.putExtra("type", type);
         context.startActivity(starter);
+        APP_LIST_SETTING = context.getFilesDir() + "/text/ver/" + AppListAdapter.TAG;
     }
 
     @Override
@@ -121,7 +124,7 @@ public class AppListActivity extends BaseActivity implements LoaderManager.Loade
     }
 
     private void getProjectScriptList() {
-        for (String path : CONF.PATHS()){
+        for (String path : getPathsOrder()){
             File projectFile = new File(path,QPyConstants.DFROM_PRJ3);
             getProjectList(projectFile);
             getScriptList(path);
@@ -141,6 +144,71 @@ public class AppListActivity extends BaseActivity implements LoaderManager.Loade
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private String[] getPathsOrder(){
+        String[] paths = CONF.PATHS();
+        getPathsValueFromFile(paths.length);
+        String s;    byte k;
+        byte[] freq = frequencyAppList.clone();
+        for(byte i = 0;i < paths.length - 1; i++)
+            for(byte j = 1;j < paths.length; j++){
+                if(freq[i] < freq[j]){
+                    k = freq[i];
+                    freq[i] = freq[j];
+                    freq[j] = k;
+                    s = paths[i];
+                    paths[i] = paths[j];
+                    paths[j] = s;
+                }
+            }
+        return paths;
+    }
+
+    public static void getPathsValue(byte length){
+        String[] paths = CONF.PATHS();
+        if(length < paths.length)
+            length = (byte) paths.length;
+        getPathsValueFromFile(length);
+    }
+
+    private static void getPathsValueFromFile(int length){
+        if(frequencyAppList.length == 0){
+          frequencyAppList = new byte[length];
+        try {
+            int num = Integer.parseInt(FileHelper.getFileContent(APP_LIST_SETTING));
+            for (byte i = 0;i < length; i++){
+                frequencyAppList[i] = (byte) (num % 10);
+                num /= 10;
+            }
+        } catch (Exception ignored) {}
+    } else if(length > frequencyAppList.length){
+        byte[] freq = frequencyAppList.clone();
+        frequencyAppList = new byte[length];
+        System.arraycopy(freq, 0, frequencyAppList, 0, freq.length);
+        }
+    }
+
+    public static void setPathsValue(QPyScriptModel qPyScriptModel) {
+        byte length = qPyScriptModel.getPathType();
+        getPathsValue(length);
+        frequencyAppList[length] += 1;
+        byte k = 10;
+        for (byte b : frequencyAppList) {
+            if (b < k)
+                k = b;
+            else if (b > 9)
+                k += 1;
+        }
+        int num = 0,t = 1;
+        for(byte i = 0; i < frequencyAppList.length; i++){
+            frequencyAppList[i] -= k;
+            if(frequencyAppList[i] < 0)
+                frequencyAppList[i] = 0;
+            num += frequencyAppList[i] * t;
+            t *= 10;
+        }
+        FileHelper.putFileContents(APP_LIST_SETTING,String.valueOf(num));
     }
 
     @Override

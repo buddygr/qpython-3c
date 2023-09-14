@@ -15,16 +15,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
 import android.os.PowerManager;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
@@ -35,10 +31,8 @@ import android.widget.Toast;
 import com.quseit.util.NAction;
 import com.quseit.util.NStorage;
 
-import org.json.JSONObject;
 import org.qpython.qpy.R;
 import org.qpython.qpy.main.activity.HomeMainActivity;
-import org.qpython.qpy.main.activity.SettingActivity;
 import org.qpython.qpy.main.app.App;
 import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.main.auxActivity.ProtectActivity;
@@ -48,13 +42,10 @@ import org.qpython.qpy.texteditor.ui.view.EnterDialog;
 import org.qpython.qpysdk.QPySDK;
 import org.qpython.qpysdk.utils.Utils;
 import org.qpython.qsl4a.QPyScriptService;
-import org.qpython.qsl4a.qsl4a.facade.FtpFacade;
 import org.qpython.qsl4a.qsl4a.jsonrpc.JsonRpcServer;
 import org.swiftp.Globals;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -720,7 +711,7 @@ public class SettingFragment extends PreferenceFragment {
     private void restartApp() {
         Intent mStartActivity = new Intent(getActivity(), HomeMainActivity.class);
         int mPendingIntentId = 123456;
-        PendingIntent mPendingIntent = PendingIntent.getActivity(getActivity(), mPendingIntentId, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent mPendingIntent = PendingIntent.getActivity(getActivity(), mPendingIntentId, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         AlarmManager mgr = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
         mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
         System.exit(0);

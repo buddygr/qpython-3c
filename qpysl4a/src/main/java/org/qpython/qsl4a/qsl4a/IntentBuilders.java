@@ -152,6 +152,6 @@ public class IntentBuilders {
   public static PendingIntent buildTriggerServicePendingIntent(Context context) {
     final Intent intent = buildTriggerServiceIntent();
     return PendingIntent.getService(context, EXECUTE_SCRIPT_REQUEST_CODE, intent,
-        PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
   }
 }

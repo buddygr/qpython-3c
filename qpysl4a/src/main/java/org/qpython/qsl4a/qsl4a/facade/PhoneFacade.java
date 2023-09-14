@@ -22,14 +22,13 @@ import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Contacts.PhonesColumns;
+import android.provider.Settings;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
 import android.telephony.CellIdentityCdma;
 import android.telephony.CellIdentityGsm;
 import android.telephony.CellIdentityLte;
@@ -59,6 +58,7 @@ import org.qpython.qsl4a.qsl4a.rpc.RpcOptional;
 import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
 import org.qpython.qsl4a.qsl4a.rpc.RpcStartEvent;
 import org.qpython.qsl4a.qsl4a.rpc.RpcStopEvent;
+import org.qpython.qsl4a.qsl4a.util.PermissionUtil;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
@@ -82,6 +82,7 @@ public class PhoneFacade extends RpcReceiver {
     private final Bundle mPhoneState;
     private final Service mService;
     private final PhoneStateListener mPhoneStateListener;
+    private final Context context;
 
     public PhoneFacade(FacadeManager manager) {
         super(manager);
@@ -89,6 +90,7 @@ public class PhoneFacade extends RpcReceiver {
         mTelephonyManager = (TelephonyManager) mService.getSystemService(Context.TELEPHONY_SERVICE);
         mAndroidFacade = manager.getReceiver(AndroidFacade.class);
         mEventFacade = manager.getReceiver(EventFacade.class);
+        context = mAndroidFacade.context;
         mPhoneState = new Bundle();
         mPhoneStateListener = MainThread.run(mService, new Callable<PhoneStateListener>() {
             @Override
@@ -186,9 +188,7 @@ public class PhoneFacade extends RpcReceiver {
     }
 
     public void check_Access_Fine_Location_Permission() throws Exception {
-        if (ActivityCompat.checkSelfPermission(mService, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            throw new Exception(Manifest.permission.ACCESS_FINE_LOCATION);
-        }
+        PermissionUtil.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION);
     }
 
     private void getCellLocation(CellInfo cellInfo,JSONObject result,boolean complex) throws Exception {
@@ -204,14 +204,14 @@ public class PhoneFacade extends RpcReceiver {
             if (complex) {
                 result.put("Mcc,Mnc",nrCellInfoIdetity.getMccString()+","+nrCellInfoIdetity.getMncString());
                 result.put("NrArfcn",nrCellInfoIdetity.getNrarfcn());
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                if (Build.VERSION.SDK_INT >= 30) {
                     int[] bands = nrCellInfoIdetity.getBands();
                     JSONArray Bands = new JSONArray();
                     for (int band : bands)
                         Bands.put(band);
                     result.put("Bands", Bands);
                 }
-            }
+            } else result.put("Operator",nrCellInfoIdetity.getOperatorAlphaShort());
         }
         else if (cellInfo instanceof CellInfoLte){
             CellIdentityLte lteCellInfoIdetity = ((CellInfoLte) cellInfo).getCellIdentity();
@@ -224,14 +224,15 @@ public class PhoneFacade extends RpcReceiver {
                 result.put("Mcc,Mnc",lteCellInfoIdetity.getMcc()+","+lteCellInfoIdetity.getMnc());
                 result.put("Earfcn",lteCellInfoIdetity.getEarfcn());
                 //result.put("Bandwidth",lteCellInfoIdetity.getBandwidth()); //总是2147483647
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                if (Build.VERSION.SDK_INT >= 30) {
                     int[] bands = lteCellInfoIdetity.getBands();
                     JSONArray Bands = new JSONArray();
                     for (int band : bands)
                         Bands.put(band);
                     result.put("Bands", Bands);
                 }
-            }
+            } else if(Build.VERSION.SDK_INT >= 28)
+                result.put("Operator",lteCellInfoIdetity.getMobileNetworkOperator());
         }
         else if (cellInfo instanceof CellInfoWcdma){
             CellIdentityWcdma wcdmaCellInfoIdetity = ((CellInfoWcdma) cellInfo).getCellIdentity();
@@ -278,9 +279,13 @@ public class PhoneFacade extends RpcReceiver {
         try{
         List<CellInfo> cellInfos = mTelephonyManager.getAllCellInfo();
         result.put("CellCount",cellInfos.size());
+        byte n = 1;
         for (CellInfo cellInfo : cellInfos) {
             if(!cellInfo.isRegistered()) continue;
-            getCellLocation(cellInfo,result,false);
+            JSONObject cell = new JSONObject();
+            getCellLocation(cellInfo,cell,false);
+            result.put("Registered"+n,cell);
+            n+=1;
         }
         return result;
        } catch (Exception e){
@@ -315,12 +320,10 @@ public class PhoneFacade extends RpcReceiver {
     }
 
     public void check_Read_Phone_State_Permission() throws Exception {
-        if (ActivityCompat.checkSelfPermission(mService, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            throw new Exception(Manifest.permission.READ_PHONE_STATE);
+        PermissionUtil.checkPermission(Manifest.permission.READ_PHONE_STATE);
         }
-    }
 
-
+    @SuppressLint("NewApi")
     @Rpc(description = "Returns a the radio technology (network type) currently in use on the device.")
     public String getNetworkType() throws Exception {
         // TODO(damonkohler): API level 5 has many more types.
@@ -446,6 +449,13 @@ public class PhoneFacade extends RpcReceiver {
         return mTelephonyManager.isNetworkRoaming();
     }
 
+    @Rpc(description = "get Android ID")
+    public String getAndroidID() throws Exception {
+        return Settings.System.getString(
+                context.getContentResolver(), Settings.Secure.ANDROID_ID);
+    }
+
+    @SuppressLint("NewApi")
     @Rpc(description = "Returns the unique device ID, for example, the IMEI for GSM and the MEID for CDMA phones. Return null if device ID is not available.")
     public String getDeviceId(
             @RpcParameter(name = "index", description = "index parameter need Android >= 6.0 .") @RpcDefault("0") Integer index
@@ -496,9 +506,7 @@ public class PhoneFacade extends RpcReceiver {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Rpc(description = "Returns the phone number string for line 1, for example, the MSISDN for a GSM phone. Return null if it is unavailable.")
     public String getLine1Number() throws Exception {
-        if (ActivityCompat.checkSelfPermission(mService, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mService, Manifest.permission.READ_PHONE_NUMBERS) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mService, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            throw new Exception(Manifest.permission.READ_SMS + "," + Manifest.permission.READ_PHONE_NUMBERS + "," + Manifest.permission.READ_PHONE_STATE);
-        }
+        PermissionUtil.checkPermission(new String[]{Manifest.permission.READ_SMS,Manifest.permission.READ_PHONE_NUMBERS,Manifest.permission.READ_PHONE_STATE});
         return mTelephonyManager.getLine1Number();
     }
 
@@ -511,18 +519,5 @@ public class PhoneFacade extends RpcReceiver {
     private String tudeIntToStr(int x){
         return String.valueOf(Math.round((double) x/0.144D)/100000D);
     }
-
-    /*@Rpc(description = "Mobile data traffic flow , need Android >= 8.0")
-    public void setDataEnabled(
-            @RpcParameter(name = "state") @RpcOptional Boolean state) throws Exception {
-        if (Build.VERSION.SDK_INT>=26) {
-            if (ActivityCompat.checkSelfPermission(mService, Manifest.permission.MODIFY_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                throw new Exception(Manifest.permission.MODIFY_PHONE_STATE);
-            }
-            mTelephonyManager.setDataEnabled(state);
-        } else {
-            throw new Exception("setDataEnabled need Android >= 8.0 .");
-        }
-
-    }*/
+    
 }

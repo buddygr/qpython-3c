@@ -136,7 +136,7 @@
     <string name="add">添加</string>
     <string name="sl4a_running">SL4A服务运行中</string>
     <string name="service_toggle">服务开关</string>
-    <string name="qpy_description">QPython 3C是安卓设备Python小程序引擎，支持PyVer、新版SL4A、打开文件、写外置卡、加解密、图形界面、音视频播放。</string>
+    <string name="qpy_description">QPython Plus是安卓设备Python小程序引擎，支持PyVer、新版SL4A、打开文件、写外置卡、加解密、图形界面、音视频播放。</string>
     <string name="warning">警告</string>
     <string name="reset_warning">将重置所有设置并删除已下载的库,确定重置吗?</string>
     <string name="downloading">库文件</string>
@@ -441,7 +441,7 @@
     <string name="feed_contribute">更新/贡献者</string>
     <string name="py2_or_3">您想使用 Python 3 还是 2 ？</string>
     <string name="use_py3">使用 Python 3</string>
-    <string name="welcome">欢迎使用QPython 3C，享受您的手机编程之旅吧。</string>
+    <string name="welcome">欢迎使用QPython Plus，享受您的手机编程之旅吧。</string>
     <string name="notice">提示</string>
     <string name="python_interpreter">Python解释器</string>
     <string name="shell_terminal">Shell 终端</string>
@@ -530,7 +530,7 @@
     <string name="optimize_1">移除assert和__debug__依赖声明</string>
     <string name="optimize_2">在等级1的改变基础上，同时丢弃文档字符串</string -->
     <string name="edit_to_new_path">您可以将其编辑为新路径。</string>
-    <string name="app_name">QPython 3C</string>
+    <string name="app_name">QPython Plus</string>
     <string name="qpypi_up">扩展</string>
     <string name="sl4a_start">启动SL4A服务……</string>
 </resources>

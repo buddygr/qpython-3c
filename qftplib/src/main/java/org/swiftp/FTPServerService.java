@@ -395,7 +395,7 @@ public abstract class FTPServerService extends Service implements Runnable {
         CharSequence contentText = getString(R.string.notif_text);
         Intent notificationIntent = new Intent(this, getSettingClass());
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                notificationIntent, 0);
+                notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
         Notification notification;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {

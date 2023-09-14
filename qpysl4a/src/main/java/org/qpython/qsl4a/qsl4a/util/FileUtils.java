@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.Environment;
 
-import org.qpython.qsl4a.qsl4a.IoUtils;
 import org.qpython.qsl4a.qsl4a.LogUtil;
 
 import java.io.BufferedReader;

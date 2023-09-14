@@ -22,7 +22,6 @@ import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
@@ -41,7 +40,6 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
 import android.util.DisplayMetrics;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
@@ -56,6 +54,7 @@ import org.qpython.qsl4a.qsl4a.rpc.Rpc;
 import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
 import org.qpython.qsl4a.qsl4a.rpc.RpcOptional;
 import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
+import org.qpython.qsl4a.qsl4a.util.PermissionUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -530,9 +529,7 @@ public class MediaRecorderFacade extends RpcReceiver {
       if (isGetVoiceRun) {
         throw new Exception("Recording, please wait ……");
       }
-      if (ActivityCompat.checkSelfPermission(mService, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-        throw new Exception("No Permission of Record Audio ……");
-      }
+      PermissionUtil.checkPermission(Manifest.permission.RECORD_AUDIO);
       mAudioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,
               SAMPLE_RATE_IN_HZ, AudioFormat.CHANNEL_IN_DEFAULT,
               AudioFormat.ENCODING_PCM_16BIT, BUFFER_SIZE);
@@ -552,7 +549,7 @@ public class MediaRecorderFacade extends RpcReceiver {
           // 平方和除以数据总长度，得到音量大小。
           double mean = v / (double) r;
           volume[0] = 10 * Math.log10(mean);
-          //每duration毫秒1次
+          //每interval毫秒1次
           synchronized (mLock) {
             try {
               mLock.wait(interval);

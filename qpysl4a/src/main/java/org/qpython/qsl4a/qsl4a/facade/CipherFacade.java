@@ -1,8 +1,12 @@
 package org.qpython.qsl4a.qsl4a.facade;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.support.v4.provider.DocumentFile;
 import android.util.Base64;
+
+import com.quseit.util.DocumentsUtils;
 
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
@@ -13,9 +17,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.nio.ByteBuffer;
+import java.io.IOException;
+import java.util.Arrays;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -23,6 +30,8 @@ public class CipherFacade extends RpcReceiver {
 
     private final Service mService;
     private final PackageManager mPackageManager;
+    private final AndroidFacade mAndroidFacade;
+    private static Context context;
     //加密引擎
     private Cipher cipherEncrypt;
     //解密引擎
@@ -35,21 +44,39 @@ public class CipherFacade extends RpcReceiver {
         super(manager);
         mService = manager.getService();
         mPackageManager = mService.getPackageManager();
+        mAndroidFacade = manager.getReceiver(AndroidFacade.class);
+        context = mAndroidFacade.context;
     }
 
     private static byte[] readFromFile(String filePath) throws Exception {
         File file = new File(filePath);
-        FileInputStream fis = new FileInputStream(file);
-        int length = fis.available();
-        byte[] data = new byte[length];
+        FileInputStream fis;
+        byte[] data;
+        int length;
+        try {
+            fis = new FileInputStream(file);
+            length = fis.available();
+        } catch (IOException e) {
+            DocumentFile destFile = DocumentsUtils.getDocumentFile(file, false, context);
+            fis = (FileInputStream) context.getContentResolver().openInputStream(destFile.getUri());
+            length = fis.available();
+        }
+        data = new byte[length];
         fis.read(data);
         fis.close();
         return data;
         }
 
     private static void writeToFile(String filePath, byte[] data) throws Exception {
-        FileOutputStream fos = new FileOutputStream(filePath);
+        FileOutputStream fos;
+      try {
+        fos = new FileOutputStream(filePath);
         fos.write(data);
+      } catch (IOException e) {
+          DocumentFile file = DocumentsUtils.getDocumentFile(new File(filePath), false, context);
+          fos = (FileOutputStream) context.getContentResolver().openOutputStream(file.getUri(),"wt");
+          fos.write(data);
+      }
         fos.flush();
         fos.close();
     }
@@ -180,16 +207,34 @@ public class CipherFacade extends RpcReceiver {
 
     /**  全二进制文件模式  */
 
-    private void cipherFile(final String srcFile,final String dstFile,final Cipher cipher)
-            throws Exception {
-        FileInputStream fis = new FileInputStream(srcFile);
-        FileOutputStream fos = new FileOutputStream(dstFile);
-        int len = fis.available();
-        if (len>MAX_BUFFER_SIZE) len=MAX_BUFFER_SIZE; //max buffer size 5MB
-        byte[] data = new byte[len];
-        while((len=fis.read(data))==MAX_BUFFER_SIZE)
-            fos.write(cipher.update(data));
-        fos.write(cipher.doFinal(data,0,len));
+    private void cipherFile(final String srcFile,final String dstFile,final Cipher cipher) throws Exception {
+        FileInputStream fis;
+        FileOutputStream fos;
+        int len;
+        try {
+            fis = new FileInputStream(srcFile);
+            len = fis.available();
+        } catch (IOException e) {
+            DocumentFile sorcFile = DocumentsUtils.getDocumentFile(new File(srcFile), false, context);
+            fis = (FileInputStream) context.getContentResolver().openInputStream(sorcFile.getUri());
+            len = fis.available();
+        }
+        if (len > MAX_BUFFER_SIZE) //max buffer size 5MB
+            len = MAX_BUFFER_SIZE;
+        try {
+            fos = new FileOutputStream(dstFile);
+            byte[] data = new byte[len];
+            while ((len = fis.read(data)) == MAX_BUFFER_SIZE)
+                fos.write(cipher.update(data));
+            fos.write(cipher.doFinal(data, 0, len));
+        } catch (IOException e){
+            DocumentFile file = DocumentsUtils.getDocumentFile(new File(dstFile), false, context);
+            fos = (FileOutputStream) context.getContentResolver().openOutputStream(file.getUri(),"wt");
+            byte[] data = new byte[len];
+            while ((len = fis.read(data)) == MAX_BUFFER_SIZE)
+                fos.write(cipher.update(data));
+            fos.write(cipher.doFinal(data, 0, len));
+        }
         fos.flush();
         fis.close();
         fos.close();

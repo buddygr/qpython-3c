@@ -47,4 +47,6 @@ public class CONF implements QPyConstants {
 
     public static SharedPreferences PREF;
 
+    public static String NATIVE_LIBRARY;
+
 }

@@ -1,5 +1,5 @@
 package org.qpython.qsl4a.qsl4a.facade;
-//by 乘着船 at 2021-2022
+//by 乘着船 at 2021-2023
 
 import android.app.Activity;
 import android.content.Context;
@@ -46,11 +46,11 @@ public class DocumentFileFacade extends RpcReceiver {
     public Uri documentTreeShowOpen(
             @RpcParameter(name = "rootPath") String rootPath
     ) throws Exception {
-        File file = new File(rootPath);
+        File file = (new File(rootPath)).getCanonicalFile();
         if(file.canWrite())
             return Uri.fromFile(file);
-        String p = file.getAbsolutePath();
-        if(p.startsWith(DocumentsUtils.ANDROID_PATH))
+        rootPath = file.getPath();
+        if(rootPath.startsWith(DocumentsUtils.ANDROID_PATH))
             return documentTreeAndroid(file);
         // else next grade 1
         DocumentFile documentFile;
@@ -60,7 +60,7 @@ public class DocumentFileFacade extends RpcReceiver {
                 return documentFile.getUri();
             // else next grade 2
             } else {
-                p = PreferenceManager.getDefaultSharedPreferences(context).getString(rootPath, null);
+                String p = PreferenceManager.getDefaultSharedPreferences(context).getString(rootPath, null);
                 if (p != null) {
                     documentFile = DocumentFile.fromTreeUri(context, Uri.parse(p));
                     if(documentFile != null && documentFile.canWrite())
@@ -190,18 +190,14 @@ public class DocumentFileFacade extends RpcReceiver {
     public Uri documentFileGetUri (
             @RpcParameter(name = "path") String path,
             @RpcParameter(name = "isDirectory") @RpcOptional Boolean isDirectory) {
-        DocumentFile documentFile = DocumentsUtils.getDocumentFile(new File(path),isDirectory,context);
-        if(documentFile == null) return null;
-        else return documentFile.getUri();
+        return DocumentsUtils.getUri(context,new File(path));
     }
 
     @Rpc(description = "Document File Is Directory .")
     public Boolean documentFileIsDirectory (
             @RpcParameter(name = "path") String path
-    ) {
-        DocumentFile documentFile = DocumentsUtils.getDocumentFile(new File(path),null,context);
-        if(documentFile == null) return null;
-        else return documentFile.isDirectory();
+    ) throws Exception {
+        return DocumentsUtils.isDirectory(context,new File(path));
     }
 
     @Rpc(description = "Document File Get Stat .")
@@ -209,7 +205,7 @@ public class DocumentFileFacade extends RpcReceiver {
             @RpcParameter(name = "path") String path
     ){
         DocumentFile documentFile = DocumentsUtils.getDocumentFile(new File(path),null,context);
-        if(documentFile == null) return null;
+        if(documentFile == null) return getFileStat(path);
         Map<String,Object> map = new HashMap<>();
         map.put("length",documentFile.length());
         map.put("lastModified",documentFile.lastModified());
@@ -236,7 +232,7 @@ public class DocumentFileFacade extends RpcReceiver {
     }
 
     public Uri documentTreeAndroid(File file) throws Exception {
-        String path = file.getAbsolutePath();
+        String path = file.getPath();
         String subPath = path.substring(DocumentsUtils.ANDROID_PATH.length());
         SharedPreferences perf = PreferenceManager.getDefaultSharedPreferences(context);
         String uriStr = perf.getString(path,null);

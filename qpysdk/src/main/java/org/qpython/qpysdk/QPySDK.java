@@ -257,12 +257,6 @@ public class QPySDK {
         // The version of data in memory and on disk.
         String data_version = getVersion();
 
-        //LogUtil.d(TAG, "data_version:"+data_version+"-"+resource + "_version"+"-"+resourceManager);
-        // If no version, no unpacking is necessary.
-        /*f (data_version == null) {
-            return;
-        }*/
-
         // Check the current disk version, if any.
         String filesDir = target.getAbsolutePath();
         String disk_version_fn = filesDir + "/" + resource + ".version";

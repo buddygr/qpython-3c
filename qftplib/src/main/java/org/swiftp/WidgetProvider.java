@@ -37,7 +37,7 @@ public class WidgetProvider extends AppWidgetProvider {
         active.setAction(ACTION_WIDGET_BUTTON);
 
         PendingIntent actionPendingIntent = PendingIntent.getBroadcast(context, 0,
-                active, 0);
+                active, PendingIntent.FLAG_IMMUTABLE);
         remoteViews.setOnClickPendingIntent(R.id.widget_button_off, actionPendingIntent);
         remoteViews.setOnClickPendingIntent(R.id.widget_button_on, actionPendingIntent);
 

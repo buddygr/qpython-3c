@@ -118,7 +118,7 @@ public class ShellTermSession extends GenericTermSession {
         for (int i=0;i<env.length;i++) {
             content.append("\nexport ").append(env[i]);
         }
-        FileHelper.putFileContents(context, enf.getAbsolutePath(), content.toString().trim());
+        FileHelper.putFileContents(enf.getAbsolutePath(), content.toString().trim());
         try {
             FileUtils.chmod(enf, 0755);
         }

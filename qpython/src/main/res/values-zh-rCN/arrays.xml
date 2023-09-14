@@ -164,9 +164,4 @@
         <item>2000</item>
     </string-array>
 
-    <string-array name="funding_stage">
-        <item>初级课程</item>
-        <item>中级课程</item>
-        <item>高级课程</item>
-    </string-array>
 </resources>
