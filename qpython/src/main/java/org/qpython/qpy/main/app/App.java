@@ -1,7 +1,6 @@
 package org.qpython.qpy.main.app;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
@@ -10,7 +9,6 @@ import android.support.multidex.MultiDex;
 import com.google.gson.Gson;
 import com.quseit.common.CrashHandler;
 import com.quseit.common.updater.downloader.DefaultDownloader;
-import com.squareup.leakcanary.LeakCanary;
 
 import org.qpython.qpy.main.server.Service;
 import org.qpython.qpy.main.server.gist.Api;
@@ -31,6 +29,8 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+
+//import com.squareup.leakcanary.LeakCanary;
 
 public class App extends QSL4APP {
 
@@ -151,12 +151,12 @@ public class App extends QSL4APP {
     @Override
     public void onCreate() {
         super.onCreate();
-        if (LeakCanary.isInAnalyzerProcess(this)) {
+        /*if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.
             // You should not init your app in this process.
             return;
         }
-        LeakCanary.install(this);
+        LeakCanary.install(this);*/
 
         sContext = getApplicationContext();
         downloader = new DefaultDownloader(sContext);
@@ -214,12 +214,10 @@ public class App extends QSL4APP {
 
 
     private void initLayoutDir() {
-        if (Build.VERSION.SDK_INT >= 17) {
-            Resources resources = getResources();
-            Configuration config = resources.getConfiguration();
-            Locale locale = config.locale;
-            config.setLayoutDirection(locale);
-            resources.updateConfiguration(config, resources.getDisplayMetrics());
-        }
+        Resources resources = getResources();
+        Configuration config = resources.getConfiguration();
+        Locale locale = config.locale;
+        config.setLayoutDirection(locale);
+        resources.updateConfiguration(config, resources.getDisplayMetrics());
     }
 }

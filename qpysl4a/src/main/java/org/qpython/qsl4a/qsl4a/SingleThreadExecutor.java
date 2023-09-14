@@ -29,7 +29,6 @@ public class SingleThreadExecutor extends ThreadPoolExecutor {
   @Override
   protected void afterExecute(Runnable r, Throwable t) {
     if (t != null) {
-      throw new RuntimeException(t);
-    }
+      throw new RuntimeException(t);    }
   }
 }

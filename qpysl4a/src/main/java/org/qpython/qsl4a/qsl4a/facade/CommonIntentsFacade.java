@@ -70,7 +70,7 @@ public class CommonIntentsFacade extends RpcReceiver {
   }
 
   @Rpc(description = "Display content to be picked by URI (e.g. contacts)", returns = "A map of result values.")
-  public Intent pick(@RpcParameter(name = "uri") String uri) throws JSONException {
+  public Intent pick(@RpcParameter(name = "uri") String uri) throws Exception {
     return mAndroidFacade.startActivityForResult(Intent.ACTION_PICK, uri, null, null, null, null);
   }
 
@@ -406,7 +406,7 @@ public class CommonIntentsFacade extends RpcReceiver {
                 Intent pinnedShortcutCallbackIntent =
                         mShortcutManager.createShortcutResultIntent(pinShortcutInfo);
                 PendingIntent successCallback = PendingIntent.getBroadcast(context, 0,
-                        pinnedShortcutCallbackIntent, 0);
+                        pinnedShortcutCallbackIntent, PendingIntent.FLAG_IMMUTABLE);
                 mShortcutManager.requestPinShortcut(pinShortcutInfo,
                         successCallback.getIntentSender());
             }

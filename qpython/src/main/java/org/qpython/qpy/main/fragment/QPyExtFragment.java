@@ -29,6 +29,7 @@ import org.qpython.qpy.main.activity.BaseActivity;
 import org.qpython.qpy.main.activity.HomeMainActivity;
 import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpysdk.QPySDK;
+import org.qpython.qsl4a.qsl4a.util.PermissionUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -82,27 +83,14 @@ public class QPyExtFragment extends Fragment {
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private static void checkOtherPermission() throws Exception {
-        List<String> unPermissionList = new ArrayList<String>();
+        //List<String> unPermissionList = new ArrayList<String>();
         PackageManager pm = activity.getPackageManager();
         PackageInfo info;
-        String[] packagePermissions;
+        //String[] packagePermissions;
 
         info = pm.getPackageInfo(activity.getPackageName(), PackageManager.GET_PERMISSIONS);
-        packagePermissions = info.requestedPermissions;
-        if (packagePermissions != null) {
-            for (String packagePermission : packagePermissions) {
-                if (ContextCompat.checkSelfPermission(activity, packagePermission) !=
-                        PackageManager.PERMISSION_GRANTED) {
-                    unPermissionList.add(packagePermission);//添加还未授予的权限到unPermissionList中
-                }
-            }
-
-            //有权限没有通过，需要申请
-            if (unPermissionList.size() > 0) {
-                ActivityCompat.requestPermissions(
-                        activity,unPermissionList.toArray(new String[0]),100);
-            }
-        }
+        //packagePermissions = info.requestedPermissions;
+        PermissionUtil.checkPermission(info.requestedPermissions);
         if (!Settings.canDrawOverlays(activity))
             activity.startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + activity.getPackageName())),100);
     }
@@ -150,6 +138,8 @@ public class QPyExtFragment extends Fragment {
             pyVer = qpysdk.getPyVer();
             CONF.pyVerComplete = pyVer[1];
             CONF.pyVer = pyVer[0];
+            CONF.NATIVE_LIBRARY = activity.getPackageManager().getApplicationInfo(
+                    activity.getPackageName(),PackageManager.GET_UNINSTALLED_PACKAGES).nativeLibraryDir;
             //可以消除终端中文输入的某些bug，虽然不知道为什么
             if (once) activity.startShell("init.sh");
             else activity.runShortcut(activity.getIntent());
@@ -166,6 +156,7 @@ public class QPyExtFragment extends Fragment {
         if (qpysdk==null)
             qpysdk = new QPySDK(activity, activity);
         String[] permssions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        PermissionUtil.activity = context;
 
         if (CONF.PREF.getString("security_tip","").equals(activity.getString(R.string.security_version)))
         {

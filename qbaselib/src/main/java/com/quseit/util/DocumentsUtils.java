@@ -1,5 +1,5 @@
 package com.quseit.util;
-//by 乘着船 at 2021-2022
+//by 乘着船 at 2021-2023
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -192,8 +192,8 @@ public class DocumentsUtils {
     public static boolean mkdirs(Context context, File dir) {
         boolean res = dir.mkdirs();
         if (!res) {
-            if (DocumentsUtils.isOnExtSdCard(dir, context)) {
-                DocumentFile documentFile = DocumentsUtils.getDocumentFile(dir, true, context);
+            if (isOnExtSdCard(dir, context)) {
+                DocumentFile documentFile = getDocumentFile(dir, true, context);
                 res = documentFile != null && documentFile.canWrite();
             }
         }
@@ -216,12 +216,12 @@ public class DocumentsUtils {
     public static boolean delete(Context context, File file) {
         boolean ret = FileDelete(file);
         if (ret) return ret;
-        if (DocumentsUtils.isOnExtSdCard(file, context)) {
-            DocumentFile f = DocumentsUtils.getDocumentFile(file, false, context);
+        //if (isOnExtSdCard(file, context)) {
+            DocumentFile f = getDocumentFile(file, false, context);
             if (f != null) {
                 ret = f.delete();
             }
-        }
+        //}
         return ret;
     }
 
@@ -245,8 +245,8 @@ public class DocumentsUtils {
     /*public static boolean canWrite(Context context, File file) {
         boolean res = canWrite(file);
 
-        if (!res && DocumentsUtils.isOnExtSdCard(file, context)) {
-            DocumentFile documentFile = DocumentsUtils.getDocumentFile(file, true, context);
+        if (!res && isOnExtSdCard(file, context)) {
+            DocumentFile documentFile = getDocumentFile(file, true, context);
             res = documentFile != null && documentFile.canWrite();
         }
         return res;
@@ -255,7 +255,12 @@ public class DocumentsUtils {
     private static boolean renameToCross(Context context,File src,File dest) throws Exception {
         copy(context,src,dest);
         boolean exist = dest.exists();
-        if (exist) delete(context,src);
+        if (!exist)  {
+            DocumentFile Dest = getDocumentFile(dest,null,context);
+            if(Dest!=null && Dest.exists())
+                exist = true;
+        }
+        delete(context,src);
         return exist;
     }
 
@@ -276,7 +281,7 @@ public class DocumentsUtils {
                 if(!srcDoc.exists())
                     throw new FileNotFoundException(src.toString());
                 if (Objects.equals(src.getParent(), dest.getParent())) {
-                    DocumentFile DestDoc = DocumentsUtils.getDocumentFile(dest, null, context);
+                    DocumentFile DestDoc = getDocumentFile(dest, null, context);
                     if(DestDoc!=null && DestDoc.exists()){
                         if(!DestDoc.delete())
                             return false;
@@ -305,7 +310,7 @@ public class DocumentsUtils {
         InputStream in = null;
         try {
             if (!canWrite(destFile) && isOnExtSdCard(destFile, context)) {
-                DocumentFile file = DocumentsUtils.getDocumentFile(destFile, false, context);
+                DocumentFile file = getDocumentFile(destFile, false, context);
                 if (file != null && file.canWrite()) {
                     in = context.getContentResolver().openInputStream(file.getUri());
                 }
@@ -323,9 +328,9 @@ public class DocumentsUtils {
         OutputStream out = null;
         try {
             if (!canWrite(destFile) && isOnExtSdCard(destFile, context)) {
-                DocumentFile file = DocumentsUtils.getDocumentFile(destFile, false, context);
+                DocumentFile file = getDocumentFile(destFile, false, context);
                 if (file != null && file.canWrite())
-                    out = context.getContentResolver().openOutputStream(file.getUri());
+                    out = context.getContentResolver().openOutputStream(file.getUri(),"wt");
             } else {
                 out = new FileOutputStream(destFile);
 
@@ -351,7 +356,7 @@ public class DocumentsUtils {
         if (!root.canWrite()) {
 
             if (isOnExtSdCard(root, context)) {
-                DocumentFile documentFile = DocumentsUtils.getDocumentFile(root, true, context);
+                DocumentFile documentFile = getDocumentFile(root, true, context);
                 return documentFile == null || !documentFile.canWrite();
             } else {
                 SharedPreferences perf = PreferenceManager.getDefaultSharedPreferences(context);
@@ -371,9 +376,9 @@ public class DocumentsUtils {
 
     private static void copyFile (
             Context context, File srcFile, File destFile) throws Exception {
-        InputStream fis=DocumentsUtils.getInputStream(context,srcFile);
+        InputStream fis=getInputStream(context,srcFile);
         if (fis==null) fis=new FileInputStream(srcFile);
-        OutputStream fos=DocumentsUtils.getOutputStream(context,destFile);
+        OutputStream fos=getOutputStream(context,destFile);
         if (fos==null) fos=new FileOutputStream(destFile);
         int len = fis.available();
         if (len>MAX_BUFFER_SIZE) len=MAX_BUFFER_SIZE;
@@ -389,9 +394,9 @@ public class DocumentsUtils {
     private static void copyTree (
             Context context,File srcFolder,File destFolder)
             throws Exception{
-        DocumentFile DestFolder=DocumentsUtils.getDocumentFile(destFolder,true,context);
+        DocumentFile DestFolder=getDocumentFile(destFolder,true,context);
         if (DestFolder==null) destFolder.mkdirs();
-        DocumentFile SrcFolder=DocumentsUtils.getDocumentFile(srcFolder,true,context);
+        DocumentFile SrcFolder=getDocumentFile(srcFolder,true,context);
         String name;
         File srcSub,destSub;
         if (SrcFolder != null) {
@@ -401,9 +406,9 @@ public class DocumentsUtils {
                 srcSub=new File(srcFolder.getAbsolutePath(), name);
                 destSub=new File(destFolder.getAbsolutePath(), name);
                 if (SrcSub.isDirectory()){
-                    DocumentsUtils.copyTree(context,srcSub,destSub);
+                    copyTree(context,srcSub,destSub);
                 } else {
-                    DocumentsUtils.copyFile(context,srcSub,destSub);
+                    copyFile(context,srcSub,destSub);
                 }
             }
         } else {
@@ -413,9 +418,9 @@ public class DocumentsUtils {
                 srcSub=new File(srcFolder.getAbsolutePath(), name);
                 destSub=new File(destFolder.getAbsolutePath(), name);
                 if (SrcSub.isDirectory()){
-                    DocumentsUtils.copyTree(context,srcSub,destSub);
+                    copyTree(context,srcSub,destSub);
                 } else {
-                    DocumentsUtils.copyFile(context,srcSub,destSub);
+                    copyFile(context,srcSub,destSub);
                 }
             }
         }
@@ -424,14 +429,15 @@ public class DocumentsUtils {
     public static void copy (
             Context context, File src, File dest)
             throws Exception{
-        if (src.isDirectory()) copyTree(context,src,dest);
+        if (isDirectory(context,src))
+            copyTree(context,src,dest);
         else copyFile(context,src,dest);
     }
 
     public static String[] listFiles (
             Context context,File folder)
             throws Exception{
-        DocumentFile Folder=DocumentsUtils.getDocumentFile(folder,true,context);
+        DocumentFile Folder=getDocumentFile(folder,true,context);
         if (Folder == null) {
             File[] Subs = folder.listFiles();
             if (Subs==null) return null;
@@ -449,11 +455,29 @@ public class DocumentsUtils {
         }
     }
 
+    public static Boolean isDirectory(
+    Context context, File file) throws Exception{
+        DocumentFile documentFile = getDocumentFile(file,null,context);
+        if(documentFile == null)
+            return file.isDirectory();
+        else
+            return documentFile.isDirectory();
+    }
+
+    public static Uri getUri(
+            Context context, File file) {
+        DocumentFile documentFile = getDocumentFile(file,null,context);
+        if(documentFile == null)
+            return Uri.fromFile(file);
+        else
+            return documentFile.getUri();
+    }
+
     /*@RequiresApi(api = Build.VERSION_CODES.N)
     public static void storageShowOpen(
             String rootPath, Activity context
     ) {
-        if (DocumentsUtils.checkWritableRootPath(context, rootPath)) {
+        if (checkWritableRootPath(context, rootPath)) {
             Intent intent = null;
             StorageManager sm = context.getSystemService(StorageManager.class);
             StorageVolume volume = sm.getStorageVolume(new File(rootPath));
@@ -464,14 +488,14 @@ public class DocumentsUtils {
                 intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
             }
             requestRootPath = rootPath;
-            startActivityForResult(context, intent, DocumentsUtils.OPEN_DOCUMENT_TREE_CODE, null);
+            startActivityForResult(context, intent, OPEN_DOCUMENT_TREE_CODE, null);
         }}
 
         public static boolean storageHandleResult(
                 int resultCode, Intent data, Activity context){
             if (resultCode == Activity.RESULT_OK) {
                 Uri uri = data.getData();
-                DocumentsUtils.saveTreeUri(context, requestRootPath, uri);
+                saveTreeUri(context, requestRootPath, uri);
                 return true;
             }
             return false;

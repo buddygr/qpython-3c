@@ -19,9 +19,12 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.quseit.util.FileHelper;
+
 import org.qpython.qpy.R;
 import org.qpython.qpy.console.ScriptExec;
 import org.qpython.qpy.databinding.ItemAppListBinding;
+import org.qpython.qpy.main.activity.AppListActivity;
 import org.qpython.qpy.main.activity.HomeMainActivity;
 import org.qpython.qpy.main.model.AppModel;
 import org.qpython.qpy.main.model.LocalAppModel;
@@ -41,7 +44,7 @@ import java.util.List;
 
 public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppListBinding>> {
     private static final String TYPE_SCRIPT = "script";
-    private static final String TAG = "AppListAdapter";
+    public static final String TAG = "AppListAdapter";
 
     private List<AppModel> dataList;
     private String         type;
@@ -69,9 +72,12 @@ public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppLis
             binding.ciAppIcon.setImageResource(R.drawable.ic_home_qpy_add);
             binding.tvAppName.setText(R.string.add);
         } else {
-            binding.ciAppIcon.setImageDrawable(dataList.get(position).getIcon());
-            binding.tvAppName.setText(dataList.get(position).getLabel());
-        }
+            AppModel pos = dataList.get(position);
+            binding.ciAppIcon.setImageDrawable(pos.getIcon());
+            binding.tvAppName.setText(pos.getLabel());
+            if(pos instanceof QPyScriptModel){
+                binding.ciAppIcon.setColorFilter(((QPyScriptModel) pos).getPathColor());
+        }}
         binding.getRoot().setOnClickListener(v -> {
             if (position == dataList.size()) {
                 EditorActivity.start(context, "");
@@ -82,6 +88,7 @@ public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppLis
                 } else {
                     callback.runScript(qPyScriptItem);
                 }
+                AppListActivity.setPathsValue(qPyScriptItem);
             } else if (dataList.get(position) instanceof LocalAppModel) {
                 LocalAppModel localAppItem = (LocalAppModel) dataList.get(position);
                 Intent intent = context.getPackageManager().getLaunchIntentForPackage(localAppItem.getApplicationPackageName());
@@ -189,7 +196,7 @@ public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppLis
                             Intent pinnedShortcutCallbackIntent =
                                     mShortcutManager.createShortcutResultIntent(pinShortcutInfo);
                             PendingIntent successCallback = PendingIntent.getBroadcast(context, 0,
-                                    pinnedShortcutCallbackIntent, 0);
+                                    pinnedShortcutCallbackIntent, PendingIntent.FLAG_IMMUTABLE);
                             mShortcutManager.requestPinShortcut(pinShortcutInfo,
                                     successCallback.getIntentSender());
                             return true;

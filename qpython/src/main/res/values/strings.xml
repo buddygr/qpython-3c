@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ExtraTranslation">
-<string name="app_name">QPython 3C</string>
+<string name="app_name">QPython Plus</string>
 
     <string name="privacy_html" translatable="false">https://www.qpython.org/privacy.html</string>
     <string name="thanks_link" translatable="false">https://www.qpython.org/contributors.html</string>
@@ -231,7 +231,7 @@
     <string name="sl4a_running">SL4A server is running</string>
     <string name="sl4a_un_running">SL4A server is not running</string>
     <string name="service_toggle">Server taggle</string>
-    <string name="qpy_description">QPython 3C is the Python applet engine for Android devices. It supports PyVer, new SL4A, Open File, Write External Sdcard, Encryption and Decryption, GUI, Audio and Video Play.</string>
+    <string name="qpy_description">QPython Plus is the Python applet engine for Android devices. It supports PyVer, new SL4A, Open File, Write External Sdcard, Encryption and Decryption, GUI, Audio and Video Play.</string>
     <string name="warning">Warning</string>
     <string name="reset_warning">Reset storage will lost all setting and downloaded libs, are you sure you want to reset?</string>
     <string name="downloading">Library</string>
@@ -658,7 +658,7 @@
     <string name="ip_address">My IP Adress</string>
     <string name="ip_address_need_wifi_or_ap">Please connect your WiFi or turn on WiFi hotspot</string>
     <string name="editor_override">Do you want to override?</string>
-    <string name="welcome">Welcome to use QPython 3C , enjoy your mobile phone programming journey now .</string>
+    <string name="welcome">Welcome to use QPython Plus , enjoy your mobile phone programming journey now .</string>
     <string name="notice">Notice</string>
     <string name="package_name_title">Package Name</string>
     <string name="qpython_android">qpython-android</string>

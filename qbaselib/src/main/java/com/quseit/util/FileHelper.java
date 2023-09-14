@@ -111,7 +111,7 @@ public class FileHelper {
         return tContents;
     }
 
-    public static void putFileContents(Context context, String filename, String content) {
+    public static void putFileContents(String filename, String content) {
         try {
             File fileCache = new File(filename);
             byte[] data = content.getBytes();
@@ -190,6 +190,30 @@ public class FileHelper {
                 e.printStackTrace();
             }
 
+        }
+        return tContent.toString();
+    }
+
+    public static String getFileContent(String filename) {
+        File scriptFile = new File(filename);
+        StringBuilder tContent = new StringBuilder();
+        if (scriptFile.exists()) {
+            BufferedReader in;
+            try {
+                in = new BufferedReader(new FileReader(scriptFile));
+                String line;
+
+                int off = 0;int len = 0;
+                char[] buf = new char[100];
+                while ((len = in.read(buf,off,100)) == 100) {
+                    tContent.append(buf);
+                }
+                tContent.append(buf,0,len);
+                in.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         return tContent.toString();
     }

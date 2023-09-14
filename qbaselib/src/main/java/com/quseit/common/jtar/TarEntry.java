@@ -17,6 +17,9 @@
 
 package com.quseit.common.jtar;
 
+import android.os.Build;
+import android.support.annotation.RequiresApi;
+
 import java.io.File;
 import java.util.Date;
 
@@ -33,6 +36,7 @@ public class TarEntry {
 		header = new TarHeader();
 	}
 
+	@RequiresApi(api = Build.VERSION_CODES.O)
 	public TarEntry(File file, String entryName) {
 		this();
 		this.file = file;
@@ -172,6 +176,7 @@ public class TarEntry {
 	/**
 	 * Extract header from File
 	 */
+	@RequiresApi(api = Build.VERSION_CODES.O)
 	public void extractTarHeader(String entryName) {
 		int permissions = PermissionUtils.permissions(file);
 		header = TarHeader.createHeader(entryName, file.length(), file.lastModified() / 1000, file.isDirectory(), permissions);

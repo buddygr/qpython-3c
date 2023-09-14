@@ -8,8 +8,10 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.Build;
 
 
+import org.json.JSONObject;
 import org.qpython.qsl4a.R;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
@@ -63,40 +65,27 @@ public class ApplicationManagerFacade extends RpcReceiver {
     return applications;
   }
 
-  /*@Rpc(description = "get all packages")
-  public Map<String,String> getAllPackages() {
-    Map<String, String> packages = new HashMap<>();
-    List<PackageInfo> packageInfos = context.getPackageManager().getInstalledPackages(PackageManager.GET_ACTIVITIES |
-            PackageManager.GET_SERVICES);
-    for (PackageInfo info : packageInfos) {
-      packages.put(info.packageName,  info.applicationInfo.loadLabel(mPackageManager).toString());
+  @Rpc(description = "get Application Info")
+  public JSONObject getApplicationInfo(
+          @RpcParameter(name = "package name") @RpcOptional String packageName) throws Exception {
+    if(packageName == null)
+      packageName = context.getPackageName();
+    ApplicationInfo appInfo = mPackageManager.getApplicationInfo(packageName, PackageManager.GET_UNINSTALLED_PACKAGES);
+    JSONObject result = new JSONObject();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+      result.put("compileSdkVersion",appInfo.compileSdkVersion);
+    result.put("targetSdkVersion",appInfo.targetSdkVersion);
+    result.put("minSdkVersion",appInfo.minSdkVersion);
+    result.put("className",appInfo.className);
+    result.put("uid",appInfo.uid);
+    result.put("dataDir",appInfo.dataDir);
+    result.put("nativeLibraryDir",appInfo.nativeLibraryDir);
+    result.put("sourceDir",appInfo.sourceDir);
+    result.put("publicSourceDir",appInfo.publicSourceDir);
+    result.put("deviceProtectedDataDir",appInfo.deviceProtectedDataDir);
+    result.put("label",appInfo.loadLabel(mPackageManager));
+    return result;
   }
-    return packages;
-  }
-
-  @Rpc(description = "get system packages")
-  public Map<String,String> getSystemPackages() {
-    Map<String, String> packages = new HashMap<>();
-    List<PackageInfo> packageInfos = context.getPackageManager().getInstalledPackages(PackageManager.GET_ACTIVITIES |
-            PackageManager.GET_SERVICES);
-    for (PackageInfo info : packageInfos) {
-      if(((info.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 1) || ((info.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == 1))
-        packages.put(info.packageName, info.applicationInfo.loadLabel(mPackageManager).toString());
-    }
-    return packages;
-  }
-
-  @Rpc(description = "get user packages")
-  public Map<String,String> getUserPackages() {
-    Map<String, String> packages = new HashMap<>();
-    List<PackageInfo> packageInfos = context.getPackageManager().getInstalledPackages(PackageManager.GET_ACTIVITIES |
-            PackageManager.GET_SERVICES);
-    for (PackageInfo info : packageInfos) {
-      if(((info.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 1) && ((info.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 1))
-        packages.put(info.packageName, info.applicationInfo.loadLabel(mPackageManager).toString());
-    }
-    return packages;
-  }*/
 
   @Rpc(description = "Start activity with the given classname and/or packagename .")
   public void launch(@RpcParameter(name = "classname") @RpcOptional final String classname,

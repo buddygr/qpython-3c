@@ -17,17 +17,13 @@
 package org.qpython.qsl4a.qsl4a.facade;
 
 import android.Manifest;
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 
 
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
@@ -35,6 +31,7 @@ import org.qpython.qsl4a.qsl4a.rpc.Rpc;
 import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
 import org.qpython.qsl4a.qsl4a.rpc.RpcStartEvent;
 import org.qpython.qsl4a.qsl4a.rpc.RpcStopEvent;
+import org.qpython.qsl4a.qsl4a.util.PermissionUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -155,7 +152,7 @@ public class SensorManagerFacade extends RpcReceiver {
   @RpcStartEvent("sensors")
   public void startSensingTimed(
       @RpcParameter(name = "sensorNumber", description = SENSOR_DESCRIPTION) Integer sensorNumber,
-      @RpcParameter(name = "delayTime", description = "Minimum time between readings in milliseconds") Integer delayTime) {
+      @RpcParameter(name = "delayTime", description = "Minimum time between readings in milliseconds") Integer delayTime) throws Exception {
     mSensorNumber = sensorNumber;
     if (delayTime < 20) {
       delayTime = 20;
@@ -200,21 +197,17 @@ public class SensorManagerFacade extends RpcReceiver {
     }
   }
 
-  private void checkActivityRecognizePermission(){
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && ContextCompat.checkSelfPermission(context, Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
-        ActivityCompat.requestPermissions(new Activity(),
-                new String[]{Manifest.permission.ACTIVITY_RECOGNITION},
-                100);
-    }
+  @SuppressLint("InlinedApi")
+  private void checkActivityRecognizePermission() throws Exception {
+    PermissionUtil.checkPermission(Manifest.permission.ACTIVITY_RECOGNITION,29);
   }
 
   @Rpc(description = "Records to the Event Queue sensor data exceeding a chosen threshold.")
   @RpcStartEvent("threshold")
   public void startSensingThreshold(
-
       @RpcParameter(name = "sensorNumber", description = SENSOR_DESCRIPTION) Integer sensorNumber,
       @RpcParameter(name = "threshold", description = "Threshold level for chosen sensor (integer)") Integer threshold,
-      @RpcParameter(name = "axis", description = "0 = No axis, 1 = X, 2 = Y, 3 = X+Y, 4 = Z, 5= X+Z, 6 = Y+Z, 7 = X+Y+Z") Integer axis) {
+      @RpcParameter(name = "axis", description = "0 = No axis, 1 = X, 2 = Y, 3 = X+Y, 4 = Z, 5= X+Z, 6 = Y+Z, 7 = X+Y+Z") Integer axis) throws Exception {
     mSensorNumber = sensorNumber;
     mXAxis = axis & 1;
     mYAxis = axis & 2;

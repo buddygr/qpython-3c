@@ -1,13 +1,16 @@
 package org.qpython.qpy.main.model;
 
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 
 import com.quseit.util.FileHelper;
 
 import org.qpython.qpy.R;
 import org.qpython.qpy.main.app.App;
+import org.qpython.qpy.main.app.CONF;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * QPython script list item model
@@ -18,9 +21,25 @@ public class QPyScriptModel extends AppModel {
     private File    file;
     private boolean isProj;
     private int res = -1;
+    private byte pathType = 0;
+
+    private static final int[] COLOR = {
+        Color.argb(0,0,0,0),
+        Color.argb(32,192,255,192),
+        Color.argb(48, 224,224,191)
+    };
 
     public QPyScriptModel(File file) {
         this.file = file;
+        if(file==null)
+            return;
+        String path = file.getAbsolutePath();
+        if(path.startsWith(CONF.SCOPE_STORAGE_PATH))
+            pathType = 0;
+        else if (path.startsWith(CONF.LEGACY_PATH))
+            pathType = 1;
+        else
+            pathType = 2;
     }
 
 
@@ -38,10 +57,6 @@ public class QPyScriptModel extends AppModel {
             content = org.qpython.qpysdk.utils.FileHelper.getFileContents(getPath());
         }
         boolean isWeb = content.contains("#qpy:webapp");
-        //boolean isQApp = content.contains("#qpy:quiet") || content.contains("#qpy:qpysrv");
-        //boolean isKivy = content.contains("#qpy:kivy");
-        //boolean isGame = content.contains("#qpy:pygame");
-        //boolean isPy3 = content.contains("#qpy:3");
 
         if (isWeb) {
             //if (isPy3) {
@@ -49,13 +64,7 @@ public class QPyScriptModel extends AppModel {
             //} else {
                 res = (isProj ? R.drawable.ic_project_webapp : R.drawable.ic_pyfile_webapp);
             //}
-        } /*else if (isKivy || isGame) {
-            if (isPy3) {
-                res = (isProj ? R.drawable.ic_project_kivy3 : R.drawable.ic_pyfile_kivy3);
-            } else {
-                res = (isProj ? R.drawable.ic_project_kivy : R.drawable.ic_pyfile_kivy);
-            }
-        }*/ else {
+        } else {
             //if (isPy3) {
                 res = (isProj ? R.drawable.ic_project_qapp3 : R.drawable.ic_pyfile_qapp3);
             //} else {
@@ -86,6 +95,14 @@ public class QPyScriptModel extends AppModel {
 
     public File getFile() {
         return file;
+    }
+
+    public byte getPathType(){
+        return pathType;
+    }
+
+    public int getPathColor(){
+        return COLOR[pathType];
     }
 
     public boolean isProj() {

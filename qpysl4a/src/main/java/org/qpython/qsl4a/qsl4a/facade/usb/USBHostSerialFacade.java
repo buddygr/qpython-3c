@@ -154,7 +154,7 @@ public class USBHostSerialFacade extends RpcReceiver {
     boolean deviceFound = false;
 
     PendingIntent mPermissionIntent =
-        PendingIntent.getBroadcast(mService, 0, new Intent(ACTION_USB_PERMISSION), 0);
+        PendingIntent.getBroadcast(mService, 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
     Map<String, UsbDevice> map = mUsbManager.getDeviceList();
 
     if (hash.equals("")) {

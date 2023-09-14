@@ -78,12 +78,12 @@ public class ContactsFacade extends RpcReceiver {
   }
 
   @Rpc(description = "Displays a list of contacts to pick from.", returns = "A map of result values.")
-  public Intent pickContact() throws JSONException {
+  public Intent pickContact() throws Exception {
     return mCommonIntentsFacade.pick("content://contacts/people");
   }
 
   @Rpc(description = "Displays a list of phone numbers to pick from.", returns = "The selected phone number.")
-  public String pickPhone() throws JSONException {
+  public String pickPhone() throws Exception {
     String result = null;
     Intent data = mCommonIntentsFacade.pick("content://contacts/phones");
     if (data != null) {

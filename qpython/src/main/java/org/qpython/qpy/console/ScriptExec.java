@@ -174,10 +174,10 @@ public class ScriptExec {
         env[10] = "AP_HANDSHAKE="+SPFUtils.getSP(context, "sl4a.secue");
 
         env[11] = "ANDROID_PUBLIC="+externalStorage;
-        env[12] = "ANDROID_PRIVATE="+filesDir;
+        env[12] = "ANDROID_NATIVE_LIBRARY="+CONF.NATIVE_LIBRARY;
         env[13] = "ANDROID_ARGUMENT=\""+pyPath+"\"";
 
-        env[15] = "QPY_USERNO="+ NAction.getUserNoId(context);
+        //env[15] = "QPY_USERNO="+ NAction.getUserNoId(context);
         env[16] = "QPY_ARGUMENT="+NAction.getExtConf(context);
         env[17] = "PYTHONDONTWRITEBYTECODE=1";
         env[18] = "TMP="+externalStorage+"/cache";
@@ -186,6 +186,7 @@ public class ScriptExec {
         env[21] = "HOME="+filesDir;
         env[22] = "ANDROID_DATA="+System.getenv("ANDROID_DATA");
         env[23] = "ANDROID_ROOT="+System.getenv("ANDROID_ROOT");
+        env[15] = "ANDROID_SDK="+Build.VERSION.SDK_INT;
         env[6] = "EXTERNAL_STORAGE="+Environment.getExternalStorageDirectory();
         return env;
     }
@@ -350,7 +351,7 @@ public class ScriptExec {
         StringUtils.argvParse(argv,mArguments);
         //修改↑
 
-        String[] argumentsArray = mArguments.toArray(new String[mArguments.size()]);
+        String[] argumentsArray = mArguments.toArray(new String[0]);
 
         logFile = Utils.getQuietLog(script);
         Utils.backTaskNotify(context);
@@ -369,14 +370,14 @@ public class ScriptExec {
             int returnValue = Exec.waitFor(mPid.get());
 
             //long mEndTime = System.currentTimeMillis();
-            int pid1 = mPid.getAndSet(PID_INIT_VALUE);
-            Log.d("", "out:" + mFd.out.toString());
+            //int pid1 = mPid.getAndSet(PID_INIT_VALUE);
+            //Log.d("", "out:" + mFd.out.toString());
 
             Message msg = new Message();
             msg.what = returnValue;
             msg.obj = mArguments.get(0);
 
-            Log.d(TAG, "Process " + pid1 + " exited with result code " + returnValue + ".");
+            //Log.d(TAG, "Process " + pid1 + " exited with result code " + returnValue + ".");
 
             try {
                 mIn.close();
@@ -446,25 +447,21 @@ public class ScriptExec {
 */
     public final void checkPermissionDo(Context context, String[] permissions, PermissionAction action) {
         Map<Integer, PermissionAction> mActionMap = new ArrayMap<>();
-        if (Build.VERSION.SDK_INT >= 23) {
-            boolean granted = true;
-            for (int i = 0; i < permissions.length; i++) {
-                String permission = permissions[i];
-                int checkPermission = ContextCompat.checkSelfPermission(context, permission);
-                if (checkPermission != PackageManager.PERMISSION_GRANTED) {
-                    granted = false;
+        boolean granted = true;
+        for (int i = 0; i < permissions.length; i++) {
+            String permission = permissions[i];
+            int checkPermission = ContextCompat.checkSelfPermission(context, permission);
+            if (checkPermission != PackageManager.PERMISSION_GRANTED) {
+                granted = false;
 
-                } else {
-                    granted = true;
-                }
-            }
-            if (!granted) {
-                int code = permissions.hashCode() & 0xffff;
-                mActionMap.put(code, action);
-                ActivityCompat.requestPermissions((Activity) context, permissions, code);
             } else {
-                action.onGrant();
+                granted = true;
             }
+        }
+        if (!granted) {
+            int code = permissions.hashCode() & 0xffff;
+            mActionMap.put(code, action);
+            ActivityCompat.requestPermissions((Activity) context, permissions, code);
         } else {
             action.onGrant();
         }

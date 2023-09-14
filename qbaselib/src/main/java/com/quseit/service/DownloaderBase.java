@@ -292,7 +292,7 @@ public abstract class DownloaderBase extends Service {
 
                 updateIntent = new Intent(this, getMan());
                 updatePendingIntent = PendingIntent.getActivity(this,
-                        NOTIFICATION_ID, updateIntent, 0);
+                        NOTIFICATION_ID, updateIntent, PendingIntent.FLAG_IMMUTABLE);
 
                 Notification downloadNotification = NAction.getNotification(getApplicationContext(), mTitle + "(" + mArtist + ")", "0%", updatePendingIntent,
                         R.drawable.ic_download_nb, null, Notification.FLAG_ONGOING_EVENT);
@@ -500,7 +500,7 @@ public abstract class DownloaderBase extends Service {
 
                 updateIntent = new Intent(this, getMan());
                 updatePendingIntent = PendingIntent.getActivity(this,
-                        NOTIFICATION_ID, updateIntent, 0);
+                        NOTIFICATION_ID, updateIntent, PendingIntent.FLAG_IMMUTABLE);
 
                 Notification downloadNotification = NAction.getNotification(getApplicationContext(), mTitle + "(" + mArtist + ")", getString(R.string.up_soft_download), updatePendingIntent,
                         R.drawable.ic_download_nb, null, Notification.FLAG_ONGOING_EVENT);
@@ -634,7 +634,7 @@ public abstract class DownloaderBase extends Service {
                             if (mCompletedSize * 100 / fileLenght % 2 == 0) {
 
                                 updatePendingIntent = PendingIntent.getActivity(DownloaderBase.this,
-                                        NOTIFICATION_ID, updateIntent, 0);
+                                        NOTIFICATION_ID, updateIntent, PendingIntent.FLAG_IMMUTABLE);
 
                                 Notification downloadNotification = NAction.getNotification(getApplicationContext(), mTitle + "(" + mArtist + ")", mCompletedSize * 100 / fileLenght + "%", updatePendingIntent,
                                         R.drawable.ic_download_nb, null, Notification.FLAG_ONGOING_EVENT);

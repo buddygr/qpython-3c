@@ -216,31 +216,12 @@ public class QPySDK {
         return pyVer;
     }
 
-
     public void extractRes(File file, File target, boolean forceExtrac) {
-        String fileName = file.getName().startsWith(".") ? file.getName().substring(1, file.getName().length()) : file.getName();
+        String fileName = file.getName().startsWith(".") ? file.getName().substring(1) : file.getName();
         fileName = fileName.substring(0, !file.getName().contains(".") ? file.getName().length() : file.getName().indexOf("."));
 
         String data_version = getVersion();
-        // resourceManager.getString(fileName + "_version");
-        /*if (data_version==null) {
-            data_version = "0";
-        }*/
-
-        //Log.d(TAG, "extractRes:"+fileName+"["+data_version+"]"+"["+disk_version+"]");
-
         String disk_version_fn = target.getAbsolutePath() + "/" + fileName + ".version";
-        /*try {
-            byte buf[] = new byte[64];
-            InputStream is = new FileInputStream(disk_version_fn);
-            int len = is.read(buf);
-            disk_version = new String(buf, 0, len);
-            is.close();
-        } catch (FileNotFoundException e) {
-            disk_version = "0";
-        } catch (IOException e) {
-            disk_version = "0";
-        }*/
         String disk_version = readDiskVersion(disk_version_fn);
 
         if (!data_version.equals(disk_version) || disk_version.equals("0") || forceExtrac) {
@@ -256,12 +237,6 @@ public class QPySDK {
     public void extractRes(final String resource, File target, boolean force) {
         // The version of data in memory and on disk.
         String data_version = getVersion();
-
-        //LogUtil.d(TAG, "data_version:"+data_version+"-"+resource + "_version"+"-"+resourceManager);
-        // If no version, no unpacking is necessary.
-        /*f (data_version == null) {
-            return;
-        }*/
 
         // Check the current disk version, if any.
         String filesDir = target.getAbsolutePath();
@@ -284,16 +259,7 @@ public class QPySDK {
             } else {
 
                 try {
-                /*if (resource.equals("private")) {
-                    Toast.makeText(getApplicationContext(), R.string.first_load, Toast.LENGTH_SHORT).show();
-            	}*/
-                    // Write .nomedia.
                     new File(target, ".nomedia").createNewFile();
-
-                    /*/ Write version file.
-                    FileOutputStream os = new FileOutputStream(disk_version_fn);
-                    os.write(data_version.getBytes());
-                    os.close();*/
                     writeDataVersion(disk_version_fn,data_version);
                 } catch (Exception e) {
                     Log.w("python", e);
@@ -312,56 +278,6 @@ public class QPySDK {
     public void extractRes(final String resource, File target) {
         extractRes( resource, target, false);
     }
-
-
-    /*public void extractRes2(final String resource, File target) {
-        Log.d(TAG, "extractRes:" + target);
-        // The version of data in memory and on disk.
-        String data_version = getVersion();
-
-        // If no version, no unpacking is necessary.
-        / *if (data_version == null) {
-            return;
-        }* /
-
-        // Check the current disk version, if any.
-        String filesDir = target.getAbsolutePath();
-        String disk_version_fn = filesDir + "/" + resource + ".version";
-
-        String disk_version = readDiskVersion(disk_version_fn);
-
-        // If the disk data is out of date, extract it and write the
-        // version file.
-        if (!data_version.equals(disk_version)) {
-            Log.v("python", "Extracting " + resource + " assets.");
-
-            //_recursiveDelete(target);
-            target.mkdirs();
-
-            AssetExtract ae = new AssetExtract(activity);
-            if (!ae.extractTar(resource + ".mp3", target.getAbsolutePath())) {
-                //toastError("Could not extract " + resource + " data.");
-//            if (!ae.copyFromAssetsToInternalStorage(resource + ".zip")) {
-            } else {
-
-                try {
-                    new File(target, ".nomedia").createNewFile();
-
-                    // Write version file.
-                    / *FileOutputStream os = new FileOutputStream(disk_version_fn);
-                    os.write(data_version.getBytes());
-                    os.close();* /
-                    writeDataVersion(disk_version_fn,data_version);
-                } catch (Exception e) {
-                    Log.w("unpackData", e);
-                }
-            }
-        }
-
-        if (resource.startsWith("private") || resource.startsWith("notebook")) {
-            chmodX();
-        }
-    }*/
 
     private void chmodX () {
         File bind = new File(this.context.getFilesDir() , "bin");

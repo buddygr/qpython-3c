@@ -13,9 +13,7 @@ import com.quseit.util.NAction;
 import com.quseit.util.NUtil;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -31,7 +29,7 @@ public class CrashHandler implements UncaughtExceptionHandler {
     private Context mContext;
     private Thread.UncaughtExceptionHandler mDefaultHandler;
 	private Map<String, String> infos = new HashMap<String, String>();
-	private static String errlog;
+	public static String errlog;
 
     public static CrashHandler getInstance() {
         if (INSTANCE == null) {
@@ -193,37 +191,11 @@ public class CrashHandler implements UncaughtExceptionHandler {
 		}
 
 	}
-      
-	/**
-	 * 保存错误信息到文件中
-	 *
-	 * @return	返回文件名称,便于将文件传送到服务器
-	 */
-	/*private String saveCrashInfo2File(StringBuffer sb) {
-
-		String path = util.preparePath(mContext) + "crash/";
-		try {
-			long timestamp = System.currentTimeMillis();
-			String time = formatter.format(new Date());
-			String fileName = "crash-" + time + "-" + timestamp + ".log";
-			File dir = new File(path);
-			if (!dir.exists()) {
-				dir.mkdirs();
-			}
-			FileOutputStream fos = new FileOutputStream(path + fileName);
-			fos.write(sb.toString().getBytes());
-			fos.close();
-			return path + fileName;
-		} catch (Exception e) {
-			Log.e(TAG, "an error occured while writing file...", e);
-		}
-		return "";
-	}*/
 
     public void init(Context ctx) {
         mContext = ctx;
         mDefaultHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(this);
-		errlog = ctx.getExternalFilesDir("").getParent()+"/log/"+NAction.getCode(mContext)+"_last_err.log";
+		errlog = ctx.getExternalFilesDir("").getParent()+"/log/qpython_last_error.log";
     }
 }  

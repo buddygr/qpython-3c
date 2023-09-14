@@ -39,7 +39,7 @@ public class TedAppWidgetProvider extends AppWidgetProvider implements Constants
 		intent.setData(Uri.fromFile(targetFile));
 		intent.putExtra(EXTRA_FORCE_READ_ONLY, pref.mReadOnly);
 
-		pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+		pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
 		views = new RemoteViews(context.getPackageName(), R.layout.widget);
 

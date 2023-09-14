@@ -79,7 +79,7 @@ public class TermService extends Service implements TermSession.FinishCallback {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Intent resultIntent = new Intent(this, TermActivity.class);
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
         Notification.Builder builder;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -189,7 +189,7 @@ public class TermService extends Service implements TermSession.FinishCallback {
                     .putExtra(RemoteInterface.PRIVEXTRA_TARGET_WINDOW, sessionHandle);
 
             final PendingIntent result = PendingIntent.getActivity(getApplicationContext(), sessionHandle.hashCode(),
-                    switchIntent, 0);
+                    switchIntent, PendingIntent.FLAG_IMMUTABLE);
 
             final PackageManager pm = getPackageManager();
             final String[] pkgs = pm.getPackagesForUid(getCallingUid());

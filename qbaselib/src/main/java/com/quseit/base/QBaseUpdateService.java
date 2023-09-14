@@ -94,10 +94,9 @@ public abstract class QBaseUpdateService extends Service {
 		    	Intent updateIntent = new Intent();
 		    	updateIntent.setClassName(this.getPackageName(), this.getPackageName()+".MIndexAct");
 		    	
-		    	updatePendingIntent = PendingIntent.getActivity(this,NOTIFICATION_ID,updateIntent,0);
+		    	updatePendingIntent = PendingIntent.getActivity(this,NOTIFICATION_ID,updateIntent,PendingIntent.FLAG_IMMUTABLE);
 		    } else {
-		    	Intent updateIntent = x;
-			    updatePendingIntent = PendingIntent.getActivity(this,NOTIFICATION_ID,updateIntent,0);
+				updatePendingIntent = PendingIntent.getActivity(this,NOTIFICATION_ID, x,PendingIntent.FLAG_IMMUTABLE);
 		    }
 
 			Notification updateNotification = NAction.getNotification(getApplicationContext(), getString(R.string.up_soft_update),"%0", updatePendingIntent, R.drawable.ic_download_nb, null,Notification.FLAG_ONGOING_EVENT);

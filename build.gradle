@@ -91,9 +91,9 @@ ext {
     libSupportDesign = "com.android.support:design:${supportVersion}"
     libOkHttp3Log = "com.squareup.okhttp3:logging-interceptor:${okhttpVersion}"
 
-    minSdkVersion = 21
+    minSdkVersion = 24
     targetSdkVersion = 28
-    compileSdkVersion = 33
+    compileSdkVersion = 34
     buildToolsVersion = '28.0.3'
 
     // firebase related https://firebase.google.com/docs/android/setup

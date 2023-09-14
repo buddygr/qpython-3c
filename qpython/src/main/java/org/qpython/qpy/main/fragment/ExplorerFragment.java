@@ -394,6 +394,9 @@ public class ExplorerFragment extends Fragment {
         } else {
             File dir = new File(dirPath);
             if (dir.exists()) {
+                try {
+                    dir = dir.getCanonicalFile();
+                } catch (IOException ignored) {}
                 File[] files = dir.listFiles();
                 if (files != null) {
                     Arrays.sort(files, sortTypeByName);

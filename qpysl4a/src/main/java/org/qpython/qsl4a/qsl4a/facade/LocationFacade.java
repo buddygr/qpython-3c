@@ -43,6 +43,8 @@ import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
 import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
 import org.qpython.qsl4a.qsl4a.rpc.RpcStartEvent;
 import org.qpython.qsl4a.qsl4a.rpc.RpcStopEvent;
+import org.qpython.qsl4a.qsl4a.util.IoUtils;
+import org.qpython.qsl4a.qsl4a.util.PermissionUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -142,9 +144,7 @@ public class LocationFacade extends RpcReceiver {
   }
 
   private void check_Access_Fine_Location_Permission() throws Exception {
-    if (ActivityCompat.checkSelfPermission(mService, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-      throw new Exception(Manifest.permission.ACCESS_FINE_LOCATION);
-    }
+    PermissionUtil.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION);
   }
 
   @Rpc(description = "Returns availables providers on the phone")

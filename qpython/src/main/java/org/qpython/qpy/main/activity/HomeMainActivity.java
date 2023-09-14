@@ -151,7 +151,7 @@ public class HomeMainActivity extends BaseActivity {
                             StringBuilder sb = new StringBuilder();
                             for(i = 0; i < consoleItem.length; i++)
                                 sb.append(consoleMenu.get(i));
-                            FileHelper.putFileContents(this,CONSOLE_SETTING,sb.toString());
+                            FileHelper.putFileContents(CONSOLE_SETTING,sb.toString());
                         }
                     }).setNegativeButton(getString(R.string.close), (dialogInterface, i) -> dialogInterface.dismiss())
                     .show();
