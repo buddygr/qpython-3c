@@ -8,9 +8,16 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
+import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.qpython.qsl4a.R;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
@@ -18,6 +25,7 @@ import org.qpython.qsl4a.qsl4a.rpc.Rpc;
 import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
 import org.qpython.qsl4a.qsl4a.rpc.RpcOptional;
 import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
+import org.qpython.qsl4a.qsl4a.util.PermissionUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,6 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -159,6 +168,49 @@ public class ApplicationManagerFacade extends RpcReceiver {
   public void forceStopPackage(
       @RpcParameter(name = "packageName", description = "name of package") final String packageName) {
     mActivityManager.restartPackage(packageName);
+  }
+
+  @Rpc(description = "check all Permissions are granted or denied .")
+  public static JSONObject checkPermissions() throws Exception {
+    JSONArray granted,denied;
+    granted = new JSONArray();
+    denied = new JSONArray();
+    JSONObject json = new JSONObject();
+    PackageManager pm = PermissionUtil.activity.getPackageManager();
+    PackageInfo info;
+    info = pm.getPackageInfo(PermissionUtil.activity.getPackageName(), PackageManager.GET_PERMISSIONS);
+    for (String permission:info.requestedPermissions){
+      if(ContextCompat.checkSelfPermission(PermissionUtil.activity, permission) == PackageManager.PERMISSION_GRANTED)
+        granted.put(permission);
+      else
+        denied.put(permission);
+    }
+    json.put("granted",granted);
+    json.put("denied",denied);
+    return json;
+  }
+
+  @Rpc(description = "request Permissions")
+  public static void requestPermissions(
+          @RpcParameter(name = "permissions") @RpcOptional JSONArray permissions) throws Exception {
+    if(permissions == null)
+      permissions = checkPermissions().getJSONArray("denied");
+    String[] permission = new String[permissions.length()];
+    for(int i = 0; i < permission.length; i++) {
+      try {
+        permission[i] = (String) permissions.get(i);
+      } catch (JSONException e) {
+        permission[i] = "";
+      }
+    }
+    ActivityCompat.requestPermissions(PermissionUtil.activity, permission, 100);
+    if (Build.VERSION.SDK_INT >= 30) {
+      if (!Environment.isExternalStorageManager()) {
+        Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+        intent.setData(Uri.parse("package:" + PermissionUtil.activity.getPackageName()));
+        PermissionUtil.activity.startActivityForResult(intent, 100);
+      }
+    }
   }
 
   @Override

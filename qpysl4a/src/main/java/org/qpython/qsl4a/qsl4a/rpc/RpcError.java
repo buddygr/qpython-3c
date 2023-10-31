@@ -16,7 +16,6 @@
 
 package org.qpython.qsl4a.qsl4a.rpc;
 
-@SuppressWarnings("serial")
 public class RpcError extends Exception {
 
   public RpcError(String message) {

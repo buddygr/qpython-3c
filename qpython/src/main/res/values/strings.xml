@@ -749,4 +749,6 @@
     <string name="edit_to_new_path">You can edit it to new path .</string>
     <string name="qpy_custom_dir_key">QPython Custom Directory</string>
     <string name="sl4a_start">Start SL4A Server …</string>
+    <string name="initial_qpython">Initial QPython, DO NOT operate !</string>
+    <string name="umeng">Allow QPython to send user statistics for UMeng ?</string>
 </resources>

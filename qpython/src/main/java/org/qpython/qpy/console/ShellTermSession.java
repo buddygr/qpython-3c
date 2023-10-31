@@ -23,6 +23,7 @@ import android.util.Log;
 
 import com.quseit.util.FileHelper;
 import com.quseit.util.FileUtils;
+import com.quseit.util.StringUtils;
 
 import org.qpython.qpy.console.compont.FileCompat;
 import org.qpython.qpy.console.util.TermSettings;
@@ -159,7 +160,8 @@ public class ShellTermSession extends GenericTermSession {
     }
 
     private int createSubprocess(String shell, String[] env) throws IOException {
-        ArrayList<String> argList = parse(shell);
+        ArrayList<String> argList = new ArrayList<String>();// = parse(shell);
+        StringUtils.argvParse(shell,argList);
         String arg0;
         String[] args;
 

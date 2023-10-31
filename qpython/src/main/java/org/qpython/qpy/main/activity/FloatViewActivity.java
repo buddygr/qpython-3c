@@ -119,36 +119,43 @@ public class FloatViewActivity extends Activity
         floatButton.setOnTouchListener(new View.OnTouchListener() {
             private int x;
             private int y;
+            private boolean moved;
 
             @SuppressLint("ClickableViewAccessibility")
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public boolean onTouch(View view, MotionEvent event) {
                 final int index = (int) view.getTag();
+                int nowX,nowY;
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         x = (int) event.getRawX();
                         y = (int) event.getRawY();
+                        moved = false;
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        int nowX = (int) event.getRawX();
-                        int nowY = (int) event.getRawY();
-                        boolean moved = nowX != x || nowY != y;
+                        nowX = (int) event.getRawX();
+                        nowY = (int) event.getRawY();
+                        moved = nowX != x || nowY != y;
                         x = nowX;
                         y = nowY;
                         // 更新悬浮窗控件布局
                         if (moved) {
                             final WindowManager.LayoutParams layoutParams = params.get(index);
-                            layoutParams.x = nowX - displayMetrics.widthPixels/2;
-                            layoutParams.y = nowY - displayMetrics.heightPixels/2;
+                            layoutParams.x = nowX - displayMetrics.widthPixels / 2;
+                            layoutParams.y = nowY - displayMetrics.heightPixels / 2;
                             windowManager.updateViewLayout(view, layoutParams);
                             operations.set(index, "move");
-                        } else {
-                            operations.set(index, "click");
+                            times.set(index, System.currentTimeMillis());
                         }
-                        times.set(index, System.currentTimeMillis());
                         break;
                     case MotionEvent.ACTION_UP:
+                        nowX = (int) event.getRawX();
+                        nowY = (int) event.getRawY();
+                        if(!moved && nowX == x && nowY == y) {
+                        operations.set(index, "click");
+                        times.set(index, System.currentTimeMillis());
+                    }
                     if (operations.get(index).equals("click")) {
                             if(script!=null){
                                 //脚本参数

@@ -102,8 +102,12 @@ public class SettingFragment extends PreferenceFragment {
         addPreferencesFromResource(R.xml.qpython_setting);
         settings = CONF.PREF;
         resources = getResources();
-        initSettings();
-        initListener();
+        try {
+            initSettings();
+            initListener();
+        } catch (Exception exception) {
+            Toast.makeText(getActivity(),exception.toString(),Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -150,7 +154,7 @@ public class SettingFragment extends PreferenceFragment {
         }
     }
 
-    private void initSettings() {
+    private void initSettings() throws Exception{
         ipaddress = findPreference("ipaddress");
         showIpAddress();
 
@@ -268,7 +272,7 @@ public class SettingFragment extends PreferenceFragment {
     }
 
     @SuppressLint({"InvalidWakeLockTag", "WakelockTimeout"})
-    private void initListener() {
+    private void initListener() throws Exception {
 
         lastlog.setOnPreferenceClickListener(preference -> {
             File logFolder = new File(CONF.SCOPE_STORAGE_PATH,"log");
@@ -685,7 +689,7 @@ public class SettingFragment extends PreferenceFragment {
     }*/
 
 
-    private void releaseQPycRes(String path) {
+    /*private void releaseQPycRes(String path) {
         final String extarget = CONF.PY_CACHE_PATH;
 
         if (path!=null && !path.equals("")) {
@@ -696,7 +700,7 @@ public class SettingFragment extends PreferenceFragment {
                 qpySDK.extractRes(res, new File(extarget), false);
             }
         }
-    }
+    }*/
 
     private void updatePreference(Preference preference) {
         SharedPreferences.Editor editor = settings.edit();

@@ -759,17 +759,9 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
 
     private void setTextToEmulator(String text) {
         if (mViewFlipper.getCurrentView() != null) {
-            if (text!=null && text.equals("[tab]")) {
-                Log.d("TermAcity", "setTextToEmulator:"+text);
-
-                //((EmulatorView) mViewFlipper.getCurrentView()).sendTabKey();
-
-                ((EmulatorView) mViewFlipper.getCurrentView()).setTextBuff("\t");
-                ((EmulatorView) mViewFlipper.getCurrentView()).getTermSession().write("\t");
-                ((EmulatorView) mViewFlipper.getCurrentView()).getTermSession().notifyUpdate();
-
-
-            } else {
+            {
+                if(text.equals("[tab]"))
+                    text="\t";
                 ((EmulatorView) mViewFlipper.getCurrentView()).setTextBuff(text);
                 ((EmulatorView) mViewFlipper.getCurrentView()).getTermSession().write(text);
                 ((EmulatorView) mViewFlipper.getCurrentView()).getTermSession().notifyUpdate();
@@ -1168,6 +1160,17 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
             startActivity(openLink);
     }
 
+    private TermSession setup(TermSettings settings) throws IOException {
+        SharedPreferences.Editor pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+        pref.putString("shell",getString(R.string.pref_shell_default)).apply();
+        String filesDir = this.getFilesDir().getAbsolutePath();
+        TermSession session = createTermSession(this, settings,
+                this.getApplicationInfo().nativeLibraryDir + "/lib-qpython-setup.so setup && exit",
+                filesDir);
+        pref.putString("shell",filesDir+"/bin/sh").apply();
+        return session;
+    }
+
     private TermSession createPyTermSession(String[] mArgs) throws IOException {
         Log.d("TermActivity", "createPyTermSession:" + mArgs);
         TermSettings settings = mSettings;
@@ -1185,12 +1188,12 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
             shell_type = CONF.binDir + shell_type;
             mArgs = new String[]{shell_type, shell_type};
         } else if (shell_type.equals("shell"))
-            session = createTermSession(this, settings, "cd && cat text/" + getString(R.string.lang_flag) + "/shell", CONF.filesDir);
-        else
+            session = createTermSession(this, settings, "cd && bin/shell.sh", CONF.filesDir);
+        else if (shell_type.equals("setup")) {
+            session = setup(settings);
+        } else
             session = createTermSession(this, settings, CONF.binDir + shell_type + " && exit", CONF.filesDir);
         if (mArgs != null) {
-            //String content = FileHelper.getFileContents(mArgs[0]);
-            //String cmd = settings.getInitialCommand().equals("")?scmd:settings.getInitialCommand();
             String scmd = getScmd();
             if (mArgs.length < 3) {
                 session = createTermSession(this, settings, scmd + " \"" + StringUtils.addSlashes(mArgs[0]) + "\" && exit", mArgs[1]);

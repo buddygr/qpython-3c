@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import org.qpython.qpysdk.utils.AssetExtract;
 import org.qpython.qpysdk.utils.FileExtract;
+import org.qpython.qpysdk.utils.FileHelper;
 import org.qpython.qpysdk.utils.FileUtils;
 import org.qpython.qpysdk.utils.ResourceManager;
 import org.qpython.qpysdk.utils.StreamGobbler;
@@ -87,7 +88,7 @@ public class QPySDK {
         String[] argumentsArray = mArguments.toArray(new String[mArguments.size()]);
 
         final File mLog = new File(String.format("%s", QPyConstants.LEGACY_LOG));
-        File logDir = mLog.getParentFile();
+        //File logDir = mLog.getParentFile();
 
         mFd = Exec.createSubprocess(binaryPath, argumentsArray, getEnvironmentArray(f.getParentFile() + ""), Environment.getExternalStorageDirectory() + "/", pid);
         final AtomicInteger mPid = new AtomicInteger(PID_INIT_VALUE);
@@ -143,13 +144,6 @@ public class QPySDK {
 
         File externalStorage = new File(Environment.getExternalStorageDirectory(), "org.qpython.qpy");
 
-        /*environmentVariables.add("PYTHONPATH=" + externalStorage + "/lib/python2.7/site-packages/:"
-                + filesDir + "/lib/python2.7/site-packages/:"
-                + filesDir + "/lib/python2.7/:"
-                + filesDir + "/lib/python27.zip:"
-                + filesDir + "/lib/python2.7/lib-dynload/:"
-                + pyPath);*/
-
         //environmentVariables.add("PYTHONSTARTUP=" + externalStorage + "/lib/python2.7/site-packages/qpythoninit.py");
         environmentVariables.add("PYTHONOPTIMIZE=1");
 
@@ -182,9 +176,9 @@ public class QPySDK {
     }
 
     public String readDiskVersion(String filename){
-        String disk_version = "0";
+        String disk_version;
         try {
-            byte buf[] = new byte[64];
+            byte[] buf = new byte[64];
             InputStream is = new FileInputStream(filename);
             int len = is.read(buf);
             disk_version = new String(buf, 0, len);
@@ -203,7 +197,10 @@ public class QPySDK {
     }
 
     public boolean needUpdateRes(){
-        String fn = context.getFilesDir()+"/text/ver/qpython";
+        String fn = context.getFilesDir().getPath();
+        if(readDiskVersion(fn + "/bin/python").equals("0"))
+            return true;
+        fn += "/text/ver/qpython";
         return !readDiskVersion(fn).equals(getVersion());
     }
 
@@ -216,7 +213,7 @@ public class QPySDK {
         return pyVer;
     }
 
-    public void extractRes(File file, File target, boolean forceExtrac) {
+    /*public void extractRes(File file, File target, boolean forceExtrac) {
         String fileName = file.getName().startsWith(".") ? file.getName().substring(1) : file.getName();
         fileName = fileName.substring(0, !file.getName().contains(".") ? file.getName().length() : file.getName().indexOf("."));
 
@@ -232,7 +229,7 @@ public class QPySDK {
         }
 
         chmodX();
-    }
+    }*/
 
     public void extractRes(final String resource, File target, boolean force) {
         // The version of data in memory and on disk.

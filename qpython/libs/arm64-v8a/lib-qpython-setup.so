@@ -1,0 +1,60 @@
+#!/system/bin/sh
+
+if [ "$1" != "setup" ]; then
+exit
+fi
+
+if [ $ANDROID_SDK -ge 29 ];
+then
+LNK=/system/bin/linker64
+else
+LNK=
+fi
+
+BIN=$HOME/bin
+
+for i in python python3 python3.11
+do
+ln -s -f $ANDROID_NATIVE_LIBRARY/lib-python.so $BIN/$i
+done
+
+for i in busybox bash ash sh
+do
+ln -s -f $ANDROID_NATIVE_LIBRARY/lib-busybox.so $BIN/$i
+done
+
+function p7z {
+j=$HOME/lib/p7zip/$1
+echo "\"$j\" \"\$@\"" > $BIN/$1
+chmod 777 $j
+j="$LNK $j"
+}
+
+p7z 7za
+
+for i in en zh
+do
+rm $HOME/text/$i/shell
+done
+
+for i in 1 2
+do
+i=$HOME/private$i.7z
+$j x $i -aoa -o$HOME
+rm $i
+done
+
+p7z 7z
+
+i=$HOME/public.7z
+$j x $i -aoa -o$ANDROID_PUBLIC
+rm $i
+
+for i in $(ls $BIN)
+do
+chmod 777 $BIN/$i
+done
+
+python $HOME/setup.py
+
+sleep 3

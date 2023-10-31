@@ -213,15 +213,16 @@
         <item>pyw</item>
         <item>html</item>
         <item>htm</item>
+        <item>log</item>
+        <item>conf</item>
         <item>js</item>
         <item>css</item>
+        <item>ini</item>
+        <item>sh</item>
         <item>md</item>
-        <item>pyx</item>
-        <item>log</item>
         <item>c</item>
         <item>h</item>
-        <item>ini</item>
-
+        <item>pyx</item>
     </string-array>
 
     <string-array name="syntax_ext" translatable="false">

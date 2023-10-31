@@ -38,8 +38,8 @@ public interface QPyConstants extends BASE_CONF {
     String LEGACY_PATH = DocumentsUtils.SDCARD_PATH + BASE_PATH;
     String LEGACY_LOG = LEGACY_PATH+"/log/last.log";
 
-    String QPYC3 = "https://dl.qpy.io/py3.json";
-    String QPYC2COMPATIBLE = "https://dl.qpy.io/py2compatible.json";
+    String QPYC3 = "https://io.qpython.org/py3.json";
+    String QPYC2COMPATIBLE = "https://io.qpython.org/py2compatible.json";
     String QPYC3_VER_KEY= "setting.py3resource.ver";
     String QPYC2COMPATIBLE_VER_KEY="setting.py2compatibleresource.ver";
 }

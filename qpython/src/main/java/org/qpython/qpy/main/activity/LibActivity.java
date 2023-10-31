@@ -112,8 +112,8 @@ public class LibActivity extends AppCompatActivity {
 
     private void initTabs() {
         binding.tabs.addTab(binding.tabs.newTab().setText(R.string.key_default));
-        binding.tabs.addTab(binding.tabs.newTab().setText(R.string.key_sl4a));
-        binding.tabs.addTab(binding.tabs.newTab().setText(R.string.other));
+        binding.tabs.addTab(binding.tabs.newTab().setText(R.string.qpypi));
+        binding.tabs.addTab(binding.tabs.newTab().setText(R.string.aipy));
         binding.tabs.setTabGravity(TabLayout.GRAVITY_FILL);
         binding.tabs.setTabTextColors(getResources().getColor(R.color.white), getResources().getColor(R.color.colorAccent));
         binding.tabs.setSelectedTabIndicatorColor(getResources().getColor(R.color.colorAccent));
@@ -126,7 +126,7 @@ public class LibActivity extends AppCompatActivity {
             public void onTabSelected(TabLayout.Tab tab) {
                 binding.vp.setCurrentItem(tab.getPosition());
                 position = tab.getPosition();
-                QPyExtFragment.viewPage(position);
+                //QPyExtFragment.viewPage(position);
             }
 
             @Override
