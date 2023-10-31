@@ -1,15 +1,19 @@
 package org.qpython.qpy.main.app;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.os.Build;
 import android.support.multidex.MultiDex;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.preference.PreferenceManager;
 
 import com.google.gson.Gson;
 import com.quseit.common.CrashHandler;
 import com.quseit.common.updater.downloader.DefaultDownloader;
 
+import org.qpython.qpy.R;
 import org.qpython.qpy.main.server.Service;
 import org.qpython.qpy.main.server.gist.Api;
 import org.qpython.qpy.main.server.gist.TokenManager;
@@ -22,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
@@ -29,6 +34,8 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+
+import com.umeng.commonsdk.UMConfigure;
 
 //import com.squareup.leakcanary.LeakCanary;
 
@@ -72,59 +79,13 @@ public class App extends QSL4APP {
         return mService;
     }
 
-    /*public static String getScriptPath() {
-        return sScriptPath;
-    }
-
-    public static String getProjectPath() {
-        return sProjectPath;
-    }*/
-
     public static Context getContext() {
         return sContext;
     }
 
-//    public static AppCompatActivity getActivity() {
-//        return sActivity;
-//    }
-//
-//    public static void setActivity(AppCompatActivity activity) {
-//        sActivity = activity;
-//    }
-    /*public static User getUser() {
-        if (mPreferences.getString("email", null) == null) {
-            return null;
-        }
-        User user = new User();
-        user.setNick(mPreferences.getString("nick", ""));
-        user.setUserName(mPreferences.getString("name", ""));
-        user.setUserId(mPreferences.getString("id", ""));
-        user.setEmail(mPreferences.getString("email", ""));
-        user.setAvatarUrl(mPreferences.getString("avatar", ""));
-        return user;
-    }*/
-
     public static DefaultDownloader getDownloader() {
         return downloader;
     }
-
-    /*public static void setUser(User user) {
-        SharedPreferences.Editor editor = mPreferences.edit();
-        if (user == null) {
-            editor.clear();
-            editor.apply();
-            return;
-        }
-        editor.putString("nick", user.getNick());
-        editor.putString("name", user.getUserName());
-        editor.putString("email", user.getEmail());
-        editor.putString("avatar", user.getAvatarUrl());
-        editor.putString("id", user.getUserId());
-        if (!editor.commit()) {
-            editor.apply();
-        }
-
-    }*/
 
     private static List<String> favorites = new ArrayList<>();
 
@@ -151,12 +112,6 @@ public class App extends QSL4APP {
     @Override
     public void onCreate() {
         super.onCreate();
-        /*if (LeakCanary.isInAnalyzerProcess(this)) {
-            // This process is dedicated to LeakCanary for heap analysis.
-            // You should not init your app in this process.
-            return;
-        }
-        LeakCanary.install(this);*/
 
         sContext = getApplicationContext();
         downloader = new DefaultDownloader(sContext);
@@ -198,20 +153,40 @@ public class App extends QSL4APP {
                 .addHeaders(header)
                 .init(Api.BASE_URL);
 
-//        if (NotebookUtil.isNotebookLibInstall(getActivity())) {
-//            if (Utils.httpPing(NotebookUtil.NB_SERVER, 300)) {
-//                NotebookUtil.startNotebookService(getActivity());
-//            }
-//        }
-
-        // restart Notebook
-        /*if (NotebookUtil.isNBSrvSet(this)) {
-
-            NotebookUtil.killNBSrv(this);
-            NotebookUtil.startNotebookService2(this);
-        }*/
+        //initUmeng();
     }
 
+    public static void initUmeng(Activity activity,SharedPreferences sharedPreferences) {
+        /*String um = "umeng";
+        int i;
+        if(sharedPreferences != null)
+            i = sharedPreferences.getInt(um, 0);
+        else
+            i = 1;
+        switch (i){
+            case 1:*/
+                //友盟预初始化
+                UMConfigure.preInit(activity,"6533d918b2f6fa00ba69536c","QPython Plus");
+                //友盟初始化
+                UMConfigure.init(activity, UMConfigure.DEVICE_TYPE_PHONE, "");
+                /*break;
+            case 0:
+                new AlertDialog.Builder(activity, R.style.MyDialog)
+                        .setTitle(R.string.notice)
+                        .setMessage(
+                                activity.getString(R.string.umeng))
+                        .setPositiveButton(R.string.agree, (dialog1, which) -> {
+                            sharedPreferences.edit().putInt(um,1).apply();
+                            initUmeng(activity,null);
+                        })
+                        .setNegativeButton(R.string.disagree, (dialog1, which) -> {
+                            sharedPreferences.edit().putInt(um,-1).apply();
+                        })
+                        .create()
+                        .show();
+            default:
+        }*/
+    }
 
     private void initLayoutDir() {
         Resources resources = getResources();

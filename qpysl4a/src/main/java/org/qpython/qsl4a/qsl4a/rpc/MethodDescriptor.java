@@ -506,6 +506,22 @@ public final class MethodDescriptor {
         throw new IllegalArgumentException("'" + input + "' is not a boolean");
       }
     });
+    converters.put(String.class, new Converter<String>() {
+      @Override
+      public String convert(String value) {
+        return value;
+      }
+    });
+    converters.put(Double.class, new Converter<Double>() {
+      @Override
+      public Double convert(String input) {
+        try {
+          return Double.parseDouble(input);
+        } catch (NumberFormatException e) {
+          throw new IllegalArgumentException("'" + input + "' is not a float");
+        }
+      }
+    });
     return converters;
   }
 }

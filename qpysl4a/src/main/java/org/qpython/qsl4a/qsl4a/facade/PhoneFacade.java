@@ -449,12 +449,6 @@ public class PhoneFacade extends RpcReceiver {
         return mTelephonyManager.isNetworkRoaming();
     }
 
-    @Rpc(description = "get Android ID")
-    public String getAndroidID() throws Exception {
-        return Settings.System.getString(
-                context.getContentResolver(), Settings.Secure.ANDROID_ID);
-    }
-
     @SuppressLint("NewApi")
     @Rpc(description = "Returns the unique device ID, for example, the IMEI for GSM and the MEID for CDMA phones. Return null if device ID is not available.")
     public String getDeviceId(

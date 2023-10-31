@@ -19,6 +19,8 @@ package org.qpython.qsl4a.qsl4a.jsonrpc;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Arrays;
+
 /**
  * Represents a JSON RPC result.
  * 

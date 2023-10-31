@@ -19,7 +19,7 @@ import rx.Observable;
 
 interface ServiceRequest {
     /**
-     * Domain: http://dl.qpy.io
+     * Domain: http://io.qpython.org
      */
 
     @GET("/libs-2x-715.json")
@@ -28,16 +28,10 @@ interface ServiceRequest {
     @GET("/libs-3x-66.json")
     Observable<List<LibModel>> getLibs3();
 
-    @GET("/qpypi-2x-715.json")
-    Observable<List<QpypiModel>> getQPyPi();
-
-    @GET("/qpypi-3x-66.json")
+    @GET("/qpypi-3x-311.json")
     Observable<List<QpypiModel>> getQPyPi3();
 
-    @GET("/aipy-2x-715.json")
-    Observable<List<BaseLibModel>> getAIPy();
-
-    @GET("/aipy-3x-66.json")
+    @GET("/aipy-3x-311.json")
     Observable<List<BaseLibModel>> getAIPy3();
 
     @GET("/update.json")

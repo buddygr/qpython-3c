@@ -67,13 +67,7 @@ public class TermShortcutLayout extends LinearLayout {
                     shortcutBean.setListener(new OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Instrumentation inst = new Instrumentation();
-                                    inst.sendKeyDownUpSync(KeyEvent.KEYCODE_DEL);
-                                }
-                            }).start();
+                            callback.enter("\b");
                         }
                     });
                     break;
@@ -81,15 +75,7 @@ public class TermShortcutLayout extends LinearLayout {
                     shortcutBean.setListener(new OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Instrumentation inst = new Instrumentation();
-                                    for (int i = 0; i < 4; i++) {
-                                        inst.sendKeyDownUpSync(KeyEvent.KEYCODE_DEL);
-                                    }
-                                }
-                            }).start();
+                            callback.enter("\b\b\b\b");
                         }
                     });
                     break;

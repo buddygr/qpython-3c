@@ -98,7 +98,7 @@ public class LibQPyPiFragment extends RefreshFragment {
     public void refresh(boolean forceRefresh) {
         Log.d(TAG, "refresh:"+forceRefresh);
         dataList.clear();
-        binding.progressBar.setVisibility(View.GONE);
+        binding.progressBar.setVisibility(View.VISIBLE);
         binding.netError.setVisibility(View.GONE);
         adapter.notifyDataSetChanged();
         App.getService().getQPyPi(forceRefresh, new MySubscriber<List<QpypiModel>>() {

@@ -148,7 +148,7 @@ public class GistDetailActivity extends BaseActivity implements DetailView {
                     break;
                 }
                 case ShareDialog.COPY_LINK: {
-                    OpenWebUtil.open(this, "http://gist.qpy.io/share/"+getIntent().getStringExtra(GIST_ID));
+                    OpenWebUtil.open(this, "http://gist.qpython.org/share/"+getIntent().getStringExtra(GIST_ID));
                     break;
                 }
             }

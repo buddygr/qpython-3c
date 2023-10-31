@@ -48,6 +48,7 @@ import org.qpython.qsl4a.qsl4a.future.FutureActivityTaskExecutor;
 import org.qpython.qsl4a.qsl4a.LogUtil;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -319,26 +320,33 @@ public class SettingsFacade extends RpcReceiver {
     return Resources.getSystem().getConfiguration().getLocales().get(0).toString();
   }
 
-  @SuppressLint("HardwareIds")
   @Rpc(description = "get system infomation .")
-  public Map<String,Object> getSysInfo(){
-    Map<String,Object> s = new HashMap<>();
-    s.put("model", Build.MODEL);
-    s.put("sdk",Build.VERSION.SDK_INT);
-    s.put("release",Build.VERSION.RELEASE);
-    s.put("brand",Build.BRAND);
-    s.put("device",Build.DEVICE);
-    s.put("display",Build.DISPLAY);
-    s.put("manufacturer",Build.MANUFACTURER);
-    s.put("language", Locale.getDefault().getLanguage());
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-      s.put("serial",Build.getSerial());
-    else
-      s.put("serial",Build.SERIAL);
-    s.put("hardware", Build.HARDWARE);
-    s.put("user", Build.USER);
-    s.put("abis", Build.SUPPORTED_ABIS);
-    return s;
+  public Map<String,Object> getSysInfo() {
+      Map<String, Object> s = new HashMap<>();
+      s.put("model", Build.MODEL);
+      s.put("sdk", Build.VERSION.SDK_INT);
+      s.put("release", Build.VERSION.RELEASE);
+      s.put("brand", Build.BRAND);
+      s.put("device", Build.DEVICE);
+      s.put("display", Build.DISPLAY);
+      s.put("manufacturer", Build.MANUFACTURER);
+      s.put("language", Locale.getDefault().getLanguage());
+      try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+          s.put("serial", Build.getSerial());
+        else
+          s.put("serial", Build.SERIAL);
+      } catch (Exception ignored){}
+      s.put("hardware", Build.HARDWARE);
+      s.put("user", Build.USER);
+      s.put("abis", Build.SUPPORTED_ABIS);
+      return s;
+    }
+
+  @Rpc(description = "get Android ID")
+  public String getAndroidID() {
+    return Settings.System.getString(
+            context.getContentResolver(), Settings.Secure.ANDROID_ID);
   }
 
   @Rpc(description = "get screen infomation .")

@@ -1,7 +1,6 @@
 package org.qpython.qpy.main.fragment;
 
 
-import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -12,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.quseit.util.ACache;
-import com.quseit.util.NAction;
 
 import org.qpython.qpy.R;
 import org.qpython.qpy.databinding.FragmentRefreshRvBinding;
@@ -94,8 +92,8 @@ public class LibAIPyFragment extends RefreshFragment {
         binding.netError.setVisibility(View.GONE);
         dataList.clear();
         adapter.notifyDataSetChanged();
-        binding.progressBar.setVisibility(View.GONE);
-        App.getService().getAIPyList(true,forceRefresh, new Subscriber<List<BaseLibModel>>() {
+        binding.progressBar.setVisibility(View.VISIBLE);
+        App.getService().getAIPyList(forceRefresh, new Subscriber<List<BaseLibModel>>() {
             @Override
             public void onCompleted() {
                 binding.swipeList.setVisibility(View.VISIBLE);

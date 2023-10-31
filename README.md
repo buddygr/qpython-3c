@@ -1,6 +1,6 @@
 # About
 
-<p align="center"><a href="https://gitee.com/buddygr/qpython-3c/raw/master/qpython/src/main/res/drawable-xxhdpi/ic_launcher.png" target="_blank"><img src="https://gitee.com/buddygr/qpython-3c/raw/master/qpython/src/main/res/drawable-xxhdpi/ic_launcher.png"></a></p>
+<p align="center"><a href="https://gitee.com/buddygr/qpython-3c/raw/master/qpython/src/main/res/drawable-xxhdpi/ic_launcher.jpg" target="_blank"><img src="https://gitee.com/buddygr/qpython-3c/raw/master/qpython/src/main/res/drawable-xxhdpi/ic_launcher.jpg"></a></p>
 
 Welcome to the QPython project!
 

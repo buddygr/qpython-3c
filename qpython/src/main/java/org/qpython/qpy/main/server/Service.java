@@ -15,6 +15,7 @@ import com.quseit.util.NAction;
 import org.greenrobot.eventbus.EventBus;
 import org.qpython.qpy.main.activity.LibActivity;
 import org.qpython.qpy.main.app.App;
+import org.qpython.qpy.main.fragment.QPyExtFragment;
 import org.qpython.qpy.main.server.model.BaseLibModel;
 import org.qpython.qpy.main.server.model.LibModel;
 import org.qpython.qpy.main.server.model.PayStatusModel;
@@ -40,7 +41,7 @@ public class Service extends CacheKey {
 
     public Service() {
         request = App.getRetrofit()
-                .baseUrl(BASE_URL + "dl.qpy.io")
+                .baseUrl(BASE_URL + "io.qpython.org")
                 .build()
                 .create(ServiceRequest.class);
 
@@ -76,14 +77,18 @@ public class Service extends CacheKey {
     }
 
     public void getQPyPi(boolean forceRefresh, Subscriber<List<QpypiModel>> subscriber) {
-        /*List<QpypiModel> qpypiList = getObject(new TypeToken<ArrayList<QpypiModel>>() {
+        List<QpypiModel> qpypiList = getObject(new TypeToken<ArrayList<QpypiModel>>() {
         }.getType(), QPYPI);
         if (qpypiList == null || forceRefresh) {
-            toSubscribe(NAction.isQPy3(App.getContext()) ? request.getQPyPi3() : request.getQPyPi(), subscriber);
-            ACache.get(App.getContext()).put(CacheKey.QPYPI_LAST_REFRESH, DateTimeHelper.getDate());
+            toSubscribe(request.getQPyPi3(), subscriber);
+            try {
+                ACache.get(App.getContext()).put(CacheKey.QPYPI_LAST_REFRESH, DateTimeHelper.getDate());
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
         } else {
             toSubscribe(Observable.just(qpypiList), subscriber);
-        }*/
+        }
     }
 
     public void checkUpdate(Subscriber<UpdateModel> subscriber) {
@@ -127,15 +132,19 @@ public class Service extends CacheKey {
         toSubscribe(apuQuseit.getSupportNum(articleId), callback);
     }
 
-    public void getAIPyList(boolean isQpy3, boolean forceRefresh, Subscriber<List<BaseLibModel>> subscriber) {
-        /*List<BaseLibModel> aipyList = getObject(new TypeToken<ArrayList<BaseLibModel>>() {
+    public void getAIPyList(boolean forceRefresh, Subscriber<List<BaseLibModel>> subscriber) {
+        List<BaseLibModel> aipyList = getObject(new TypeToken<ArrayList<BaseLibModel>>() {
         }.getType(), AIPY);
         if (aipyList == null || forceRefresh) {
-            toSubscribe(isQpy3?request.getAIPy3():request.getAIPy(), subscriber);
-            ACache.get(App.getContext()).put(CacheKey.AIPY_LAST_REFRESH, DateTimeHelper.getDate());
+            toSubscribe(request.getAIPy3(), subscriber);
+            try {
+                ACache.get(App.getContext()).put(CacheKey.AIPY_LAST_REFRESH, DateTimeHelper.getDate());
+            } catch (Exception exception) {
+                QPyExtFragment.viewPage(12);
+            }
         } else {
             toSubscribe(Observable.just(aipyList), subscriber);
-        }*/
+        }
     }
 
     public void downloadLib(String url, String fileName, String description) {

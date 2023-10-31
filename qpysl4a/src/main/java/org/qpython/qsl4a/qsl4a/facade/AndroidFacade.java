@@ -106,6 +106,7 @@ public class AndroidFacade extends RpcReceiver {
   public final Context context;
   public final String qpyProvider;
   public static Handler handler;
+  public final String SCOPE_STORAGE_PATH;
 
   public final int intentFlags = Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION  | Intent.FLAG_GRANT_WRITE_URI_PERMISSION ;
 
@@ -132,6 +133,7 @@ public class AndroidFacade extends RpcReceiver {
     //乘着船 修改
     context = mService.getApplicationContext();
     qpyProvider = context.getPackageName() + ".provider";
+    SCOPE_STORAGE_PATH = context.getExternalFilesDir("").getParent();
   }
 
   ClipboardManager getClipboardManager() {

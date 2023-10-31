@@ -19,6 +19,9 @@ package org.qpython.qsl4a.qsl4a.facade;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -37,9 +40,13 @@ import android.media.MediaRecorder;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.IBinder;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.util.DisplayMetrics;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
@@ -47,6 +54,7 @@ import android.view.SurfaceView;
 import android.view.WindowManager;
 
 import org.qpython.qsl4a.QSL4APP;
+import org.qpython.qsl4a.R;
 import org.qpython.qsl4a.qsl4a.future.FutureActivityTaskExecutor;
 import org.qpython.qsl4a.qsl4a.future.FutureActivityTask;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
@@ -84,17 +92,19 @@ public class MediaRecorderFacade extends RpcReceiver {
 
   private final AndroidFacade mAndroidFacade;
   private final Context context;
-  private final String sdcard;
+  private final String basepath;
   private final Handler mHandler;
   private final Service mService;
   static Intent intentMP;
   static int resultCodeMP;
+  static MediaProjectionManager mediaProjectionManager;
   static MediaProjection mediaProjection;
   static MediaRecorder mMediaRecorder;
   static Camera camera;
   static final int SAMPLE_RATE_IN_HZ = 8000;
   static final int BUFFER_SIZE = AudioRecord.getMinBufferSize(SAMPLE_RATE_IN_HZ,
           AudioFormat.CHANNEL_IN_DEFAULT, AudioFormat.ENCODING_PCM_16BIT);
+  private static CountDownLatch countDownLatch;
   AudioRecord mAudioRecord;
   boolean isGetVoiceRun;
   final Object mLock;
@@ -104,7 +114,10 @@ public class MediaRecorderFacade extends RpcReceiver {
     super(manager);
     mAndroidFacade = manager.getReceiver(AndroidFacade.class);
     context = mAndroidFacade.context;
-    sdcard = Environment.getExternalStorageDirectory().toString();
+    if( Environment.getExternalStorageDirectory().canWrite())
+       basepath = Environment.getExternalStorageDirectory().getAbsolutePath();
+    else
+       basepath = context.getExternalFilesDir("").getAbsolutePath();
     mHandler = mAndroidFacade.mHandler;
     mService = mAndroidFacade.mService;
     mLock = new Object();
@@ -113,27 +126,35 @@ public class MediaRecorderFacade extends RpcReceiver {
   @Rpc(description = "Records audio from the microphone and saves it to the given location.")
   public String recorderStartMicrophone(
           @RpcParameter(name = "targetPath") @RpcOptional String path)
-          throws IOException {
+          throws Exception {
     if (path == null) {
-      path = sdcard + "/Sounds/Recorder/"; /*存放录音的文件夹*/
+      path = basepath + "/Sounds/Recorder/"; /*存放录音的文件夹*/
       File _path = new File(path);
       if (!_path.exists()) {
         _path.mkdirs();
       }
       path += new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date()) + ".amr";//音频命名
     }
-    startAudioRecording(path, MediaRecorder.AudioSource.MIC);
+    startAudioRecording(path);
     return path;
   }
 
-  private void startAudioRecording(String targetPath, int source) throws IOException {
+  private void startAudioRecording(String targetPath) throws Exception {
     mMediaRecorder = new MediaRecorder();
-    mMediaRecorder.setAudioSource(source);
+    setAudioSource();
     mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
     mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
     mMediaRecorder.setOutputFile(targetPath);
     mMediaRecorder.prepare();
     mMediaRecorder.start();
+  }
+
+  private void setAudioSource() throws Exception {
+    try {
+      mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+    } catch(Exception e){
+      throw new Exception("Please check Microphone Permission .\n"+e);
+    }
   }
 
   @Rpc(description = "Stops a previously started recording.")
@@ -247,30 +268,88 @@ public class MediaRecorderFacade extends RpcReceiver {
         cursor.close();
         return recPath;
       default:
-        return null;
+        throw new Exception("record Audio unknown Exception .");
     }
   }
 
-  private MediaProjection createMediaProjection() throws Exception {
-    MediaProjectionManager mpm = ((MediaProjectionManager) mService.getSystemService(Context.MEDIA_PROJECTION_SERVICE));
-    Intent permissionIntent = mpm.createScreenCaptureIntent();
+  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+  public static class CaptureScreenService extends Service {
+    private int resultCode;
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+      return null;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+
+      String SCREEN_CAPTURE = "ScreenCapture";
+      Notification.Builder builder = new Notification.Builder(this.getApplicationContext()); //获取一个Notification构造器
+
+      /*以下是对Android 8.0的适配*/
+      if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        //普通notification适配
+        builder.setChannelId(SCREEN_CAPTURE);
+        //前台服务notification适配
+        NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        NotificationChannel channel = new NotificationChannel(SCREEN_CAPTURE, SCREEN_CAPTURE, NotificationManager.IMPORTANCE_LOW);
+        notificationManager.createNotificationChannel(channel);
+      }
+
+      Notification notification = builder.build(); // 获取构建好的Notification
+      notification.defaults = Notification.DEFAULT_SOUND; //设置为默认的声音
+      startForeground(100, notification);
+
+      resultCode = intent.getIntExtra("RESULT_CODE", -1);
+      intent.removeExtra("RESULT_CODE");
+
+      mediaProjection = mediaProjectionManager.getMediaProjection(resultCode,intent);
+
+      countDownLatch.countDown();
+      return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    public void onDestroy() {
+      super.onDestroy();
+      stopForeground(true);
+    }
+  }
+
+
+  @SuppressLint("InlinedApi")
+  private void createMediaProjection() throws Exception {
+    PermissionUtil.checkPermission(Manifest.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION,34);
+    mediaProjectionManager = ((MediaProjectionManager) mService.getSystemService(Context.MEDIA_PROJECTION_SERVICE));
+    Intent permissionIntent = mediaProjectionManager.createScreenCaptureIntent();
     if (intentMP==null){
     intentMP = mAndroidFacade.startActivityForResultCode(permissionIntent);
     resultCodeMP = intentMP.getIntExtra("RESULT_CODE", -1025);
-    if (resultCodeMP != Activity.RESULT_OK) {
-      return null;
-    }}
-    MediaProjection mp = mpm.getMediaProjection(resultCodeMP, intentMP);
-    if (mp == null) {
-      throw new Exception("Null MediaProjection .");
+    if (resultCodeMP != Activity.RESULT_OK)
+      throw new Exception("MediaProjection Result Code not OK .");
     }
-    return mp;
+    if (intentMP == null)
+      throw new Exception("Null MediaProjection Permission Intent .");
+    if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q){
+      //启动前台服务
+      Intent service = new Intent(context, CaptureScreenService.class);
+      service.putExtras(intentMP);
+      countDownLatch = new CountDownLatch(1);
+      context.startForegroundService(service);
+      countDownLatch.await(1000,TimeUnit.MILLISECONDS);
+    } else {
+      mediaProjection = mediaProjectionManager.getMediaProjection(resultCodeMP, intentMP);
+    }
+    if (mediaProjection == null)
+      throw new Exception("Null MediaProjection .");
   }
 
   private void createMediaRecorder(String path, boolean audio, int quality, int screenWidth, int screenHeight) throws Exception {
     mMediaRecorder = new MediaRecorder();
     mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
-    if (audio) mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+    if (audio) setAudioSource();
     mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
     //int screenWidth = dm.widthPixels;
     //int screenHeight = dm.heightPixels;
@@ -303,13 +382,10 @@ public class MediaRecorderFacade extends RpcReceiver {
           @RpcParameter(name = "autoStart") @RpcDefault("true") Boolean autoStart
   )
           throws Exception {
-    mediaProjection = createMediaProjection();
-    if (mediaProjection == null) {
-      return null;
-    }
+    createMediaProjection();
     DisplayMetrics dm = context.getResources().getDisplayMetrics();
     if (path == null) {
-      path = sdcard + "/Pictures/Screenshots/"; /*存放截屏的文件夹*/
+      path = basepath + "/Pictures/Screenshots/"; /*存放截屏的文件夹*/
       File _path = new File(path);
       if (!_path.exists()) {
         _path.mkdirs();
@@ -336,27 +412,15 @@ public class MediaRecorderFacade extends RpcReceiver {
     mMediaRecorder.start();
   }
 
-  /*@Rpc(description = "Starts an activity for screen record .")
-  public String screenRecord() throws JSONException {
-    Intent intent = mAndroidFacade.startActivityForResult(
-            "android.intent.action.VIEW", null, null, null,
-            context.getPackageName(), "org.qpython.qpy.main.auxActivity.ScreenRecordActivity");
-    //mMediaRecorder = intent.getParcelableExtra("mediaRecorder");
-    return intent.getStringExtra("path");
-  }*/
-
   @Rpc(description = "Capture ScreenShot .")
   public String imageReaderGetScreenShot(
           @RpcParameter(name = "path") @RpcOptional String path,
           @RpcParameter(name = "delayMilliSec") @RpcDefault("1000") Integer delayMilliSec
         ) throws Exception {
-  MediaProjection mediaProjection = createMediaProjection();
-  if (mediaProjection == null) {
-    return null;
-  }
+  createMediaProjection();
   DisplayMetrics dm = context.getResources().getDisplayMetrics();
   if (path == null) {
-    path = sdcard + "/Pictures/Screenshots/"; /*存放截屏的文件夹*/
+    path = basepath + "/Pictures/Screenshots/"; /*存放截屏的文件夹*/
     File _path = new File(path);
     if (!_path.exists()) {
       _path.mkdirs();
@@ -415,11 +479,8 @@ public class MediaRecorderFacade extends RpcReceiver {
   } catch (Exception e) {
     errInfo[0]=e.toString();
 }}},delayMilliSec);
-  /*if(!errInfo[0].equals("")){
-    throw new Exception(errInfo[0]);
-  }*/
   return path;
-  }
+ }
 
   @Rpc(description = "Records video from the camera and saves it to the given location.")
   public String recorderCaptureVideo(
@@ -432,11 +493,7 @@ public class MediaRecorderFacade extends RpcReceiver {
           @RpcParameter(name = "quality") @RpcDefault("8") Integer quality
   ) throws Exception {
     int ms = convertSecondsToMilliseconds(duration);
-    try {
       startVideoRecording(new File(targetPath), ms, cameraId, quality);
-    } catch (Exception e) {
-      throw new Exception(Arrays.toString(e.getStackTrace()));
-    }
     return targetPath;
   }
 
@@ -445,7 +502,7 @@ public class MediaRecorderFacade extends RpcReceiver {
     mMediaRecorder = new MediaRecorder();
     camera.unlock();
       mMediaRecorder.setCamera(camera);
-      mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+      setAudioSource();
       //mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
     mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
     //mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
@@ -464,48 +521,6 @@ public class MediaRecorderFacade extends RpcReceiver {
     prepTask.finish();
     recorderStop();
   }
-
-  /*@Rpc(description = "Records video (and optionally audio) from the camera and saves it to the given location. "
-          + "\nDuration specifies the maximum duration of the recording session. "
-          + "\nIf duration is not provided this method will return immediately and the recording will only be stopped "
-          + "\nwhen recorderStop is called or when a scripts exits. "
-          + "\nOtherwise it will block for the time period equal to the duration argument.")
-  public void recorderCaptureVideo(@RpcParameter(name = "targetPath") String targetPath,
-                                   @RpcParameter(name = "duration") @RpcOptional Integer duration,
-                                   @RpcParameter(name = "recordAudio") @RpcDefault("true") Boolean recordAudio) throws Exception {
-    int ms = convertSecondsToMilliseconds(duration);
-    startVideoRecording(new File(targetPath), ms, recordAudio);
-  }
-
-  private void startVideoRecording(File file, int milliseconds, boolean withAudio) throws Exception {
-    mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-    if (withAudio) {
-      int audioSource = MediaRecorder.AudioSource.MIC;
-      try {
-        Field source =
-                Class.forName("android.media.MediaRecorder$AudioSource").getField("CAMCORDER");
-        audioSource = source.getInt(null);
-      } catch (Exception e) {
-        //LogUtil.e(e);
-      }
-      mMediaRecorder.setAudioSource(audioSource);
-      mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
-      mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
-    } else {
-      mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
-    }
-    mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
-    mMediaRecorder.setOutputFile(file.getAbsolutePath());
-    if (milliseconds > 0) {
-      mMediaRecorder.setMaxDuration(milliseconds);
-    }
-    FutureActivityTask<Exception> prepTask = prepare();
-    mMediaRecorder.start();
-    if (milliseconds > 0) {
-      new CountDownLatch(1).await(milliseconds, TimeUnit.MILLISECONDS);
-    }
-    prepTask.finish();
-  }*/
 
   private int convertSecondsToMilliseconds(Integer seconds) {
     if (seconds == null) {

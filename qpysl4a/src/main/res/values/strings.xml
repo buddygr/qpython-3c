@@ -16,4 +16,5 @@
     <string name="open">Open</string>
     <string name="normal">Normal</string>
     <string name="click_daemon">Click on "Daemon+Number" in the multitask list to unlock the process</string>
+    <string name="screen_capture_service">QPython Screen Capture Service</string>
 </resources>

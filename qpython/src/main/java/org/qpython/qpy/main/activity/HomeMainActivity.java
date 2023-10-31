@@ -26,6 +26,7 @@ import org.qpython.qpy.R;
 import org.qpython.qpy.console.ScriptExec;
 import org.qpython.qpy.console.TermActivity;
 import org.qpython.qpy.databinding.ActivityMainBinding;
+import org.qpython.qpy.main.app.App;
 import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.main.auxActivity.ProtectActivity;
 import org.qpython.qpy.main.auxActivity.ScreenRecordActivity;
@@ -135,10 +136,10 @@ public class HomeMainActivity extends BaseActivity {
                                 playPy("browserConsole");
                                 break;
                             case 5:
-                                startShell("shell");
+                                startShell("shell.py");
                                 break;
                             case 6:
-                                startShell("shell.py");
+                                startShell("shell");
                                 break;
                             case 7:
                                 playPy("open_notebook");
@@ -330,8 +331,8 @@ public class HomeMainActivity extends BaseActivity {
                 strIdToHtm(R.string.ipython_interactive,"dfbfdf"),
                 strIdToHtm(R.string.sl4a_gui_console,"ffffff"),
                 strIdToHtm(R.string.browser_console,"ffbfbf"),
-                strIdToHtm(R.string.shell_terminal,"bfffbf"),
                 strIdToHtm(R.string.python_shell_terminal,"bfbfff"),
+                strIdToHtm(R.string.shell_terminal,"bfffbf"),
                 strIdToHtm(R.string.jupyter_notebook,"ffbfff"),
         };
         byte i, k;

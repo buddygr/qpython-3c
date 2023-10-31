@@ -2,18 +2,19 @@ package org.qpython.qpy.main.fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,16 +25,15 @@ import com.quseit.util.FileHelper;
 import com.quseit.util.NAction;
 
 import org.qpython.qpy.R;
-import org.qpython.qpy.console.ScriptExec;
+import org.qpython.qpy.console.TermActivity;
 import org.qpython.qpy.main.activity.BaseActivity;
 import org.qpython.qpy.main.activity.HomeMainActivity;
+import org.qpython.qpy.main.app.App;
 import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpysdk.QPySDK;
 import org.qpython.qsl4a.qsl4a.util.PermissionUtil;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -72,16 +72,15 @@ public class QPyExtFragment extends Fragment {
 
     public static void viewPage(int pos){
         switch (pos) {
-            case 1:
+            case 11:
                 viewWebSite(R.string.qpython_sl4a_gui_gitee);
                 break;
-            case 2:
+            case 12:
                 viewWebSite(R.string.qpython_3c_release_gitee);
         }
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     private static void checkOtherPermission() throws Exception {
         //List<String> unPermissionList = new ArrayList<String>();
         PackageManager pm = activity.getPackageManager();
@@ -97,10 +96,12 @@ public class QPyExtFragment extends Fragment {
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private static void initQPy(){
+        long t1 = SystemClock.elapsedRealtimeNanos();
+        Toast.makeText(activity,R.string.initial_qpython,Toast.LENGTH_SHORT).show();
         File filesDir = activity.getFilesDir();
         if (!CONF.pyVer.equals("-1"))
             qpysdk.extractRes("resource", filesDir,true);
-        new AlertDialog.Builder(activity, R.style.MyDialog)
+        /*new AlertDialog.Builder(activity, R.style.MyDialog)
                 .setTitle(R.string.notice)
                 .setMessage(
                         activity.getString(R.string.welcome)+"\n\n"+
@@ -112,14 +113,36 @@ public class QPyExtFragment extends Fragment {
                 .setNegativeButton(R.string.ignore, (dialog1, which) -> getPyVer(false))
                 .setOnCancelListener(cancel -> getPyVer(false))
                 .create()
-                .show();
-        ScriptExec.getInstance().playScript(activity,
-                "setup", null);
+                .show();*/
+        TermActivity.startShell(activity,"setup");
+        long t2 = SystemClock.elapsedRealtimeNanos();
         try {
             checkOtherPermission();
         } catch (Exception e) {
             Toast.makeText(activity,e.toString(),Toast.LENGTH_LONG).show();
         }
+        int t = (int) Math.round((t2-t1)*0.001);
+        File f = new File(filesDir+"/resource.version");
+        final boolean[] exist = {false};
+        (new CountDownTimer(t,500){
+            @Override
+            public void onTick(long l) {
+                int c = t - (int) l;
+                if(c*4<t && !exist[0]) {
+                    if(f.exists())
+                        exist[0] = true;
+                } else {
+                    if(!f.exists()){
+                        this.cancel();
+                        onFinish();
+                    }
+                }
+            }
+            @Override
+            public void onFinish() {
+                getPyVer(false);
+            }
+        }).start();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -138,8 +161,6 @@ public class QPyExtFragment extends Fragment {
             pyVer = qpysdk.getPyVer();
             CONF.pyVerComplete = pyVer[1];
             CONF.pyVer = pyVer[0];
-            CONF.NATIVE_LIBRARY = activity.getPackageManager().getApplicationInfo(
-                    activity.getPackageName(),PackageManager.GET_UNINSTALLED_PACKAGES).nativeLibraryDir;
             //可以消除终端中文输入的某些bug，虽然不知道为什么
             if (once) activity.startShell("init.sh");
             else activity.runShortcut(activity.getIntent());
@@ -155,6 +176,12 @@ public class QPyExtFragment extends Fragment {
         CONF.PREF = PreferenceManager.getDefaultSharedPreferences(activity);
         if (qpysdk==null)
             qpysdk = new QPySDK(activity, activity);
+        try {
+            CONF.NATIVE_LIBRARY = activity.getPackageManager().getApplicationInfo(
+                activity.getPackageName(),PackageManager.GET_UNINSTALLED_PACKAGES).nativeLibraryDir;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
         String[] permssions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
         PermissionUtil.activity = context;
 
@@ -180,27 +207,33 @@ public class QPyExtFragment extends Fragment {
         }
     }
 
+    private static void initQPySdk(){
+        //这里只执行一次做为初始化
+        CONF.CUSTOM_PATH = CONF.PREF.getString(activity.getString(R.string.qpy_custom_dir_key),CONF.LEGACY_PATH);
+        if ( NAction.isQPyInterpreterSet(activity) ) {
+            getPyVer(true);
+        } else {
+            NAction.setQPyInterpreter(activity, "3.x");
+            initQPy();
+        }
+        App.initUmeng(activity,CONF.PREF);
+    }
+
     private static void QpySdkAgree(String[] permssions){
+            if(activity.getExternalFilesDir("").canWrite())
+                initQPySdk();
+            else {
         activity.checkPermissionDo(permssions, new BaseActivity.PermissionAction() {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onGrant() {
-                //这里只执行一次做为初始化
-                CONF.CUSTOM_PATH = CONF.PREF.getString(activity.getString(R.string.qpy_custom_dir_key),CONF.LEGACY_PATH);
-
-                if ( NAction.isQPyInterpreterSet(activity) ) {
-                    getPyVer(true);
-                } else {
-                    NAction.setQPyInterpreter(activity, "3.x");
-                    initQPy();
-                }
+                initQPySdk();
             }
-
             @Override
             public void onDeny() {
                 Toast.makeText(activity, activity.getString(R.string.grant_storage_hint), Toast.LENGTH_SHORT).show();
             }
-
-        });
+        });}
     }
+
 }

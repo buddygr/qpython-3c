@@ -17,7 +17,7 @@ public class LibModel extends BaseLibModel{
     /**
      * src : http://kivy.org
      * rdate : 2017-06-15
-     * link : http://dl.qpy.io/2x/kivy/kivy-1.9.1.zip
+     * link : http://io.qpython.org/2x/kivy/kivy-1.9.1.zip
      * description : kivy 1.9.1 prebuild for qpython
      * title : kivy
      * ver : 1

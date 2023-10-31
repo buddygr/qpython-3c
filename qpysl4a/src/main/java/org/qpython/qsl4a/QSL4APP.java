@@ -16,7 +16,6 @@ public class QSL4APP extends MyApp implements InterpreterConfiguration.Configura
 
     private final CountDownLatch mLatch = new CountDownLatch(1);
     private final FutureActivityTaskExecutor mTaskExecutor = new FutureActivityTaskExecutor(this);
-
 	
     /*@Override
     public Class<?> getHomeActivityClass() {
@@ -46,7 +45,7 @@ public class QSL4APP extends MyApp implements InterpreterConfiguration.Configura
         mConfiguration.startDiscovering(InterpreterConstants.MIME + QSL4AScript.getFileExtension(this));
 
         //注册crashHandler类
-        int xq = 30;
+        //int xq = 30;
     }
 
     public FutureActivityTaskExecutor getTaskExecutor() {
