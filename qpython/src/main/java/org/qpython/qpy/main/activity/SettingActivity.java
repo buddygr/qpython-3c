@@ -9,15 +9,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.widget.Toast;
 
 import org.qpython.qpy.R;
 import org.qpython.qpy.main.fragment.SettingFragment;
 import org.qpython.qpy.main.service.FTPServerService;
-import org.qpython.qsl4a.qsl4a.facade.FtpFacade;
-import org.swiftp.Globals;
 
-import java.net.InetAddress;
 import java.util.Timer;
 import java.util.TimerTask;
 

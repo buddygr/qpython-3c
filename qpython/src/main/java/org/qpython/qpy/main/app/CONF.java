@@ -30,7 +30,7 @@ public class CONF implements QPyConstants {
     public static final String packageName = App.getContext().getPackageName();
     public static final String SCOPE_STORAGE_PATH = App.getContext().getExternalFilesDir("").getParent();
 
-    public static String PY_CACHE_PATH = SCOPE_STORAGE_PATH+"/"+PY_CACHE;
+    //public static String PY_CACHE_PATH = SCOPE_STORAGE_PATH+"/"+PY_CACHE;
     public static String ABSOLUTE_LOG = SCOPE_STORAGE_PATH + "/log/last.log";
     public static String WEB_LOG = SCOPE_STORAGE_PATH + "/log/web.log";
     public static String QUIET_LOG = SCOPE_STORAGE_PATH + "/log/quiet.log";

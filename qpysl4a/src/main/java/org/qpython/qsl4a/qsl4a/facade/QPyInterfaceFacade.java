@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
-import org.qpython.qsl4a.qsl4a.util.FileUtils;
+import util.FileUtil;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
 import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
@@ -140,7 +140,7 @@ public class QPyInterfaceFacade extends RpcReceiver {
     public String getLastLog(
             @RpcParameter(name = "QPython log name") @RpcDefault("last.log") String logName) {
         /*String content;
-        content = FileUtils.getFileContents(path, 64);
+        content = FileUtil.getFileContents(path, 64);
         boolean isQApp = content.contains("#qpy:qpyapp");
         boolean isWeb = content.contains("#qpy:webapp");
         //boolean isKivy = content.contains("#qpy:kivy");
@@ -153,7 +153,7 @@ public class QPyInterfaceFacade extends RpcReceiver {
                 return "# QPython:getLastLog(ok)\n"
                         +"# RunTime:"+ SPFUtils.getDateTime(lf.lastModified())+"\n"
                         +"# LogFile:"+ log+"\n"
-                        +FileUtils.getFileContents(log);
+                        +FileUtil.getFileContents(log);
             } else {
                 return "# QPython:getLastLog(-1)"
                         +"# LogFile:"+ log;
@@ -169,7 +169,7 @@ public class QPyInterfaceFacade extends RpcReceiver {
             return "# QPython:getLastLog(ok)\n"
                     + "# RunTime:" + SPFUtils.getDateTime(lf.lastModified()) + "\n"
                     + "# LogFile:" + log + "\n"
-                    + FileUtils.getFileContents(log);
+                    + FileUtil.getFileContents(log);
         } else {
             return "# QPython:getLastLog(-1)\n"
                     + "# LogFile:" + log

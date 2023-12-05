@@ -199,18 +199,16 @@ public class ApplicationManagerFacade extends RpcReceiver {
     for(int i = 0; i < permission.length; i++) {
       try {
         permission[i] = (String) permissions.get(i);
+        if(permission[i].equals("android.permission.MANAGE_EXTERNAL_STORAGE")) {
+          PermissionUtil.requestAllFilesPermission();
+          permission[i] = "";
+        }
       } catch (JSONException e) {
         permission[i] = "";
       }
     }
+
     ActivityCompat.requestPermissions(PermissionUtil.activity, permission, 100);
-    if (Build.VERSION.SDK_INT >= 30) {
-      if (!Environment.isExternalStorageManager()) {
-        Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-        intent.setData(Uri.parse("package:" + PermissionUtil.activity.getPackageName()));
-        PermissionUtil.activity.startActivityForResult(intent, 100);
-      }
-    }
   }
 
   @Override

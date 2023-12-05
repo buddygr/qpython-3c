@@ -1163,7 +1163,7 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
     private TermSession setup(TermSettings settings) throws IOException {
         SharedPreferences.Editor pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
         pref.putString("shell",getString(R.string.pref_shell_default)).apply();
-        String filesDir = this.getFilesDir().getAbsolutePath();
+        String filesDir = CONF.filesDir;
         TermSession session = createTermSession(this, settings,
                 this.getApplicationInfo().nativeLibraryDir + "/lib-qpython-setup.so setup && exit",
                 filesDir);
@@ -1172,7 +1172,7 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
     }
 
     private TermSession createPyTermSession(String[] mArgs) throws IOException {
-        Log.d("TermActivity", "createPyTermSession:" + mArgs);
+        //Log.d("TermActivity", "createPyTermSession:" + mArgs);
         TermSettings settings = mSettings;
         TermSession session = null;
         Intent intent = this.getIntent();

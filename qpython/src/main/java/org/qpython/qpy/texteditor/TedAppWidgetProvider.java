@@ -1,11 +1,5 @@
 package org.qpython.qpy.texteditor;
 
-import java.io.File;
-
-import org.qpython.qpy.R;
-import org.qpython.qpy.texteditor.common.Constants;
-import org.qpython.qpy.texteditor.common.WidgetPrefs;
-
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -15,7 +9,14 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.RemoteViews;
-import org.qpython.qpy.BuildConfig;
+
+import org.qpython.qpy.R;
+import org.qpython.qpy.texteditor.common.Constants;
+import org.qpython.qpy.texteditor.common.WidgetPrefs;
+
+import java.io.File;
+
+import rx.android.BuildConfig;
 
 public class TedAppWidgetProvider extends AppWidgetProvider implements Constants {
 

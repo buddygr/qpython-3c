@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import util.FileUtil;
+
 public class Utils {
 	private static final String TAG = "Utils";
 
@@ -120,14 +122,14 @@ public class Utils {
 				} else {
 					if(zipEntry.isDirectory()){
 						file.mkdirs();
-						FileUtils.chmod(file, 0755);
+						FileUtil.chmod(file, 0755);
 
 					}else{
 
 						// create parent file folder if not exists yet
 						if(!file.getParentFile().exists()) {
 							file.getParentFile().mkdirs();
-							FileUtils.chmod(file.getParentFile(), 0755);
+							FileUtil.chmod(file.getParentFile(), 0755);
 						}
 
 						byte buffer[] = new byte[BUFFER_SIZE];
@@ -144,7 +146,7 @@ public class Utils {
 				}
 
 				if(file.getName().endsWith(".so")) {
-					FileUtils.chmod(file, 0755);
+					FileUtil.chmod(file, 0755);
 				}
 
 				Log.d(TAG,"Unzip extracted " + dest + zipEntryName);

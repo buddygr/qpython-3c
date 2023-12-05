@@ -30,9 +30,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.swiftp.Defaults;
+import org.swiftp.Globals;
 import org.swiftp.Util;
 
 import android.util.Log;
+
+import util.DocumentUtil;
+import util.FileUtil;
 
 
 abstract public class CmdAbstractStore extends FtpCmd {
@@ -73,8 +77,8 @@ abstract public class CmdAbstractStore extends FtpCmd {
 						Util.deletedFileNotify(storeFile.getPath());
 					}
 				}
-				out = new FileOutputStream(storeFile, append);
-			} catch(FileNotFoundException e) {
+				out = FileUtil.getFileOutputStream(storeFile,append);
+			} catch(Exception e) {
 				try {
 					errString = "451 Couldn't open file \"" + param + "\" aka \"" +
 						storeFile.getCanonicalPath() + "\" for writing\r\n";

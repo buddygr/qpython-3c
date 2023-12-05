@@ -507,23 +507,25 @@ public class FileHelper {
      * @param dir
      * @return
      */
-    public static File[] getFilesByType(File dir) {
+    public static File[] getPyFiles(File dir) {
         if (dir==null) {
             return null;
         }
         typeFiles = new ArrayList<>();
-        addFile(dir);
+        addPyFile(dir);
         return typeFiles.toArray(new File[0]);
     }
 
-    private static void addFile(File dir) {
+    private static void addPyFile(File dir) {
         File[] dirFiles = dir.listFiles();
         if (dirFiles!=null) {
             for (File file : dirFiles) {
                 if (file.isDirectory() && !file.getAbsolutePath().contains("/.")) {
-                    addFile(file);
-                } else if (file.getName().contains(".py") && !file.getName().substring(0, 1).equals(".")) {
-                    typeFiles.add(file);
+                    addPyFile(file);
+                } else {
+                    String filename = file.getName();
+                    if ((filename.endsWith(".py")||filename.endsWith(".ipynb")) && filename.charAt(0)!='.')
+                        typeFiles.add(file);
                 }
             }
         }

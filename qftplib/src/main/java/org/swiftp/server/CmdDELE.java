@@ -21,9 +21,13 @@ package org.swiftp.server;
 
 import java.io.File;
 
+import org.swiftp.Globals;
 import org.swiftp.Util;
 
 import android.util.Log;
+
+import util.DocumentUtil;
+import util.FileUtil;
 
 public class CmdDELE extends FtpCmd implements Runnable {
 	protected String input;
@@ -43,7 +47,7 @@ public class CmdDELE extends FtpCmd implements Runnable {
 			errString = "550 Invalid name or chroot violation\r\n";
 		} else if(storeFile.isDirectory()) {
 			errString = "550 Can't DELE a directory\r\n";
-		} else if(!storeFile.delete()) {
+		} else if(!FileUtil.delete(storeFile)) {
 			errString = "450 Error deleting file\r\n";
 		}
 

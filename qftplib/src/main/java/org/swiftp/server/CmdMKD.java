@@ -21,7 +21,13 @@ package org.swiftp.server;
 
 import java.io.File;
 
+import android.support.v4.provider.DocumentFile;
 import android.util.Log;
+
+import org.swiftp.Globals;
+
+import util.DocumentUtil;
+import util.FileUtil;
 
 public class CmdMKD extends FtpCmd implements Runnable {
 	String input;
@@ -53,7 +59,7 @@ public class CmdMKD extends FtpCmd implements Runnable {
 				errString = "550 Already exists\r\n";
 				break mainblock;
 			}
-			if(!toCreate.mkdir()) {
+			if(!FileUtil.mkdir(toCreate)) {
 				errString = "550 Error making directory (permissions?)\r\n";
 				break mainblock;
 			}

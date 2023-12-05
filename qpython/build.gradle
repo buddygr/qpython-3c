@@ -13,8 +13,8 @@ android {
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 377
-        versionName "3.7.7.2"
+        versionCode 378
+        versionName "3.7.8"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
 
@@ -25,7 +25,6 @@ android {
         sourceSets {
             main {
                 jniLibs.srcDirs = ['libs']
-
             }
         }
     }
@@ -62,8 +61,7 @@ android {
                 variant.outputs.each { output ->
                     def outputFile = output.outputFile
                     if (outputFile != null && outputFile.name.endsWith('.apk')) {
-                        //def fileName = "qpython_${variant.productFlavors[0].name}_${releaseTime()}.apk"
-                        def fileName = "qpython_${releaseTime()}.apk"
+                        def fileName = "qpython_${variant.productFlavors[0].name}_${releaseTime()}.apk"
                         output.outputFileName = fileName
                     }
                 }
@@ -102,7 +100,7 @@ android {
     //设置渠道
     productFlavors {
 
-        oc {
+        ps {
 //            resValue "string", "app_name", "Qpython"
             applicationId "org.qpython.plus"
         }

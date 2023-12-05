@@ -6,7 +6,7 @@ import android.content.pm.PackageManager;
 import android.support.v4.provider.DocumentFile;
 import android.util.Base64;
 
-import com.quseit.util.DocumentsUtils;
+import util.DocumentUtil;
 
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
@@ -15,14 +15,10 @@ import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -57,7 +53,7 @@ public class CipherFacade extends RpcReceiver {
             fis = new FileInputStream(file);
             length = fis.available();
         } catch (IOException e) {
-            DocumentFile destFile = DocumentsUtils.getDocumentFile(file, false, context);
+            DocumentFile destFile = DocumentUtil.getDocumentFile(file, false, context);
             fis = (FileInputStream) context.getContentResolver().openInputStream(destFile.getUri());
             length = fis.available();
         }
@@ -73,7 +69,7 @@ public class CipherFacade extends RpcReceiver {
         fos = new FileOutputStream(filePath);
         fos.write(data);
       } catch (IOException e) {
-          DocumentFile file = DocumentsUtils.getDocumentFile(new File(filePath), false, context);
+          DocumentFile file = DocumentUtil.getDocumentFile(new File(filePath), false, context);
           fos = (FileOutputStream) context.getContentResolver().openOutputStream(file.getUri(),"wt");
           fos.write(data);
       }
@@ -215,7 +211,7 @@ public class CipherFacade extends RpcReceiver {
             fis = new FileInputStream(srcFile);
             len = fis.available();
         } catch (IOException e) {
-            DocumentFile sorcFile = DocumentsUtils.getDocumentFile(new File(srcFile), false, context);
+            DocumentFile sorcFile = DocumentUtil.getDocumentFile(new File(srcFile), false, context);
             fis = (FileInputStream) context.getContentResolver().openInputStream(sorcFile.getUri());
             len = fis.available();
         }
@@ -228,7 +224,7 @@ public class CipherFacade extends RpcReceiver {
                 fos.write(cipher.update(data));
             fos.write(cipher.doFinal(data, 0, len));
         } catch (IOException e){
-            DocumentFile file = DocumentsUtils.getDocumentFile(new File(dstFile), false, context);
+            DocumentFile file = DocumentUtil.getDocumentFile(new File(dstFile), false, context);
             fos = (FileOutputStream) context.getContentResolver().openOutputStream(file.getUri(),"wt");
             byte[] data = new byte[len];
             while ((len = fis.read(data)) == MAX_BUFFER_SIZE)

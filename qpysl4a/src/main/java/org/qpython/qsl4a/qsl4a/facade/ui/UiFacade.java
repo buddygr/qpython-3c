@@ -474,9 +474,9 @@ public class UiFacade extends RpcReceiver {
           @RpcParameter(name = "url") String url,
           @RpcParameter(name = "wait", description = "block until the user exits the WebView") @RpcOptional Boolean wait)
           throws IOException {
-    String jsonSrc = FileUtils.readFromAssetsFile(mService, HtmlInterpreter.JSON_FILE);
-    String AndroidJsSrc = FileUtils.readFromAssetsFile(mService, HtmlInterpreter.ANDROID_JS_FILE);
-    String TemplateSrc = FileUtils.readFromAssetsFile(mService, HtmlInterpreter.TEMPLATE_FILE);
+    String jsonSrc = FileUtil.readFromAssetsFile(mService, HtmlInterpreter.JSON_FILE);
+    String AndroidJsSrc = FileUtil.readFromAssetsFile(mService, HtmlInterpreter.ANDROID_JS_FILE);
+    String TemplateSrc = FileUtil.readFromAssetsFile(mService, HtmlInterpreter.TEMPLATE_FILE);
 
     HtmlActivityTask task = new HtmlActivityTask(mManager, AndroidJsSrc, jsonSrc, TemplateSrc, url, false);
     mTaskQueue.execute(task);

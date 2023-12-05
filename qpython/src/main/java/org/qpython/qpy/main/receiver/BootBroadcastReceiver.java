@@ -17,15 +17,15 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
         Log.d(TAG, "BootReceiver.onReceive: " + intent.getAction());
         System.out.println("QPYSL4A程序即将执行");
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
         } else {
 
             try {
-                //context.startService(new Intent(context, QPyScriptService.class));
+                context.startService(new Intent(context, QPyScriptService.class));
             } catch (RuntimeException e) {
 
             }
-        }
+        }*/
     }
 }

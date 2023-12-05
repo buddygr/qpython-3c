@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -226,31 +225,34 @@ public class LibProjectFragment extends RefreshFragment {
 
 
     private void installTool(LibModel item) {
-        String downloadDir = null;
+        /*String downloadDir = null;
         if (item.getCat().equals("script")) {
-            downloadDir = "qpython/"+/*(NAction.isQPy3(getActivity())?*/QPyConstants.DFROM_QPY3;//:QPyConstants.DFROM_QPY2);
+            downloadDir = "qpython/"+(NAction.isQPy3(getActivity())?QPyConstants.DFROM_QPY3;//:QPyConstants.DFROM_QPY2);
         } else if (item.getCat().equals("user")) {
-            downloadDir = "qpython/"+/*(NAction.isQPy3(getActivity())?*/QPyConstants.DFROM_QPY3;//:QPyConstants.DFROM_QPY2);
-        }
+            downloadDir = "qpython/"+(NAction.isQPy3(getActivity())?QPyConstants.DFROM_QPY3;//:QPyConstants.DFROM_QPY2);
+        }*/
 
         // Download
-        App.getDownloader().download(item.getTitle(),  item.getLink(), Environment.getExternalStorageDirectory()+"/"+downloadDir+"/"+item.getSmodule(),
-        new Downloader.Callback() {
-            @Override
-            public void pending(String name) {
+        try {
+            App.getDownloader().download(item.getTitle(), item.getLink(), CONF.SCOPE_STORAGE_PATH + "/scripts3/" + item.getSmodule(),
+                    new Downloader.Callback() {
+                        @Override
+                        public void pending(String name) {
+                        }
 
-            }
+                        @Override
+                        public void complete(String name, File installer) {
+                            refresh(true);
+                        }
 
-            @Override
-            public void complete(String name, File installer) {
-                refresh(true);
-            }
+                        @Override
+                        public void error(String err) {
 
-            @Override
-            public void error(String err) {
-
-            }
-        });
+                        }
+                    });
+        } catch (Exception e){
+            Toast.makeText(getContext(), e.toString(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void initListener() {

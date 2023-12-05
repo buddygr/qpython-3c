@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.quseit.util.FileHelper;
+import util.FileUtil;
 import com.quseit.util.NAction;
 
 import org.qpython.qpy.R;
@@ -181,7 +182,9 @@ public class QPyExtFragment extends Fragment {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
+
         PermissionUtil.activity = context;
+        FileUtil.activity = context;
 
         if (CONF.PREF.getString("security_tip","").equals(activity.getString(R.string.security_version)))
         {
@@ -214,7 +217,7 @@ public class QPyExtFragment extends Fragment {
             NAction.setQPyInterpreter(activity, "3.x");
             initQPy();
         }
-        App.initUmeng(activity,CONF.PREF);
+        App.initUmeng(activity);
     }
 
     private static void QpySdkAgree(){

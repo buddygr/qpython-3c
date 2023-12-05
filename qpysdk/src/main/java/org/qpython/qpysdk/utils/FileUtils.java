@@ -29,7 +29,7 @@ public class FileUtils {
             return dir.delete();
 
         } catch (Exception e) {
-            Log.e("FileUtils","Failed to delete " + dir + " : " + e);
+            Log.e("FileUtil","Failed to delete " + dir + " : " + e);
             return false;
         }
     }

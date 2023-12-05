@@ -5,12 +5,14 @@ import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.quseit.util.FileHelper;
 import com.quseit.util.FolderUtils;
@@ -25,18 +27,26 @@ import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.main.event.AppsLoader;
 import org.qpython.qpy.main.model.AppModel;
 import org.qpython.qpy.main.model.QPyScriptModel;
+import org.qpython.qpy.texteditor.EditorActivity;
 import org.qpython.qpysdk.QPyConstants;
 import org.qpython.qpysdk.utils.Utils;
+import org.qpython.qsl4a.QPyScriptService;
+import org.qpython.qsl4a.qsl4a.jsonrpc.JsonRpcServer;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import util.FileUtil;
 
 /**
  * Local App list
  * Created by Hmei on 2017-05-22.
- * Edit by 乘着船 2021-2022
+ * Edit by 乘着船 2021-2023
  */
 
 public class AppListActivity extends BaseActivity implements LoaderManager.LoaderCallbacks<ArrayList<AppModel>> {
@@ -92,6 +102,11 @@ public class AppListActivity extends BaseActivity implements LoaderManager.Loade
             }
 
             @Override
+            public void runNotebook(QPyScriptModel item) {
+                openNotebook(AppListActivity.this,item.getFile());
+            }
+
+            @Override
             public void exit() {
                 AppListActivity.this.finish();
             }
@@ -128,12 +143,28 @@ public class AppListActivity extends BaseActivity implements LoaderManager.Loade
             File projectFile = new File(path,QPyConstants.DFROM_PRJ3);
             getProjectList(projectFile);
             getScriptList(path);
+            getNotebookList(path);
         }
     }
 
     private void getScriptList(String path) {
         try {
-            File[] files = FileHelper.getFilesByType(new File(path + "/" + QPyConstants.DFROM_QPY3));
+            File[] files = FileHelper.getPyFiles(new File(path + "/" + QPyConstants.DFROM_QPY3));
+            if (files!=null && files.length > 0) {
+                Arrays.sort(files, FolderUtils.sortByName);
+                for (File file : files) {
+                    dataList.add(new QPyScriptModel(file));
+                }
+            }
+            adapter.notifyDataSetChanged();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void getNotebookList(String path) {
+        try {
+            File[] files = FileHelper.getPyFiles(new File(path + "/notebooks"));
             if (files!=null && files.length > 0) {
                 Arrays.sort(files, FolderUtils.sortByName);
                 for (File file : files) {
@@ -208,7 +239,7 @@ public class AppListActivity extends BaseActivity implements LoaderManager.Loade
             num += frequencyAppList[i] * t;
             t *= 10;
         }
-        FileHelper.putFileContents(APP_LIST_SETTING,String.valueOf(num));
+        FileUtil.writeToFile(APP_LIST_SETTING,String.valueOf(num));
     }
 
     @Override
@@ -239,7 +270,7 @@ public class AppListActivity extends BaseActivity implements LoaderManager.Loade
 
     public void showLogDialog(ScriptExec.LogDialog event) {
         AlertDialog alertDialog = new AlertDialog.Builder(this, R.style.MyDialog)
-                .setTitle(R.string.last_log)
+                .setTitle(R.string.log_title)
                 .setMessage(com.quseit.qpyengine.R.string.open_log)
                 .setNegativeButton(R.string.no, ((dialog, which) -> dialog.dismiss()))
                 .setPositiveButton(R.string.ok, (dialog, which) -> {
@@ -251,6 +282,29 @@ public class AppListActivity extends BaseActivity implements LoaderManager.Loade
                 .create();
         alertDialog.show();
     }
+
+    public static void openNotebook(Context context,String file){
+        openNotebook(context,new File(file));
+    }
+
+    public static void openNotebook(Context context,File file){
+        if(JsonRpcServer.isServiceRunning()) {
+        File qcnb = new File(CONF.filesDir,"bin/quick_notebook.py");
+        boolean notebookInstall = qcnb.exists();
+        if(notebookInstall)
+            ScriptExec.getInstance().playQScript(context,qcnb.getAbsolutePath(),file.getAbsolutePath());
+        else
+            EditorActivity.start(context, Uri.fromFile(file));
+    } else {
+            context.startService(new Intent(context, QPyScriptService.class));
+            Toast.makeText(context, R.string.sl4a_start, Toast.LENGTH_SHORT).show();
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    openNotebook(context,file);
+                }
+            },512);
+        }}
 
     @Override
     public void finish() {

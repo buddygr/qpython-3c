@@ -26,7 +26,6 @@ import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.main.utils.Utils;
 import org.qpython.qpysdk.Exec;
 import org.qpython.qpysdk.QPyConstants;
-import org.qpython.qpysdk.utils.FileHelper;
 import org.qpython.qpysdk.utils.StreamGobbler;
 import org.qpython.qsl4a.QPyScriptService;
 import org.qpython.qsl4a.qsl4a.jsonrpc.JsonRpcServer;
@@ -46,6 +45,8 @@ import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import util.FileUtil;
 
 public class ScriptExec {
 
@@ -69,7 +70,7 @@ public class ScriptExec {
         // confirm the SL4A Service is started
         if(JsonRpcServer.isServiceRunning()) {
 
-            String header_512 = FileHelper.getFileContents(script,512);
+            String header_512 = FileUtil.getFileContents(script,512);
             if (header_512.contains("#qpy:webapp")) {
                 playWebApp(context,  script, arg);
             } else if (header_512.contains("#qpy:quiet")) {
@@ -237,7 +238,7 @@ public class ScriptExec {
     Run WEBAPP
      */
     private void playWebApp(Context context, String script, String argv) {
-        String header_512 = FileHelper.getFileContents(script, 512);
+        String header_512 = FileUtil.getFileContents(script, 512);
 
         boolean isNoHead = header_512.contains("#qpy:fullscreen");
         boolean isDrawer = header_512.contains("#qpy:drawer");

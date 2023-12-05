@@ -78,4 +78,10 @@ public class TextToSpeechFacade extends RpcReceiver {
     return mTts.isSpeaking();
   }
 
+  @Rpc(description = "Stop speaking TTS .")
+  public void ttsStop() throws InterruptedException {
+    mOnInitLock.await();
+    mTts.stop();
+  }
+
 }

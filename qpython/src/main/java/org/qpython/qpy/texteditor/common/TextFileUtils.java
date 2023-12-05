@@ -1,9 +1,10 @@
 package org.qpython.qpy.texteditor.common;
 
 import android.content.Context;
+import android.support.v4.provider.DocumentFile;
 import android.util.Log;
 
-import org.qpython.qpy.BuildConfig;
+import org.qpython.qsl4a.qsl4a.util.PermissionUtil;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -14,6 +15,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+
+import rx.android.BuildConfig;
+import util.DocumentUtil;
+import util.FileUtil;
 
 /**
  * Misc file utilities
@@ -34,13 +39,14 @@ public class TextFileUtils implements Constants {
 		File file = new File(path);
 		OutputStreamWriter writer;
 		BufferedWriter out;
+		FileOutputStream fos;
 		String eol_text = text;
 		try {
 			if (Settings.END_OF_LINE != EOL_LINUX) {
 				eol_text = eol_text.replaceAll("\n", Settings.getEndOfLine());
 			}
-			writer = new OutputStreamWriter(new FileOutputStream(file),
-					Settings.ENCODING);
+			fos = FileUtil.getFileOutputStream(file);
+			writer = new OutputStreamWriter(fos,Settings.ENCODING);
 			out = new BufferedWriter(writer);
 			out.write(eol_text);
 			out.close();
@@ -49,6 +55,8 @@ public class TextFileUtils implements Constants {
 			return false;
 		} catch (IOException e) {
 			Log.w(TAG, "Can't write to file " + path, e);
+			return false;
+		} catch (Exception e){
 			return false;
 		}
 		return true;

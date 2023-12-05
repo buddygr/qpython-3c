@@ -21,7 +21,13 @@ package org.swiftp.server;
 
 import java.io.File;
 
+import android.support.v4.provider.DocumentFile;
 import android.util.Log;
+
+import org.swiftp.Globals;
+
+import util.DocumentUtil;
+import util.FileUtil;
 
 public class CmdRNTO extends FtpCmd implements Runnable {
 	protected String input;
@@ -50,7 +56,7 @@ public class CmdRNTO extends FtpCmd implements Runnable {
 				errString = "550 Rename error, maybe RNFR not sent\r\n";
 				break mainblock;
 			}
-			if(!fromFile.renameTo(toFile)) {
+			if(!FileUtil.rename(fromFile,toFile)) {
 				errString = "550 Error during rename operation\r\n";
 				break mainblock;
 			}

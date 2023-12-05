@@ -12,16 +12,22 @@ import org.qpython.qpy.main.app.CONF;
 import java.io.File;
 import java.io.IOException;
 
+import util.FileUtil;
+
 /**
  * QPython script list item model
  * Created by Hmei on 2017-05-25.
+ * Edit by 乘着船 at 2023
  */
 
 public class QPyScriptModel extends AppModel {
-    private File    file;
-    private boolean isProj;
+    private final File file;
+    private byte fileType;
     private int res = -1;
     private byte pathType = 0;
+    public static final byte SCRIPT = 0;
+    public static final byte NOTEBOOK = -1;
+    public static final byte PROJECT = 1;
 
     private static final int[] COLOR = {
         Color.argb(0,0,0,0),
@@ -44,33 +50,33 @@ public class QPyScriptModel extends AppModel {
 
 
     private int initRes() {
-        isProj = getPath().contains("/projects");
+        String path = getPath();
+        if(path.contains("/projects"))
+            fileType = PROJECT;
         String content;
-        if (isProj) {
+        if (fileType == PROJECT) {
             File mainPy = FileHelper.getMainFileByType(getFile());
             if (mainPy == null) {
                 res = R.drawable.ic_project_qapp;
                 return res;
             }
-            content = org.qpython.qpysdk.utils.FileHelper.getFileContents(mainPy.getAbsolutePath());
+            content = FileUtil.getFileContents(mainPy.getAbsolutePath());
         } else {
-            content = org.qpython.qpysdk.utils.FileHelper.getFileContents(getPath());
+            if(path.endsWith(".ipynb")) {
+                fileType = NOTEBOOK;
+                content = "";
+            } else content = FileUtil.getFileContents(path);
         }
+        if(fileType == NOTEBOOK){
+            res = R.drawable.ic_pyfile_notebookapp;
+        }else{
         boolean isWeb = content.contains("#qpy:webapp");
-
         if (isWeb) {
-            //if (isPy3) {
-                res = (isProj ? R.drawable.ic_project_webapp3 : R.drawable.ic_pyfile_webapp3);
-            //} else {
-                res = (isProj ? R.drawable.ic_project_webapp : R.drawable.ic_pyfile_webapp);
-            //}
+                //res = (isProj ? R.drawable.ic_project_webapp3 : R.drawable.ic_pyfile_webapp3);
+                res = (fileType == PROJECT ? R.drawable.ic_project_webapp : R.drawable.ic_pyfile_webapp);
         } else {
-            //if (isPy3) {
-                res = (isProj ? R.drawable.ic_project_qapp3 : R.drawable.ic_pyfile_qapp3);
-            //} else {
-             //   res = (isProj ? R.drawable.ic_project_qapp : R.drawable.ic_pyfile_qapp);
-           // }
-        }
+                res = (fileType == PROJECT ? R.drawable.ic_project_qapp3 : R.drawable.ic_pyfile_qapp3);
+        }}
         return res;
     }
 
@@ -106,6 +112,14 @@ public class QPyScriptModel extends AppModel {
     }
 
     public boolean isProj() {
-        return isProj;
+        return fileType == PROJECT;
+    }
+
+    public boolean isNotebook() {
+        return fileType == NOTEBOOK;
+    }
+
+    public byte getFileType(){
+        return fileType;
     }
 }

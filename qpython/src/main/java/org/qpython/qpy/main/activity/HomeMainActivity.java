@@ -18,6 +18,7 @@ import android.text.Spanned;
 import android.widget.Toast;
 
 import com.quseit.util.FileHelper;
+import com.quseit.util.NUtil;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
@@ -31,6 +32,7 @@ import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.main.auxActivity.ProtectActivity;
 import org.qpython.qpy.main.auxActivity.ScreenRecordActivity;
 import org.qpython.qpy.main.fragment.QPyExtFragment;
+import org.qpython.qpy.main.model.QPyScriptModel;
 import org.qpython.qpy.main.utils.Bus;
 import org.qpython.qpy.texteditor.EditorActivity;
 import org.qpython.qpy.texteditor.TedLocalActivity;
@@ -38,6 +40,7 @@ import org.qpython.qsl4a.qsl4a.facade.AndroidFacade;
 import org.qpython.qsl4a.qsl4a.facade.QPyInterfaceFacade;
 import org.qpython.qsl4a.qsl4a.util.HtmlUtil;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,6 +117,7 @@ public class HomeMainActivity extends BaseActivity {
             for(byte i = 0;i < consoleItem.length;i++)
                 list.add(consoleItem[consoleMenu.get(i)]);
             Spanned[] chars = list.toArray(new Spanned[consoleItem.length]);
+            boolean k = new File(CONF.filesDir,"bin/quick_notebook.py").exists();
             new AlertDialog.Builder(this, R.style.MyDialog)
                     .setTitle(R.string.choose_action)
                     .setItems(chars, (dialog, which) -> {
@@ -124,25 +128,24 @@ public class HomeMainActivity extends BaseActivity {
                                 startShell("default");
                                 break;
                             case 1:
-                                startShell("colorConsole.py");
+                                if (k) startShell("ipython.py");
+                                else liteVersionNotSupport();
                                 break;
                             case 2:
-                                startShell("ipython.py");
-                                break;
-                            case 3:
                                 playPy("SL4A_GUI_Console");
                                 break;
-                            case 4:
+                            case 3:
                                 playPy("browserConsole");
                                 break;
-                            case 5:
+                            case 4:
                                 startShell("shell.py");
                                 break;
-                            case 6:
+                            case 5:
                                 startShell("shell");
                                 break;
-                            case 7:
-                                playPy("open_notebook");
+                            case 6:
+                                if (k) playPy("quick_notebook");
+                                else liteVersionNotSupport();
                                 break;
                         }
                         if(which>0){
@@ -188,6 +191,10 @@ public class HomeMainActivity extends BaseActivity {
             startActivity(new Intent(this, ScreenRecordActivity.class));
         });
 
+    }
+
+    private void liteVersionNotSupport() {
+        Toast.makeText(this,R.string.lite_version_not_support,Toast.LENGTH_SHORT).show();
     }
 
 
@@ -278,12 +285,14 @@ public class HomeMainActivity extends BaseActivity {
         String path = intent.getStringExtra("path");
         String arg = intent.getStringExtra("arg");
         boolean isProj = intent.getBooleanExtra("isProj", false);
-        if (isProj) {
+        if (isProj)
             ScriptExec.getInstance().playProject(this, path, arg);
-        } else {
-            ScriptExec.getInstance().playScript(this, path, arg);
-        }
-    }}
+        else {
+            if(path.endsWith(".ipynb"))
+                AppListActivity.openNotebook(this,path);
+            else
+                ScriptExec.getInstance().playScript(this, path, arg);
+    }}}
 
     private void runShortcut(){
         if(SplashActivity.delay > 100){
@@ -325,11 +334,11 @@ public class HomeMainActivity extends BaseActivity {
 
     private void setConsoleMenu(){
         CONSOLE_SETTING = getFilesDir() + "/text/ver/" + CONSOLE_SETTING;
-        consoleItem = new Spanned[]{
+            consoleItem = new Spanned[]{
                 strIdToHtm(R.string.python_interpreter,"bfdfdf"),
-                strIdToHtm(R.string.color_python_interpreter,"dfdfbf"),
+                //strIdToHtm(R.string.color_python_interpreter,"dfdfbf"),
                 strIdToHtm(R.string.ipython_interactive,"dfbfdf"),
-                strIdToHtm(R.string.sl4a_gui_console,"ffffff"),
+                strIdToHtm(R.string.sl4a_gui_console,"dfdfbf"),//"ffffff"),
                 strIdToHtm(R.string.browser_console,"ffbfbf"),
                 strIdToHtm(R.string.python_shell_terminal,"bfbfff"),
                 strIdToHtm(R.string.shell_terminal,"bfffbf"),

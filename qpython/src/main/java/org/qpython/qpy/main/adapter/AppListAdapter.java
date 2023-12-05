@@ -85,6 +85,8 @@ public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppLis
                 QPyScriptModel qPyScriptItem = (QPyScriptModel) dataList.get(position);
                 if (qPyScriptItem.isProj()) {
                     callback.runProject(qPyScriptItem);
+                } else if (qPyScriptItem.isNotebook()) {
+                    callback.runNotebook(qPyScriptItem);
                 } else {
                     callback.runScript(qPyScriptItem);
                 }
@@ -151,9 +153,8 @@ public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppLis
 
     public interface Callback {
         void runScript(QPyScriptModel item);
-
         void runProject(QPyScriptModel item);
-
+        void runNotebook(QPyScriptModel item);
         void exit();
     }
 
@@ -175,8 +176,9 @@ public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppLis
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             ShortcutManager mShortcutManager = context.getSystemService(ShortcutManager.class);
             if (mShortcutManager.isRequestPinShortcutSupported()) {
-                if(label.endsWith(".py"))
-                    label = label.substring(0,label.length()-3);
+                int dot = label.lastIndexOf('.');
+                if(dot>0)
+                    label = label.substring(0,dot);
                 intent.putExtra("label",label);
                 new EnterDialog(context)
                         .setTitle(context.getString(R.string.addshortcut_shortcut_label))
@@ -223,11 +225,7 @@ public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppLis
         QPyScriptModel model = (QPyScriptModel) dataList.get(position);
         if (model.isProj()) {
             TedLocalActivity.start(context,model.getPath());
-            //EditorActivity.start(context, Uri.parse("file://"+model.getPath()+"/main.py"));
-            //EditorActivity.start(model.getPath(), context);
         } else {
-            //Intent intent = new Intent();
-            //model.getPath()
             EditorActivity.start(context, Uri.fromFile(new File(model.getPath())));
         }
     }

@@ -21,7 +21,13 @@ package org.swiftp.server;
 
 import java.io.File;
 
+import android.support.v4.provider.DocumentFile;
 import android.util.Log;
+
+import org.swiftp.Globals;
+
+import util.DocumentUtil;
+import util.FileUtil;
 
 public class CmdRMD extends FtpCmd implements Runnable {
 	public static final String message = "TEMPLATE!!";
@@ -56,7 +62,7 @@ public class CmdRMD extends FtpCmd implements Runnable {
 				errString = "550 Won't RMD the root directory\r\n";
 				break mainblock;
 			}
-			if(!recursiveDelete(toRemove)) {
+			if(!FileUtil.delete(toRemove)) {
 				errString = "550 Deletion error, possibly incomplete\r\n";
 				break mainblock;
 			}
@@ -70,12 +76,12 @@ public class CmdRMD extends FtpCmd implements Runnable {
 		myLog.l(Log.DEBUG, "RMD finished");
 	}
 
-	/**
+	/* *
 	 * Accepts a file or directory name, and recursively deletes the contents
 	 * of that directory and all subdirectories.
 	 * @param toDelete
 	 * @return Whether the operation completed successfully
-	 */
+	 * /
 	protected boolean recursiveDelete(File toDelete) {
 		if(!toDelete.exists()) {
 			return false;
@@ -92,5 +98,5 @@ public class CmdRMD extends FtpCmd implements Runnable {
 			myLog.l(Log.DEBUG, "RMD deleting file: " + toDelete);
 			return toDelete.delete();
 		}
-	}
+	}*/
 }

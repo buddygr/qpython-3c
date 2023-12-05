@@ -1,16 +1,17 @@
 package org.qpython.qpy.main.auxActivity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
-import android.graphics.ColorSpace;
 import android.hardware.display.DisplayManager;
 import android.media.MediaRecorder;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.DisplayMetrics;
@@ -25,10 +26,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.qpython.qpy.R;
+import org.qpython.qsl4a.qsl4a.facade.MediaRecorderFacade;
+import org.qpython.qsl4a.qsl4a.util.PermissionUtil;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class ScreenRecordActivity extends Activity {
   //常量
@@ -36,12 +41,13 @@ public class ScreenRecordActivity extends Activity {
   final static int STOP = R.string.stop_record;
   final static int START2 = R.string.start_record_step_2;
   final static int EXIT = R.string.exit_window;
-  final static String sdcard = Environment.getExternalStorageDirectory().toString();
   final static int CONTINUE = 100;
   final static int WAIT = 101;
+
   //状态量
   static int start = START;
   static int exit = EXIT;
+  static String basepath;
   static String path = "";
   static boolean rotation = false;
   static MediaRecorder mMediaRecorder;
@@ -144,6 +150,10 @@ public class ScreenRecordActivity extends Activity {
     root.addView(Play, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     recorderStartScreenRecord(WAIT);
     setContentView(root);
+    if( Environment.getExternalStorageDirectory().canWrite())
+      basepath = Environment.getExternalStorageDirectory().getAbsolutePath();
+    else
+      basepath = this.getExternalFilesDir("").getAbsolutePath();
   }
 
   private void recorderStartScreenRecord() {
@@ -155,6 +165,7 @@ public class ScreenRecordActivity extends Activity {
       return;
     }
     mediaProjectionManager = ((MediaProjectionManager) this.getSystemService(Context.MEDIA_PROJECTION_SERVICE));
+    MediaRecorderFacade.mediaProjectionManager = mediaProjectionManager;
     Intent permissionIntent = mediaProjectionManager.createScreenCaptureIntent();
     startActivityForResult(permissionIntent, requestCode);
   }
@@ -163,16 +174,24 @@ public class ScreenRecordActivity extends Activity {
   protected void onActivityResult(int requestCode, int resultCode, Intent PermissionIntent) {
     permissionResultCode = resultCode;
     permissionIntent = PermissionIntent;
-    if ( resultCode == RESULT_OK && PermissionIntent != null )
-          recorderContinueScreenRecord(requestCode);
-}
+    permissionIntent.putExtra("RESULT_CODE",resultCode);
+    if (resultCode == RESULT_OK)
+        recorderContinueScreenRecord(requestCode);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      try {
+        createMediaProjection();
+      } catch (Exception exception) {
+        exception.printStackTrace();
+      }
+    }
+  }
 
   private void recorderContinueScreenRecord(int requestCode){
     if (requestCode == WAIT) return;
     try {
       createMediaProjection();
     DisplayMetrics dm = this.getResources().getDisplayMetrics();
-    path = sdcard + "/Pictures/Screenshots/"; /*存放截屏的文件夹*/
+    path = basepath + "/Pictures/Screenshots/"; /*存放截屏的文件夹*/
     File _path = new File(path);
     if (!_path.exists()) {
       _path.mkdirs();
@@ -195,8 +214,21 @@ public class ScreenRecordActivity extends Activity {
       showErr(e);
     }}
 
+  @SuppressLint("InlinedApi")
   private void createMediaProjection() throws Exception {
-    mediaProjection = mediaProjectionManager.getMediaProjection(permissionResultCode, permissionIntent);
+    PermissionUtil.checkPermission(Manifest.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION,34);
+    if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q){
+      MediaRecorderFacade.mediaProjectionManager = mediaProjectionManager;
+      //启动前台服务
+      Intent service = new Intent(this, MediaRecorderFacade.CaptureScreenService.class);
+      service.putExtras(permissionIntent);
+      MediaRecorderFacade.countDownLatch = new CountDownLatch(1);
+      this.startForegroundService(service);
+      MediaRecorderFacade.countDownLatch.await(1000, TimeUnit.MILLISECONDS);
+      mediaProjection = MediaRecorderFacade.mediaProjection;
+    } else {
+      mediaProjection = mediaProjectionManager.getMediaProjection(permissionResultCode, permissionIntent);
+    }
     if (mediaProjection == null) {
       throw new Exception("Null MediaProjection .");
     }
@@ -228,6 +260,13 @@ public class ScreenRecordActivity extends Activity {
     if (mediaProjection!=null){
       mediaProjection.stop();
       mediaProjection=null;
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      try {
+        createMediaProjection();
+      } catch (Exception exception) {
+        exception.printStackTrace();
+      }
     }
   }
 

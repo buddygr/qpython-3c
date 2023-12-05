@@ -16,12 +16,19 @@
 
 package org.qpython.qsl4a.qsl4a.util;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+
+import util.DocumentUtil;
 
 public class PermissionUtil {
   @SuppressLint("StaticFieldLeak")
@@ -57,6 +64,22 @@ public class PermissionUtil {
       ActivityCompat.requestPermissions(activity, permissions, 100);
       throw new Exception("Need Permission of"+sb);
     }
+  }
+
+  public static void requestAllFilesPermission(){
+    try {
+      checkPermission(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE});
+    } catch (Exception exception) {
+      exception.printStackTrace();
+    }
+    if (Build.VERSION.SDK_INT >= 30) {
+      if (!Environment.isExternalStorageManager()) {
+        Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+        intent.setData(Uri.parse("package:" + activity.getPackageName()));
+        activity.startActivityForResult(intent, 100);
+      }
+    }
+    DocumentUtil.storageShowOpenAll(activity);
   }
 
 }

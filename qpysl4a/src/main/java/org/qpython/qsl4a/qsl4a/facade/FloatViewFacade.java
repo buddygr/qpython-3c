@@ -1,14 +1,11 @@
 package org.qpython.qsl4a.qsl4a.facade;
 
-import android.app.AlertDialog;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcelable;
 import android.view.WindowManager;
 import android.widget.Button;
 
@@ -20,7 +17,6 @@ import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
 import org.qpython.qsl4a.qsl4a.rpc.RpcOptional;
 import org.qpython.qsl4a.qsl4a.rpc.RpcParameter;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 public class FloatViewFacade extends RpcReceiver {

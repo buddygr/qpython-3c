@@ -25,6 +25,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.quseit.base.QBaseApp;
@@ -39,10 +40,13 @@ import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.main.event.Bean;
 import org.qpython.qpy.main.utils.Utils;
 import org.qpython.qpy.texteditor.EditorActivity;
+import org.qpython.qpy.texteditor.ui.view.EnterDialog;
 import org.qpython.qpysdk.utils.FileHelper;
 
 import java.io.File;
 import java.util.Objects;
+
+import util.FileUtil;
 
 
 /**
@@ -64,10 +68,9 @@ public class QWebViewActivity extends BaseActivity {
     public static final  String SRC          = "src";
     public static final  String ACT          = "act";
     public static final  String LOG_PATH     = "LOG_PATH";
-    protected            String wvCookie     = "";
-    protected            String wvDocument   = "";
     private              String launchScript = "";
     private              String logPath      = CONF.WEB_LOG;
+    private              String webUrl       = "";
 
     protected ValueCallback<Uri> mUploadMessage;
 
@@ -208,7 +211,7 @@ public class QWebViewActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.refresh_menu, menu);
+        getMenuInflater().inflate(R.menu.qwebview_menu, menu);
         if (launchScript != null && !launchScript.isEmpty()) {
             MenuItem logItem = menu.findItem(R.id.log_menu);
             logItem.setVisible(true);
@@ -216,15 +219,17 @@ public class QWebViewActivity extends BaseActivity {
         return true;
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.refresh_menu:
                 binding.WebViewProgress.setVisibility(View.VISIBLE);
-                binding.wv.loadUrl("javascript:window.location.reload( true )");
+                //binding.wv.loadUrl("javascript:window.location.reload( true )");
+                onRefresh(binding.wv);
                 break;
             case R.id.log_menu:
-                String title = FileHelper.getFileName(launchScript);
+                //String title = FileHelper.getFileName(launchScript);
                 Intent resultIntent = new Intent(this, LogActivity.class);
                 if (launchScript.contains("/scripts")) {
                     String proj = new File(launchScript).getName();
@@ -238,6 +243,18 @@ public class QWebViewActivity extends BaseActivity {
 
                 startActivity(resultIntent);
                 break;
+            case R.id.menu_new_more:
+                new EnterDialog(this)
+                        .setTitle(URL)
+                        .setText(webUrl)
+                        .setConfirmListener(
+                                name -> {
+                                    loadurl(binding.wv,name);
+                                    return true;
+                                }
+                        )
+                        .show();
+            default:break;
         }
         return true;
     }
@@ -314,10 +331,9 @@ public class QWebViewActivity extends BaseActivity {
     }
 
     private void writeWebLog(String data) {
-        FileHelper.writeToFile(logPath,data+"\n", true);
+        FileUtil.writeToFile(logPath,data+"\n", true);
     }
 
-    //
     @SuppressLint("SetJavaScriptEnabled")
     public void initWebView() {// 初始化
         binding.WebViewProgress.setMax(100);
@@ -344,6 +360,8 @@ public class QWebViewActivity extends BaseActivity {
         ws.setUseWideViewPort(true);
 
         ws.setJavaScriptEnabled(true);// 可用JS
+        ws.setCacheMode(WebSettings.LOAD_DEFAULT);
+        ws.setDomStorageEnabled(true);
         binding.wv.addJavascriptInterface(bean, "milib");
         binding.wv.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);// 滚动条风格，为0就是不给滚动条留空间，滚动条覆盖在网页上
         ws.setRenderPriority(WebSettings.RenderPriority.HIGH);
@@ -461,13 +479,13 @@ public class QWebViewActivity extends BaseActivity {
                         .create()
                         .show();
             } else {*/
-                view.loadUrl(url);// 载入网页
-
+            view.loadUrl(url);// 载入网页
+            webUrl = url;
            // }
         } catch (Exception e) {
-            e.printStackTrace();
+            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
             view.loadUrl(url);// 载入网页
-
+            webUrl = url;
         }
 
     }

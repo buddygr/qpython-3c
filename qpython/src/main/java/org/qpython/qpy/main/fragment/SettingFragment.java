@@ -223,7 +223,7 @@ public class SettingFragment extends PreferenceFragment {
         portnum_pref.setSummary(settings.getString(resources.getString(R.string.key_port_num),
                 resources.getString(org.swiftp.R.string.portnumber_default)));
         chroot_pref.setSummary(settings.getString(resources.getString(R.string.key_root_dir),
-                Environment.getExternalStorageDirectory().getPath()));
+                Environment.getExternalStorageDirectory().getAbsolutePath()));
         qpyCustom.setSummary(CONF.CUSTOM_PATH);
         //pyOptimize.setSummary(PY_OPTIMIZE()[settings.getInt(getString(R.string.key_python_optimize),0)]);
 
@@ -261,7 +261,7 @@ public class SettingFragment extends PreferenceFragment {
         }
     }
 
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
+    /*private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getActivity().getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.getName().equals(service.service.getClassName())) {
@@ -269,7 +269,7 @@ public class SettingFragment extends PreferenceFragment {
             }
         }
         return false;
-    }
+    }*/
 
     @SuppressLint({"InvalidWakeLockTag", "WakelockTimeout"})
     private void initListener() throws Exception {
@@ -282,8 +282,8 @@ public class SettingFragment extends PreferenceFragment {
             alert = new android.app.AlertDialog.Builder(getActivity(),R.style.MyDialog);
             alert.setTitle(R.string.choose_file);
             alert.setItems(logFiles, (dialogInterface, i) -> {
-                Utils.checkRunTimeLog(getActivity(), getString(R.string.last_log),
-                        logFolder.toString()+"/"+logFiles[i]);
+                Utils.checkRunTimeLog(getActivity(), getString(R.string.log_title),
+                        logFolder +"/"+logFiles[i]);
                     });
             alert.setNegativeButton(getString(R.string.close),
                     (dialogInterface, i) -> dialogInterface.dismiss());

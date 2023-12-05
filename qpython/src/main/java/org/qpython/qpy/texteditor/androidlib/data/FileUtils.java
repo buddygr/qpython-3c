@@ -243,7 +243,7 @@ public class FileUtils {
 		try {
 			path = f.getCanonicalPath();
 		} catch (IOException e) {
-			path = f.getPath();
+			path = f.getAbsolutePath();
 			Log.w("AndroidLib",
 					"Error while canonizing file path, using raw path instead : \""
 							+ path + "\"");
@@ -301,27 +301,6 @@ public class FileUtils {
 	}
 
 	/**
-	 * Delete the given file/folder
-	 * 
-	 * @param file
-	 *            the file/folder to delete
-	 * @return if the file/folder was deleted successfully
-	 */
-	public static boolean deleteItem(File file) {
-		boolean result;
-
-		if (!file.exists()) {
-			result = true;
-		} else if (!file.canWrite()) {
-			result = false;
-		} else {
-			result = file.delete();
-		}
-
-		return result;
-	}
-
-	/**
 	 * Delete the given folder with all its content
 	 * 
 	 * @param folder
@@ -360,30 +339,6 @@ public class FileUtils {
 					result = false;
 				}
 			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * Delete the file/folder at the given path
-	 * 
-	 * @param path
-	 *            the path of the file/folder to delete
-	 * @return if the file/folder was deleted successfully
-	 */
-	public static boolean deleteItem(String path) {
-		File file;
-		boolean result;
-
-		file = new File(path);
-
-		if (!file.exists()) {
-			result = true;
-		} else if (!file.canWrite()) {
-			result = false;
-		} else {
-			result = file.delete();
 		}
 
 		return result;
@@ -481,51 +436,5 @@ public class FileUtils {
 		return complete;
 	}
 
-	/**
-	 * Rename a file
-	 * 
-	 * @param file
-	 *            the file/folder to rename
-	 * @param newName
-	 *            the new name to the file
-	 * @return if the rename was succesfull
-	 */
-	public static boolean renameItem(File file, String newName) {
-		File newFile;
-		boolean result;
 
-		if ((!file.exists()) || (!file.canWrite())) {
-			result = false;
-		} else {
-			newFile = new File(file.getParentFile(), newName);
-			result = file.renameTo(newFile);
-		}
-
-		return result;
-	}
-
-	/**
-	 * Rename a file
-	 * 
-	 * @param oldPath
-	 *            the path of the file/folder to rename
-	 * @param newPath
-	 *            the new path to the file/folder
-	 * @return if the rename was succesfull
-	 */
-	public static boolean renameItem(String oldPath, String newPath) {
-		File file, newFile;
-		boolean result;
-
-		file = new File(oldPath);
-
-		if ((!file.exists()) || (!file.canWrite())) {
-			result = false;
-		} else {
-			newFile = new File(newPath);
-			result = file.renameTo(newFile);
-		}
-
-		return result;
-	}
 }

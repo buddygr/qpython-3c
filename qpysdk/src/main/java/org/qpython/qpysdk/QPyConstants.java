@@ -1,11 +1,7 @@
 package org.qpython.qpysdk;
 
-import android.content.Context;
-import android.os.Environment;
-
 import com.quseit.config.BASE_CONF;
-import com.quseit.util.DocumentsUtils;
-import com.quseit.util.FileHelper;
+import util.DocumentUtil;
 
 public interface QPyConstants extends BASE_CONF {
 
@@ -24,7 +20,7 @@ public interface QPyConstants extends BASE_CONF {
     //String IAP_LOG_URL = "https://apu2.quseit.com/conf/iaplog/";
 
     String DFROM_RUN   = ".runtime";
-    String PY_CACHE    = ".qpyc";
+    //String PY_CACHE    = ".qpyc";
 
    // String DFROM_QPY2 = "scripts";
     String DFROM_QPY3 = "scripts3";
@@ -35,7 +31,7 @@ public interface QPyConstants extends BASE_CONF {
     //String KEY_NOTEBOOK_RES = "setting.notebook3sresource.path";
     //String KEY_NOTEBOOK2_RES = "setting.notebook2resource.path";
 
-    String LEGACY_PATH = DocumentsUtils.SDCARD_PATH + BASE_PATH;
+    String LEGACY_PATH = DocumentUtil.SDCARD_PATH + BASE_PATH;
     String LEGACY_LOG = LEGACY_PATH+"/log/last.log";
 
     String QPYC3 = "https://io.qpython.org/py3.json";

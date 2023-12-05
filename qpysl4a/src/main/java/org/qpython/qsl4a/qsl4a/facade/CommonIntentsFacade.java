@@ -382,7 +382,8 @@ public class CommonIntentsFacade extends RpcReceiver {
                 label = scriptPath;
                 if (label.endsWith("/")) label = label.substring(0,label.length()-1);
                 label = label.substring(label.lastIndexOf("/") + 1);
-                if (label.endsWith(".py")) label = label.substring(0,label.length()-3);
+                int dot = label.lastIndexOf('.');
+                if (dot>0) label = label.substring(0,dot);
             } catch (Exception ignored){}
         }
         Icon icon;

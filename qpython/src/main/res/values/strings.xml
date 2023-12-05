@@ -45,7 +45,7 @@
     <string name="gist">Gist</string>
 
     <string name="more">More</string>
-    <string name="qpypi">Featured</string>
+    <string name="qpypi">Package</string>
     <string name="sl4a_server">SL4A Server</string>
     <string name="internal_space"><![CDATA[Permissions & Storage]]></string>
     <string name="ftp_server">FTP Server</string>
@@ -477,7 +477,6 @@
     <string name="toolbar_close">Editor</string>
     <string name="not_support_yet">Not support yet</string>
     <string name="new_file">New file</string>
-    <string name="tools">Tools</string>
     <string name="aipy_not_install"><![CDATA[Please <font color="#4BAC07">enable AIPY from setting</font>]]></string>
 
 
@@ -494,7 +493,6 @@
     <string name="aipy_lib_hint">You can install or upgrade AIPY App to get more features</string>
     <string name="album">Album</string>
     <string name="last_refresh">Last Refresh: %s</string>
-    <string name="last_log">Runtime log</string>
     <string name="get_last_log">Check last runtime log</string>
 
     <string name="data_saver">Data saver</string>
@@ -717,7 +715,7 @@
     <string name="bili_com" translatable="false">bilibili.com</string>
     <string name="wechat_video_website" translatable="false">https://mp.weixin.qq.com/s/gWbEIxaux7BewTMNtRTKJw</string>
     <string name="sl4a_gui_console">Python SL4A GUI Console</string>
-    <string name="color_python_interpreter">Color Python Interpreter</string>
+    <string name="lite_version_not_support">Lite version not supported</string>
     <string name="tradition_bug">There are too many bugs in the traditional terminal. It is recommended to use it only for testing.</string>
     <string name="python_shell_terminal">Python Color Shell Terminal</string>
     <string name="wechat_com">mp.weixin.qq.com</string>
@@ -751,4 +749,5 @@
     <string name="sl4a_start">Start SL4A Server …</string>
     <string name="initial_qpython">Initial QPython, DO NOT operate !</string>
     <string name="umeng">Allow QPython to send user statistics for UMeng ?</string>
+    <string name="selected">Selected</string>
 </resources>

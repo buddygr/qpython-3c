@@ -19,12 +19,15 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.quseit.util.FileHelper;
+import util.FileUtil;
 import com.quseit.util.ImageUtil;
 import com.yanzhenjie.recyclerview.swipe.SwipeMenuCreator;
 import com.yanzhenjie.recyclerview.swipe.SwipeMenuItem;
 
 import org.qpython.qpy.R;
+import org.qpython.qpy.console.ScriptExec;
 import org.qpython.qpy.databinding.FragmentExplorerBinding;
+import org.qpython.qpy.main.activity.AppListActivity;
 import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.texteditor.EditorActivity;
 import org.qpython.qpy.texteditor.common.CommonEnums;
@@ -259,8 +262,9 @@ public class ExplorerFragment extends Fragment {
         List<String> textExts = Arrays.asList(getContext().getResources().getStringArray(R.array.text_ext));
         if (textExts.contains(ext)) {
             EditorActivity.start(getContext(), Uri.fromFile(file));
-        } /*else if (ext.equals("ipynb")) {
-            boolean notebookenable = NotebookUtil.isNotebookEnable(getActivity());
+        } else if (ext.equals("ipynb")) {
+            AppListActivity.openNotebook(getActivity(),file);
+            /*boolean notebookenable = NotebookUtil.isNotebookEnable(getActivity());
             if (notebookenable) {
                 NotebookActivity.start(getActivity(), file.getAbsolutePath(), false);
             } else {
@@ -273,9 +277,9 @@ public class ExplorerFragment extends Fragment {
                         .create()
                         .show();
 
-                //Toast.makeText(getActivity(), R.string.ennable_notebook_first, Toast.LENGTH_SHORT).show();
-            }
-        }*/ else {
+                Toast.makeText(getActivity(), R.string.ennable_notebook_first, Toast.LENGTH_SHORT).show();
+            }*/
+        } else {
             FileUtils.openFile(getContext(), file);
         }
     }
@@ -337,7 +341,7 @@ public class ExplorerFragment extends Fragment {
             .setConfirmListener(name -> {
                 File oldFile = folderList.get(adapterPosition).getFile();
                 File newFile = new File(oldFile.getParent(), name);
-                boolean renameSuc = oldFile.renameTo(newFile);
+                boolean renameSuc = FileUtil.rename(oldFile,newFile);//oldFile.renameTo(newFile);
                 if (renameSuc) {
                     folderList.set(adapterPosition, new FolderBean(newFile));
                     adapter.notifyItemChanged(adapterPosition);
@@ -365,8 +369,11 @@ public class ExplorerFragment extends Fragment {
                         .setMessage(R.string.delete_file_hint)
                         .setNegativeButton(R.string.no, null)
                         .setPositiveButton(R.string.yes, (dialog, which) -> {
-                            FileHelper.clearDir(folderList.get(adapterPosition).getFile().getAbsolutePath(), 0, true);
-                            folderList.remove(adapterPosition);
+                            if(FileUtil.delete(folderList.get(adapterPosition).getFile()))
+                            //FileHelper.clearDir(folderList.get(adapterPosition).getFile().getAbsolutePath(), 0, true);
+                                folderList.remove(adapterPosition);
+                            else
+                                Toast.makeText(getActivity(), R.string.delete_fail, Toast.LENGTH_SHORT).show();
                             adapter.notifyItemRemoved(adapterPosition);
                             adapter.notifyDataSetChanged();
                         })

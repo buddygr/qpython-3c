@@ -58,7 +58,7 @@
 
     <Preference
         android:key="lastlog"
-        android:title="@string/last_log"
+        android:title="@string/log_title"
         android:summary="@string/get_last_log"/>
 
     <CheckBoxPreference

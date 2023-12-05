@@ -49,6 +49,7 @@ This repository is the QPython Plus project repository, you can follow the below
 - 网络监测：[基站和综合网络](https://www.bilibili.com/read/cv16061380)与[WiFi网络](https://www.bilibili.com/read/cv13278468)
 - [位置](https://www.bilibili.com/read/cv11339588)与[导航卫星](https://www.bilibili.com/read/cv18956157)
 - 传感器：[加速度、磁力计、计步器、光线](https://www.bilibili.com/read/cv16824060)、[电池](https://www.bilibili.com/read/cv17813243)与[分贝计](https://www.bilibili.com/read/cv18422794)
+- [分享图片到朋友圈](https://www.bilibili.com/read/cv23144407)
 
 ## How to ask QPython related questions
 In order to benefit those guys who have the same issue with QPython, we suggest that you should ask the issue which is related with QPython within public techical communities.

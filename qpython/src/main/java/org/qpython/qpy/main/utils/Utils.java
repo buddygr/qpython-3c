@@ -29,6 +29,8 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import util.FileUtil;
+
 /**
  * Created by mathiasluo on 16-6-1.
  * 乘着船 修改 2021-2022
@@ -159,7 +161,7 @@ public class Utils extends org.qpython.qpysdk.utils.Utils {
     public static String getSrv(String script) {
         //LogUtil.d(TAG, "getSrv:"+script);
 
-        String content = FileHelper.getFileContents(script);
+        String content = FileUtil.getFileContents(script);
 
         String srv = "http://localhost";
         Pattern srvPattern = Pattern.compile("#qpy://(.+)[\\s]+", Pattern.CASE_INSENSITIVE);

@@ -50,62 +50,6 @@ public class FileUtils {
         || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state);
   }
 
-  public static String getFileContents(String filename) {
-
-    File scriptFile = new File( filename );
-    String tContent = "";
-    if (scriptFile.exists()) {
-      BufferedReader in;
-      try {
-        in = new BufferedReader(new FileReader(scriptFile));
-        String line;
-
-        while ((line = in.readLine())!=null) {
-          tContent += line+"\n";
-        }
-        in.close();
-      } catch (FileNotFoundException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      } catch (IOException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-
-    }
-    return tContent;
-  }
-
-  public static String getFileContents(String filename, int pos) {
-
-    File scriptFile = new File( filename );
-    String tContent = "";
-    if (scriptFile.exists()) {
-      BufferedReader in;
-      try {
-        in = new BufferedReader(new FileReader(scriptFile));
-        String line;
-
-        while ((line = in.readLine())!=null) {
-          tContent += line+"\n";
-          if (tContent.length()>=pos) {
-            in.close();
-            return tContent;
-          }
-        }
-        in.close();
-      } catch (FileNotFoundException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      } catch (IOException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-
-    }
-    return tContent;
-  }
-
   public static int chmod(File path, int mode) throws Exception {
     Class<?> fileUtils = Class.forName("android.os.FileUtils");
     Method setPermissions =

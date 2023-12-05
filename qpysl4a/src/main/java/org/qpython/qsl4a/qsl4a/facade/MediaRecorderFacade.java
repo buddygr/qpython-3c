@@ -97,14 +97,14 @@ public class MediaRecorderFacade extends RpcReceiver {
   private final Service mService;
   static Intent intentMP;
   static int resultCodeMP;
-  static MediaProjectionManager mediaProjectionManager;
-  static MediaProjection mediaProjection;
+  public static MediaProjectionManager mediaProjectionManager;
+  public static MediaProjection mediaProjection;
   static MediaRecorder mMediaRecorder;
   static Camera camera;
   static final int SAMPLE_RATE_IN_HZ = 8000;
   static final int BUFFER_SIZE = AudioRecord.getMinBufferSize(SAMPLE_RATE_IN_HZ,
           AudioFormat.CHANNEL_IN_DEFAULT, AudioFormat.ENCODING_PCM_16BIT);
-  private static CountDownLatch countDownLatch;
+  public static CountDownLatch countDownLatch;
   AudioRecord mAudioRecord;
   boolean isGetVoiceRun;
   final Object mLock;

@@ -4,9 +4,7 @@ import static org.qpython.qpy.texteditor.TedFragment.LOGIN_REQUEST_CODE;
 import static org.qpython.qpy.texteditor.TedLocalActivity.REQUEST_OPEN;
 import static org.qpython.qpy.texteditor.TedLocalActivity.REQUEST_RECENT;
 import static org.qpython.qpy.texteditor.TedLocalActivity.REQUEST_SAVE_AS;
-import static org.qpython.qpy.texteditor.androidlib.data.FileUtils.deleteItem;
 import static org.qpython.qpy.texteditor.androidlib.data.FileUtils.getCanonizePath;
-import static org.qpython.qpy.texteditor.androidlib.data.FileUtils.renameItem;
 import static org.qpython.qpy.texteditor.common.Constants.ACTION_WIDGET_OPEN;
 import static org.qpython.qpy.texteditor.common.Constants.EXTRA_FORCE_READ_ONLY;
 
@@ -20,13 +18,11 @@ import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.graphics.Rect;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -43,6 +39,7 @@ import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import util.FileUtil;
 import com.quseit.util.NAction;
 import com.quseit.util.NStorage;
 
@@ -50,7 +47,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.qpython.qpy.R;
 import org.qpython.qpy.console.ScriptExec;
 import org.qpython.qpy.databinding.DrawerEditorBinding;
@@ -82,6 +78,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 
@@ -504,7 +501,7 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
             mCurrentFilePath = getCanonizePath(file);
             Toast.makeText(this,mCurrentFilePath,Toast.LENGTH_SHORT).show();
             mCurrentFileName = file.getName();
-            mReadOnly = !(file.canWrite() && (!forceReadOnly));
+            mReadOnly = !FileUtil.canWrite(file) || forceReadOnly;
             if (textFragment != null) {
                 if (text != null) {
                     textFragment.setEditorText(text);
@@ -657,7 +654,7 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
 
     public void showLogDialog(ScriptExec.LogDialog event) {
         new android.app.AlertDialog.Builder(this)
-                .setTitle(R.string.last_log)
+                .setTitle(R.string.log_title)
                 .setMessage(com.quseit.qpyengine.R.string.open_log)
                 .setNegativeButton(R.string.no, ((dialog, which) -> dialog.dismiss()))
                 .setPositiveButton(R.string.ok, (dialog, which) -> {
@@ -857,13 +854,13 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
             return;
         }
 
-        if (!deleteItem(path)) {
+        if (!FileUtil.delete(path)) {
             Crouton.showText(this, R.string.toast_save_delete, Style.ALERT);
 
             return;
         }
 
-        if (!renameItem(path + ".tmp", path)) {
+        if (!FileUtil.rename(path + ".tmp", path)) {
             Crouton.showText(this, R.string.toast_save_rename, Style.ALERT);
 
             return;
@@ -1015,4 +1012,5 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
             })
             .show();
     }
+
 }

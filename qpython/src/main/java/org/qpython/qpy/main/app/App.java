@@ -152,40 +152,13 @@ public class App extends QSL4APP {
   //              .supportSSL(!BuildConfig.DEBUG)
                 .addHeaders(header)
                 .init(Api.BASE_URL);
-
-        //initUmeng();
     }
 
-    public static void initUmeng(Activity activity,SharedPreferences sharedPreferences) {
-        /*String um = "umeng";
-        int i;
-        if(sharedPreferences != null)
-            i = sharedPreferences.getInt(um, 0);
-        else
-            i = 1;
-        switch (i){
-            case 1:*/
-                //友盟预初始化
-                UMConfigure.preInit(activity,"6533d918b2f6fa00ba69536c","QPython Plus");
-                //友盟初始化
-                UMConfigure.init(activity, UMConfigure.DEVICE_TYPE_PHONE, "");
-                /*break;
-            case 0:
-                new AlertDialog.Builder(activity, R.style.MyDialog)
-                        .setTitle(R.string.notice)
-                        .setMessage(
-                                activity.getString(R.string.umeng))
-                        .setPositiveButton(R.string.agree, (dialog1, which) -> {
-                            sharedPreferences.edit().putInt(um,1).apply();
-                            initUmeng(activity,null);
-                        })
-                        .setNegativeButton(R.string.disagree, (dialog1, which) -> {
-                            sharedPreferences.edit().putInt(um,-1).apply();
-                        })
-                        .create()
-                        .show();
-            default:
-        }*/
+    public static void initUmeng(Activity activity) {
+        //友盟预初始化
+        UMConfigure.preInit(activity,"6533d918b2f6fa00ba69536c","QPython Plus");
+        //友盟初始化
+        UMConfigure.init(activity, UMConfigure.DEVICE_TYPE_PHONE, "");
     }
 
     private void initLayoutDir() {

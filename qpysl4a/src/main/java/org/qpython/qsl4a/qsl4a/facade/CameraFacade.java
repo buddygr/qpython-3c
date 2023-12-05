@@ -22,7 +22,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Camera;
-import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
@@ -33,7 +32,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
-import com.quseit.util.DocumentsUtils;
+import util.DocumentUtil;
 
 import org.qpython.qsl4a.QSL4APP;
 import org.qpython.qsl4a.qsl4a.util.FileUtils;
@@ -78,7 +77,7 @@ public class CameraFacade extends RpcReceiver {
     mService = manager.getService();
 
     mAndroidFacade = manager.getReceiver(AndroidFacade.class);
-    sdcard = DocumentsUtils.SDCARD;
+    sdcard = DocumentUtil.SDCARD;
     context = mAndroidFacade.context;
     qpyProvider = mAndroidFacade.qpyProvider;
   }

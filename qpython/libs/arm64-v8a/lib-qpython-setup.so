@@ -37,7 +37,7 @@ do
 rm $HOME/text/$i/shell
 done
 
-for i in 1 2
+for i in 1 2 3
 do
 i=$HOME/private$i.7z
 $j x $i -aoa -o$HOME

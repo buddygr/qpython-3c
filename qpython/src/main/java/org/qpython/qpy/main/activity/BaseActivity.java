@@ -114,13 +114,7 @@ public class BaseActivity extends AppCompatActivity {
         } else {
             action.onGrant();
         }
-        if (Build.VERSION.SDK_INT >= 30) {
-            if (!Environment.isExternalStorageManager()) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-                intent.setData(Uri.parse("package:" + this.getPackageName()));
-                startActivityForResult(intent, 100);
-            }
-        }
+        PermissionUtil.requestAllFilesPermission();
     }
 
 

@@ -57,7 +57,7 @@ public class TedFontActivity extends BrowsingActivity implements
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
             // navigate to parent folder
-            if (!mCurrentFolder.getPath().equals("/storage/emulated/0")) {
+            if (!mCurrentFolder.getAbsolutePath().equals("/storage/emulated/0")) {
                 File parent = mCurrentFolder.getParentFile();
                 if ((parent != null) && (parent.exists())) {
                     fillFolderView(parent);

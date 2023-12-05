@@ -22,7 +22,7 @@ import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
 import com.quseit.util.FileHelper;
-import com.quseit.util.FileUtils;
+import util.FileUtil;
 import com.quseit.util.StringUtils;
 
 import org.qpython.qpy.console.compont.FileCompat;
@@ -121,7 +121,7 @@ public class ShellTermSession extends GenericTermSession {
         }
         FileHelper.putFileContents(enf.getAbsolutePath(), content.toString().trim());
         try {
-            FileUtils.chmod(enf, 0755);
+            FileUtil.chmod(enf, 0755);
         }
         catch (Exception e) {
             e.printStackTrace();
