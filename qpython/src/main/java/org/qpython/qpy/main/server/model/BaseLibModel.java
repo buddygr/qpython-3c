@@ -48,6 +48,14 @@ public class BaseLibModel implements Serializable{
         this.link = link;
     }
 
+    public String getLinkExt() {
+        int dot = link.lastIndexOf(".");
+        if(dot<0)
+            return "";
+        else
+            return link.substring(dot+1);
+    }
+
     public String getTmodule() {
         return tmodule;
     }

@@ -2,6 +2,7 @@ package org.qpython.qpy.main.fragment;
 
 import static com.quseit.util.FolderUtils.sortTypeByName;
 
+import android.Manifest;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.net.Uri;
@@ -18,14 +19,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.quseit.util.FileHelper;
-import util.FileUtil;
 import com.quseit.util.ImageUtil;
 import com.yanzhenjie.recyclerview.swipe.SwipeMenuCreator;
 import com.yanzhenjie.recyclerview.swipe.SwipeMenuItem;
 
 import org.qpython.qpy.R;
-import org.qpython.qpy.console.ScriptExec;
 import org.qpython.qpy.databinding.FragmentExplorerBinding;
 import org.qpython.qpy.main.activity.AppListActivity;
 import org.qpython.qpy.main.app.CONF;
@@ -39,6 +37,7 @@ import org.qpython.qpy.texteditor.widget.crouton.Crouton;
 import org.qpython.qpy.texteditor.widget.crouton.Style;
 import org.qpython.qpy.utils.FileUtils;
 import org.qpython.qpysdk.QPyConstants;
+import org.qpython.qsl4a.qsl4a.util.PermissionUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,6 +47,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import util.FileUtil;
 
 public class ExplorerFragment extends Fragment {
     private static final int REQUEST_SAVE_AS   = 107;
@@ -264,21 +265,6 @@ public class ExplorerFragment extends Fragment {
             EditorActivity.start(getContext(), Uri.fromFile(file));
         } else if (ext.equals("ipynb")) {
             AppListActivity.openNotebook(getActivity(),file);
-            /*boolean notebookenable = NotebookUtil.isNotebookEnable(getActivity());
-            if (notebookenable) {
-                NotebookActivity.start(getActivity(), file.getAbsolutePath(), false);
-            } else {
-
-                new AlertDialog.Builder(getActivity(),R.style.MyDialog)
-                        .setTitle(R.string.dialog_alert)
-                        .setMessage(getString(R.string.ennable_notebook_first))
-                        .setNegativeButton(R.string.cancel, (dialog1, which) -> dialog1.dismiss())
-                        .setPositiveButton(R.string.ok, (dialog1, which) -> gotoSetting())
-                        .create()
-                        .show();
-
-                Toast.makeText(getActivity(), R.string.ennable_notebook_first, Toast.LENGTH_SHORT).show();
-            }*/
         } else {
             FileUtils.openFile(getContext(), file);
         }
@@ -309,50 +295,26 @@ public class ExplorerFragment extends Fragment {
             return;
         }
 
-        /* only available for already login user
-        if (App.getUser() == null) {
-            new AlertDialog.Builder(getActivity(), R.style.MyDialog)
-                    .setTitle(R.string.need_login)
-                    .setMessage(R.string.upload_login_hint)
-                    .setNegativeButton(R.string.no, null)
-                    .setPositiveButton(getString(R.string.login_now), (dialog, which) -> {
-                        //startActivityForResult(new Intent(getActivity(), SignInActivity.class), LOGIN_REQUEST)
-                    })
-                    .create()
-                    .show();
-            return;
-        }
-
-        // upload
-
-        File folder = folderList.get(adapterPosition).getFile();
-        folderList.get(adapterPosition).setUploading(true);
-        adapter.notifyItemChanged(adapterPosition);
-        if (folder.isDirectory()) {
-            ShareCodeUtil.getInstance().uploadFolder(folder, callback, 0);
-        } else {
-            ShareCodeUtil.getInstance().uploadFile(folder, callback);
-        }*/
     }
 
     private void renameFile(int adapterPosition) {
         new EnterDialog(getContext())
-            .setTitle(getString(R.string.rename))
-            .setConfirmListener(name -> {
-                File oldFile = folderList.get(adapterPosition).getFile();
-                File newFile = new File(oldFile.getParent(), name);
-                boolean renameSuc = FileUtil.rename(oldFile,newFile);//oldFile.renameTo(newFile);
-                if (renameSuc) {
-                    folderList.set(adapterPosition, new FolderBean(newFile));
-                    adapter.notifyItemChanged(adapterPosition);
-                    return true;
-                } else {
-                    Toast.makeText(getActivity(), R.string.rename_fail, Toast.LENGTH_SHORT).show();
-                    return false;
-                }
-            })
-            .setText(folderList.get(adapterPosition).getName())
-            .show();
+                .setTitle(getString(R.string.rename))
+                .setConfirmListener(name -> {
+                    File oldFile = folderList.get(adapterPosition).getFile();
+                    File newFile = new File(oldFile.getParent(), name);
+                    boolean renameSuc = FileUtil.rename(oldFile,newFile);//oldFile.renameTo(newFile);
+                    if (renameSuc) {
+                        folderList.set(adapterPosition, new FolderBean(newFile));
+                        adapter.notifyItemChanged(adapterPosition);
+                        return true;
+                    } else {
+                        Toast.makeText(getActivity(), R.string.rename_fail, Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                })
+                .setText(folderList.get(adapterPosition).getName())
+                .show();
     }
 
     private void deleteFile(int adapterPosition) {
@@ -370,7 +332,7 @@ public class ExplorerFragment extends Fragment {
                         .setNegativeButton(R.string.no, null)
                         .setPositiveButton(R.string.yes, (dialog, which) -> {
                             if(FileUtil.delete(folderList.get(adapterPosition).getFile()))
-                            //FileHelper.clearDir(folderList.get(adapterPosition).getFile().getAbsolutePath(), 0, true);
+                                //FileHelper.clearDir(folderList.get(adapterPosition).getFile().getAbsolutePath(), 0, true);
                                 folderList.remove(adapterPosition);
                             else
                                 Toast.makeText(getActivity(), R.string.delete_fail, Toast.LENGTH_SHORT).show();
@@ -429,6 +391,8 @@ public class ExplorerFragment extends Fragment {
                     curPath = dirPath;
                     adapter.notifyDataSetChanged();
 
+                } else {
+                    PermissionUtil.requestAllFilesPermission();
                 }
             } else {
                 Toast.makeText(getContext(), R.string.file_not_exists, Toast.LENGTH_SHORT).show();
@@ -470,30 +434,9 @@ public class ExplorerFragment extends Fragment {
         }
     }
 
-    /*private void updateClouded(File file) {
-        cloudedMap.put(file.getAbsolutePath(), true);
-        if (file.isDirectory()) {
-            for (File file1 : file.listFiles()) {
-                if (file1.isDirectory()) {
-                    updateClouded(file1);
-                } else {
-                    cloudedMap.put(file.getAbsolutePath(), true);
-                }
-            }
-        }
-    }*/
-
     public String getCurPath() {
         return curPath;
     }
-
-    /*private void initCloud() {
-        if (App.getUser() == null) {
-            return;
-        }
-        //获取云端脚本
-
-    }*/
 
     private void savePath(String path) {
         String[] paths = path.split("/");
@@ -508,18 +451,5 @@ public class ExplorerFragment extends Fragment {
         }
     }
 
-    /*public void deleteCloudedMap(String absolutePath) {
-        if (cloudedMap.containsKey(absolutePath)) {
-            cloudedMap.remove(absolutePath);
-            adapter.notifyDataSetChanged();
-        }
-    }
-
-    public void updateCloudedFiles(Map<String, Boolean> map) {
-        if (map != null) {
-            cloudedMap.putAll(map);
-        }
-        adapter.notifyDataSetChanged();
-    }*/
 }
 // GIT TEST

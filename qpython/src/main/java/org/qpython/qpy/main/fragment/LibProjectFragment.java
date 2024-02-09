@@ -6,6 +6,7 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,6 +31,7 @@ import org.qpython.qpy.R;
 import org.qpython.qpy.console.ScriptExec;
 import org.qpython.qpy.console.TermActivity;
 import org.qpython.qpy.databinding.FragmentRefreshRvBinding;
+import org.qpython.qpy.main.activity.AppListActivity;
 import org.qpython.qpy.main.adapter.LibListAdapter;
 import org.qpython.qpy.main.app.App;
 import org.qpython.qpy.main.app.CONF;
@@ -52,6 +54,7 @@ public class LibProjectFragment extends RefreshFragment {
     private static final int    SCRIPT_CONSOLE_CODE = 1237;
     private static  String SCRIPT_DIR;       //   = QPyConstants.ABSOLUTE_PATH + "/" + QPyConstants.DFROM_QPY2 + "/";
     private static  String PROJECT_DIR;      //  = QPyConstants.ABSOLUTE_PATH + "/" + QPyConstants.DFROM_PRJ2 + "/";
+    private static String NOTEBOOK_DIR;
 
     private List<LibModel>           dataList;
     private LibListAdapter<LibModel> adapter;
@@ -73,12 +76,13 @@ public class LibProjectFragment extends RefreshFragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         binding = DataBindingUtil.bind(view);
 
-        SCRIPT_DIR = CONF.SCOPE_STORAGE_PATH + "/" + /*(NAction.isQPy3(getActivity())?*/QPyConstants.DFROM_QPY3/*:QPyConstants.DFROM_QPY2)*/ +"/";
-        PROJECT_DIR = CONF.SCOPE_STORAGE_PATH + "/" + /*(NAction.isQPy3(getActivity())?*/QPyConstants.DFROM_PRJ3/*:QPyConstants.DFROM_PRJ2)*/ +"/";
+        SCRIPT_DIR = CONF.SCOPE_STORAGE_PATH + "/" + QPyConstants.DFROM_SCR3 + "/";
+        PROJECT_DIR = CONF.SCOPE_STORAGE_PATH + "/" + QPyConstants.DFROM_PRJ3 + "/";
+        NOTEBOOK_DIR = CONF.SCOPE_STORAGE_PATH + "/" + QPyConstants.DFROM_NOTE + "/";
 
         initDataList();
         initView();
@@ -142,9 +146,8 @@ public class LibProjectFragment extends RefreshFragment {
             @Override
             public void onNext(List<LibModel> libModels) {
                 for (LibModel lib : libModels) {
-                    if (new File(SCRIPT_DIR + lib.getSmodule()).exists() || new File(PROJECT_DIR + lib.getSmodule()).exists()) {
+                    if (new File(getDestPath(lib)).exists())
                         lib.setInstalled(true);
-                    }
                 }
                 try {
                     ACache.get(getContext()).put(CacheKey.LIB, tostring(libModels));
@@ -175,9 +178,9 @@ public class LibProjectFragment extends RefreshFragment {
     }
 
     private void openPip() {
-        File pip = new File(getContext().getApplicationContext().getFilesDir() + "/bin/qpypi.py");
+        File pip = new File(CONF.filesDir + "/bin/qpypi.py");
         if (pip.exists()) {
-            String[] args = {getContext().getApplicationContext().getFilesDir() + "/bin/qpypi.py", getContext().getApplicationContext().getFilesDir().toString()};
+            String[] args = {pip.getAbsolutePath(),CONF.filesDir};
             Intent intent = new Intent(getContext(), TermActivity.class);
             intent.putExtra(TermActivity.ARGS, args);
             startActivity(intent);
@@ -222,19 +225,29 @@ public class LibProjectFragment extends RefreshFragment {
         };
     }
 
-
+    private String getDestPath(LibModel item){
+        String path;
+        path = item.getLinkExt();
+        if(path.equals("ipynb"))
+            path = NOTEBOOK_DIR;
+        else if(path.equals("zip"))
+            path = PROJECT_DIR;
+        else path = SCRIPT_DIR;
+        return path + item.getSmodule();
+    }
 
     private void installTool(LibModel item) {
         /*String downloadDir = null;
         if (item.getCat().equals("script")) {
-            downloadDir = "qpython/"+(NAction.isQPy3(getActivity())?QPyConstants.DFROM_QPY3;//:QPyConstants.DFROM_QPY2);
+            downloadDir = "qpython/"+(NAction.isQPy3(getActivity())?QPyConstants.DFROM_SCR3;//:QPyConstants.DFROM_QPY2);
         } else if (item.getCat().equals("user")) {
-            downloadDir = "qpython/"+(NAction.isQPy3(getActivity())?QPyConstants.DFROM_QPY3;//:QPyConstants.DFROM_QPY2);
+            downloadDir = "qpython/"+(NAction.isQPy3(getActivity())?QPyConstants.DFROM_SCR3;//:QPyConstants.DFROM_QPY2);
         }*/
 
         // Download
         try {
-            App.getDownloader().download(item.getTitle(), item.getLink(), CONF.SCOPE_STORAGE_PATH + "/scripts3/" + item.getSmodule(),
+            String path = getDestPath(item);
+            App.getDownloader().download(item.getTitle(), item.getLink(), path,
                     new Downloader.Callback() {
                         @Override
                         public void pending(String name) {
@@ -287,13 +300,21 @@ public class LibProjectFragment extends RefreshFragment {
                 switch (menuBridge.getPosition()) {
                     case 0:
                         // run
-                        String path = "";
-                        if (item.getCat().equals("script")) {
-                            path = SCRIPT_DIR + dataList.get(menuBridge.getAdapterPosition()).getSmodule();
-                        } else if (item.getCat().equals("user")) {
-                            path = PROJECT_DIR + dataList.get(menuBridge.getAdapterPosition()).getSmodule();
+                        String path = item.getSmodule();
+                        switch (item.getLinkExt()) {
+                            case "py":
+                                path = SCRIPT_DIR + path;
+                                ScriptExec.getInstance().playScript(getContext(), path, "");
+                                break;
+                            case "ipynb":
+                                path = NOTEBOOK_DIR + path;
+                                AppListActivity.openNotebook(getContext(),path);
+                                break;
+                            case "zip":
+                                path = PROJECT_DIR + path;
+                                ScriptExec.getInstance().playProject(getContext(), path,"");
+                                break;
                         }
-                        ScriptExec.getInstance().playScript(getContext(), path, "");
                         break;
                     case 1:
                         // detail

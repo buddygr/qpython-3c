@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="course_page"
+    >
+
+    <PreferenceCategory
+        android:key="@string/course"
+        android:title="@string/course"/>
+
+    <Preference
+        android:layout_height="wrap_content"
+        android:key="course_official"
+        android:summary="@string/url_course_simple"
+        android:title="@string/course_official" />
+
+    <Preference
+        android:key="video_account"
+        android:title="@string/video_account_wechat"
+        android:summary="@string/wechat_com"/>
+
+    <Preference
+        android:layout_height="wrap_content"
+        android:key="news"
+        android:summary="@string/news_page_simple"
+        android:title="@string/news" />
+
+    <Preference
+        android:layout_height="wrap_content"
+        android:key="open_source_library"
+        android:summary="@string/bili_com"
+        android:title="@string/open_source_library_bili" />
+
+</PreferenceScreen>

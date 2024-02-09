@@ -27,9 +27,9 @@ public class QSL4APP extends MyApp implements InterpreterConfiguration.Configura
 //        //return new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.app_url)));
 //    }
     protected InterpreterConfiguration mConfiguration;
-    Map<String, Integer> movieDirs = null;
     private volatile boolean receivedConfigUpdate = false;
     private TriggerRepository mTriggerRepository;
+    public static QSL4APP THIS;
 
     protected QSL4APP() {
         super();
@@ -39,19 +39,20 @@ public class QSL4APP extends MyApp implements InterpreterConfiguration.Configura
     @Override
     public void onCreate() {
         super.onCreate();
+        THIS = this;
+        //注册crashHandler类
+        //int xq = 30;
+    }
 
+    public void initQSL4APP(){
         mConfiguration = new InterpreterConfiguration(this);
         mConfiguration.registerObserver(this);
         mConfiguration.startDiscovering(InterpreterConstants.MIME + QSL4AScript.getFileExtension(this));
-
-        //注册crashHandler类
-        //int xq = 30;
     }
 
     public FutureActivityTaskExecutor getTaskExecutor() {
         return mTaskExecutor;
     }
-
 
     public InterpreterConfiguration getInterpreterConfiguration() {
         return mConfiguration;
@@ -60,7 +61,6 @@ public class QSL4APP extends MyApp implements InterpreterConfiguration.Configura
     public TriggerRepository getTriggerRepository() {
         return mTriggerRepository;
     }
-
 
     @Override
     public void onConfigurationChanged() {

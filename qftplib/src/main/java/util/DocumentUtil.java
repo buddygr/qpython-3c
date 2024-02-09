@@ -67,14 +67,13 @@ public class DocumentUtil {
      *
      * @return A list of external SD card paths.
      */
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     private static String[] getExtSdCardPaths(Context context) {
         if (sExtSdCardPaths.size() > 0) {
             return sExtSdCardPaths.toArray(new String[0]);
         }
         for (File file : context.getExternalFilesDirs("external")) {
             if (file != null && !file.equals(context.getExternalFilesDir("external"))) {
-                int index = file.getAbsolutePath().lastIndexOf("/Android/data");
+                int index = file.getAbsolutePath().indexOf("/Android/data");
                 if (index < 0) {
                     Log.d(TAG, "Unexpected external file dir: " + file.getAbsolutePath());
                 } else {
@@ -88,7 +87,7 @@ public class DocumentUtil {
                 }
             }
         }
-        if (sExtSdCardPaths.isEmpty()) sExtSdCardPaths.add(SDCARD);
+        if (sExtSdCardPaths.isEmpty()) return new String[0];//{SDCARD};
         return sExtSdCardPaths.toArray(new String[0]);
     }
 
@@ -100,7 +99,6 @@ public class DocumentUtil {
      * card. Otherwise,
      * null is returned.
      */
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     private static String getExtSdCardFolder(final File file, Context context) {
         String[] extSdPaths = getExtSdCardPaths(context);
         try {
@@ -121,7 +119,6 @@ public class DocumentUtil {
      * @param file The file.
      * @return true if on external sd card.
      */
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     public static boolean isOnExtSdCard(final File file, Context c) {
         return getExtSdCardFolder(file, c) != null;
     }
@@ -513,8 +510,8 @@ public class DocumentUtil {
 
         public static void storageShowOpenAll (Activity context) {
         for (String rootPath:getExtSdCardPaths(context)){
-            if(SDCARD.equals(rootPath))
-                return;
+            //if(SDCARD.equals(rootPath))
+                //return;
             storageShowOpen(rootPath,context);
         }
 }}

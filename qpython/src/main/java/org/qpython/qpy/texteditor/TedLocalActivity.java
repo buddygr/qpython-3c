@@ -279,38 +279,6 @@ public class TedLocalActivity extends AppCompatActivity {
         }
     }
 
-//    public void deleteCloudFile(String path) {
-//        if (firstPageFragment instanceof ExplorerFragment) {
-//            ((ExplorerFragment) firstPageFragment).deleteCloudedMap(path);
-//        }
-//    }
-//
-//    public void updateCloudFiles(List<CloudFile> cloudFiles) {
-//        Map<String, Boolean> map = new HashMap<>();
-//        for (CloudFile cloudFile : cloudFiles) {
-//            if (cloudFile.getPath().contains("/projects/")) {
-//                map.put(QPyConstants.ABSOLUTE_PATH + "/projects/" + cloudFile.getProjectName(), true);
-//            }
-//            map.put(QPyConstants.ABSOLUTE_PATH + cloudFile.getPath(), true);
-//        }
-//        ((ExplorerFragment) firstPageFragment).updateCloudedFiles(map);
-//    }
-//
-//    public void setNewUpload() {
-//        isNewUpload = true;
-//    }
-//
-//    /**
-//     * 保存云端文件目录到本地
-//     */
-//    public void locatedCloud(List<CloudFile> cloudFiles) {
-//        if (cloudFiles.size() > 0) {
-//            Type type = new TypeToken<List<CloudFile>>() {
-//            }.getType();
-//            FileHelper.writeToFile(CONF.CLOUD_MAP_CACHE_PATH, App.getGson().toJson(cloudFiles, type));
-//        }
-//    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();

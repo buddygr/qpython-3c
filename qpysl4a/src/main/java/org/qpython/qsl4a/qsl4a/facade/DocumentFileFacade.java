@@ -48,7 +48,7 @@ public class DocumentFileFacade extends RpcReceiver {
             @RpcParameter(name = "rootPath") String rootPath
     ) throws Exception {
         File file = (new File(rootPath)).getCanonicalFile();
-    if(file.canWrite() || file.getAbsolutePath().equals(Environment.getExternalStorageDirectory().getAbsolutePath()))
+        if(file.canWrite() || file.getAbsolutePath().equals(Environment.getExternalStorageDirectory().getAbsolutePath()))
             return Uri.fromFile(file);
         rootPath = file.getAbsolutePath();
         if(rootPath.startsWith(DocumentUtil.ANDROID_PATH))

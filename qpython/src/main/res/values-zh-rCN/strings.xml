@@ -534,4 +534,9 @@
     <string name="initial_qpython">初始化QPython，请勿操作！</string>
     <string name="umeng">允许QPython发送友盟用户统计信息？</string>
     <string name="selected">精选</string>
+
+    <string name="url_course">https://edu.qpython.org/courses-cn.html</string>
+    <string name="news">新闻</string>
+    <string name="news_page">https://weibo.com/qpython</string>
+    <string name="news_page_simple">weibo.com</string>
 </resources>

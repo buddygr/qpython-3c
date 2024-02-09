@@ -31,6 +31,7 @@ import org.qpython.qpy.main.activity.HomeMainActivity;
 import org.qpython.qpy.main.app.App;
 import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpysdk.QPySDK;
+import org.qpython.qsl4a.QSL4APP;
 import org.qpython.qsl4a.qsl4a.util.PermissionUtil;
 
 import java.io.File;
@@ -81,15 +82,16 @@ public class QPyExtFragment extends Fragment {
 
     }
 
-    private static void checkOtherPermission() throws Exception {
+    private static void checkOtherPermission(){
         //List<String> unPermissionList = new ArrayList<String>();
         PackageManager pm = activity.getPackageManager();
         PackageInfo info;
         //String[] packagePermissions;
-
-        info = pm.getPackageInfo(activity.getPackageName(), PackageManager.GET_PERMISSIONS);
-        //packagePermissions = info.requestedPermissions;
-        PermissionUtil.checkPermission(info.requestedPermissions);
+        try {
+            info = pm.getPackageInfo(activity.getPackageName(), PackageManager.GET_PERMISSIONS);
+            //packagePermissions = info.requestedPermissions;
+            PermissionUtil.checkPermission(info.requestedPermissions);
+        } catch (Exception ignored){}
         if (!Settings.canDrawOverlays(activity))
             activity.startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + activity.getPackageName())),100);
     }
@@ -116,11 +118,7 @@ public class QPyExtFragment extends Fragment {
                 .show();*/
         TermActivity.startShell(activity,"setup");
         long t2 = SystemClock.elapsedRealtimeNanos();
-        try {
-            checkOtherPermission();
-        } catch (Exception e) {
-            Toast.makeText(activity,e.toString(),Toast.LENGTH_LONG).show();
-        }
+        checkOtherPermission();
         int t = (int) Math.round((t2-t1)*0.001);
         File f = new File(filesDir+"/resource.version");
         final boolean[] exist = {false};
@@ -218,6 +216,7 @@ public class QPyExtFragment extends Fragment {
             initQPy();
         }
         App.initUmeng(activity);
+        App.THIS.initQSL4APP();
     }
 
     private static void QpySdkAgree(){

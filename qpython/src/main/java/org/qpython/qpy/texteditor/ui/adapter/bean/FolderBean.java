@@ -7,6 +7,7 @@ import java.io.File;
 /**
  * To store path list's item data
  * Created by Hmei on 2017-05-11.
+ *  * Edit by 乘着船 at 2022
  */
 
 public class FolderBean {

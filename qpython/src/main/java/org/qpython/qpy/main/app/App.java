@@ -142,16 +142,6 @@ public class App extends QSL4APP {
         Map<String, String> header = new HashMap<>();
         TokenManager.init(this);
         header.put("Content-Type", "application/json");
-//        if (!TextUtils.isEmpty(TokenManager.getToken())) {
-//            header.put("HTTP_TOKEN", TokenManager.getToken());
-//        }
-        Retrofitor
-                .getInstance()
-                .setTimeOut(Retrofitor.DEFAULT_TIMEOUT)
-//                .openDebug(BuildConfig.DEBUG)
-  //              .supportSSL(!BuildConfig.DEBUG)
-                .addHeaders(header)
-                .init(Api.BASE_URL);
     }
 
     public static void initUmeng(Activity activity) {

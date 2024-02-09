@@ -39,8 +39,8 @@
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="#00ff00"
-                    android:text="2023"
-                    tools:ignore="HardcodedText" />
+                    android:text="@string/qpython_year"
+                    />
 
             </LinearLayout>
 
@@ -96,7 +96,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/can_long_press"
-                        android:textSize="11sp"
                         android:textColor="#FF7F7F" />
                 </LinearLayout>
 
@@ -200,8 +199,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/feed_contribute"
-                        android:textSize="11sp"
+                        android:text="@string/download"
                         android:textColor="#FF7F7F" />
                 </LinearLayout>
 
@@ -213,6 +211,25 @@
                 android:layout_weight="1"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/ll_course"
+                    style="@style/row_ll">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_home_course"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:lines="1"
+                        android:ellipsize="end"
+                        android:layout_marginTop="@dimen/icon_margin_top"
+                        android:text="@string/course"
+                        android:textColor="#FFF"/>
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/ll_setting"
@@ -247,24 +264,6 @@
                         android:text="@string/screen_record"
                         android:textColor="#FFF" / -->
                 </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/ll_community"
-                    style="@style/grid_item">
-
-                    <!--ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_home_club"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/icon_margin_top"
-                        android:text="@string/community"
-                        android:textColor="#FFF"/-->
-                </LinearLayout>
-
 
             </LinearLayout>
         </LinearLayout>

@@ -854,7 +854,7 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
             return;
         }
 
-        if (!FileUtil.delete(path)) {
+        if (new File(path).exists() && !FileUtil.delete(path)) {
             Crouton.showText(this, R.string.toast_save_delete, Style.ALERT);
 
             return;
@@ -945,7 +945,7 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
                 .setTitle(getString(R.string.new_script))
                 .setExt(".py")
                 .setConfirmListener(name -> {
-                    File file = new File(CONF.SCOPE_STORAGE_PATH + "/" + QPyConstants.DFROM_QPY3 + "/" + name);
+                    File file = new File(CONF.SCOPE_STORAGE_PATH + "/" + QPyConstants.DFROM_SCR3 + "/" + name);
                     if (file.exists()) {
                         Crouton.showText(this, R.string.file_exists, Style.ALERT);
 

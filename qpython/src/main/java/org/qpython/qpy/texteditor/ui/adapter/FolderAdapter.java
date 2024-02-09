@@ -41,7 +41,7 @@ public class FolderAdapter extends RecyclerView.Adapter<MyViewHolder<ItemFolderB
         if (showPath) {
             binding.tvPath.setVisibility(View.VISIBLE);
             if (item.getPath().contains("/qpython")) {
-                binding.tvPath.setText(item.getPath().substring(item.getPath().indexOf("/qpython"), item.getPath().length()));
+                binding.tvPath.setText(item.getPath().substring(item.getPath().indexOf("/qpython")));
             } else {
                 binding.tvPath.setText(item.getPath());
             }

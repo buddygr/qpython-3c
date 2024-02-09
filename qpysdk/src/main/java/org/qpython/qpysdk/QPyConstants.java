@@ -23,11 +23,12 @@ public interface QPyConstants extends BASE_CONF {
     //String PY_CACHE    = ".qpyc";
 
    // String DFROM_QPY2 = "scripts";
-    String DFROM_QPY3 = "scripts3";
+    String DFROM_SCR3 = "scripts3";
    // String DFROM_PRJ2 = "projects";
     String DFROM_PRJ3 = "projects3";
+    String DFROM_NOTE = "notebooks";
 
-    String KEY_PY3_RES = "setting.py3resource.path";
+    //String KEY_PY3_RES = "setting.py3resource.path";
     //String KEY_NOTEBOOK_RES = "setting.notebook3sresource.path";
     //String KEY_NOTEBOOK2_RES = "setting.notebook2resource.path";
 

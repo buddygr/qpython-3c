@@ -54,7 +54,6 @@ import android.view.SurfaceView;
 import android.view.WindowManager;
 
 import org.qpython.qsl4a.QSL4APP;
-import org.qpython.qsl4a.R;
 import org.qpython.qsl4a.qsl4a.future.FutureActivityTaskExecutor;
 import org.qpython.qsl4a.qsl4a.future.FutureActivityTask;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
@@ -69,7 +68,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -107,6 +105,7 @@ public class MediaRecorderFacade extends RpcReceiver {
   public static CountDownLatch countDownLatch;
   AudioRecord mAudioRecord;
   boolean isGetVoiceRun;
+  boolean soundDbMedia;
   final Object mLock;
   final double[] volume = {-255};
 
@@ -535,7 +534,7 @@ public class MediaRecorderFacade extends RpcReceiver {
   }
 
   @Rpc(description = "Recorder Sound Volumn Detect .")
-  public void recorderSoundVolumeDetect(
+  public boolean recorderSoundVolumeDetect(
           //interval > 0 --> start to detect sound volume decibel according to the time interval
           //interval <= 0 --> stop to detect sound volume decibel
           @RpcParameter(name = "interval") @RpcDefault("100") Integer interval
@@ -548,22 +547,19 @@ public class MediaRecorderFacade extends RpcReceiver {
       mAudioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,
               SAMPLE_RATE_IN_HZ, AudioFormat.CHANNEL_IN_DEFAULT,
               AudioFormat.ENCODING_PCM_16BIT, BUFFER_SIZE);
+        try {
+          mAudioRecord.startRecording();
+          soundDbMedia = false;
+        } catch (Exception e){
+          soundDbMedia = true;
+        }
       isGetVoiceRun = true;
 
       new Thread(() -> {
-        mAudioRecord.startRecording();
-        short[] buffer = new short[BUFFER_SIZE];
         while (isGetVoiceRun) {
-          //r是实际读取的数据长度，一般而言r会小于buffersize
-          int r = mAudioRecord.read(buffer, 0, BUFFER_SIZE);
-          long v = 0;
-          // 将 buffer 内容取出，进行平方和运算
-          for (short value : buffer) {
-            v += value * value;
-          }
-          // 平方和除以数据总长度，得到音量大小。
-          double mean = v / (double) r;
-          volume[0] = 10 * Math.log10(mean);
+          if(soundDbMedia)
+            volume[0] = getMediaDb();
+          else volume[0] = getAudioDb();
           //每interval毫秒1次
           synchronized (mLock) {
             try {
@@ -573,15 +569,52 @@ public class MediaRecorderFacade extends RpcReceiver {
             }
           }
         }
-        mAudioRecord.stop();
-        mAudioRecord.release();
+        try {
+          mAudioRecord.stop();
+          mAudioRecord.release();
+        } catch (Exception ignored){}
         mAudioRecord = null;
         volume[0] = -255;
       }).start();
     } else {
         isGetVoiceRun = false;
       }
-  }
+      return soundDbMedia;
   }
 
+  private double getMediaDb(){
+    int am;
+    try {
+      am = mMediaRecorder.getMaxAmplitude();
+      if (am <= 0) {
+        mAudioRecord.startRecording();
+        return -128;
+      } else return 20 * Math.log10(am);
+    } catch (Exception e){
+      try {
+        mAudioRecord.startRecording();
+      } catch (Exception ignored){}
+        soundDbMedia = false;
+      return -127;
+    }
+  }
 
+  private double getAudioDb(){
+    short[] buffer = new short[BUFFER_SIZE];
+    //r是实际读取的数据长度，一般而言r会小于buffersize
+    int r = mAudioRecord.read(buffer, 0, BUFFER_SIZE);
+    long v = 0;
+    // 将 buffer 内容取出，进行平方和运算
+    for (short value : buffer) {
+      v += value * value;
+    }
+    if (v <= 0) {
+      soundDbMedia = true;
+      return -128;
+    } else {
+      // 平方和除以数据总长度，得到音量大小。
+      double mean = v / (double) r;
+      return 10 * Math.log10(mean);
+    }
+  }
+  }

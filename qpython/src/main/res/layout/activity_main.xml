@@ -30,7 +30,7 @@
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="#00ffff"
-                android:text="QPython "
+                android:text="QPython  "
                 tools:ignore="HardcodedText" />
 
                 <TextView
@@ -40,8 +40,8 @@
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="#00ff00"
-                    android:text=" 2023"
-                    tools:ignore="HardcodedText" />
+                    android:text="@string/qpython_year"
+                    />
 
             </LinearLayout>
         </RelativeLayout>
@@ -201,25 +201,6 @@
                         android:textColor="#FF7F7F" />
                 </LinearLayout>
 
-                <!--<LinearLayout-->
-                <!--android:id="@+id/ll_local_app"-->
-                <!--style="@style/row_ll">-->
-
-                <!--<ImageView-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:src="@drawable/ic_home_app"/>-->
-
-                <!--<TextView-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginTop="@dimen/icon_margin_top"-->
-                <!--android:text="@string/local_app"-->
-                <!--android:textColor="#FFF"/>-->
-                <!--</LinearLayout>-->
-
-
-
             </LinearLayout>
 
             <LinearLayout
@@ -228,6 +209,25 @@
                 android:layout_weight="1"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/ll_course"
+                    style="@style/row_ll">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_home_course"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:lines="1"
+                        android:ellipsize="end"
+                        android:layout_marginTop="@dimen/icon_margin_top"
+                        android:text="@string/course"
+                        android:textColor="#FFF"/>
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/ll_setting"
@@ -263,24 +263,6 @@
                         android:text="@string/screen_record"
                         android:textColor="#FFF" / -->
                 </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/ll_community"
-                    style="@style/row_ll">
-
-                    <!--ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_home_club"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/icon_margin_top"
-                        android:text="@string/community"
-                        android:textColor="#FFF"/-->
-                </LinearLayout>
-
 
             </LinearLayout>
         </LinearLayout>

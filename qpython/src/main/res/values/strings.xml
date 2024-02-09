@@ -384,7 +384,7 @@
     <string name="scan">Scan</string>
     <string name="read_script_from_qrcode">Read code from QRCode</string>
 
-    <string name="course">QPython Courses</string>
+    <string name="course">Courses</string>
     <string name="open_source_library_bili">Open Source Library (Bilibili)</string>
     <string name="lost_connect">Lose Connect</string>
     <string name="programs">Programs</string>
@@ -710,7 +710,6 @@
     <string name="ignore">Ignore</string>
     <string name="set">Set</string>
     <string name="course_official">Course Official</string>
-    <string name="edu_qpy_org">edu.qpython.org</string>
     <string name="video_account_wechat">Official Video Account (WeChat)</string>
     <string name="bili_com" translatable="false">bilibili.com</string>
     <string name="wechat_video_website" translatable="false">https://mp.weixin.qq.com/s/gWbEIxaux7BewTMNtRTKJw</string>
@@ -750,4 +749,10 @@
     <string name="initial_qpython">Initial QPython, DO NOT operate !</string>
     <string name="umeng">Allow QPython to send user statistics for UMeng ?</string>
     <string name="selected">Selected</string>
+    <string name="qpython_year" translatable="false">2024</string>
+    <string name="url_course">https://edu.qpython.org/courses.html</string>
+    <string name="url_course_simple" translatable="false">edu.qpython.org</string>
+    <string name="news">News</string>
+    <string name="news_page">https://twitter.com/qpython</string>
+    <string name="news_page_simple">twitter.com</string>
 </resources>

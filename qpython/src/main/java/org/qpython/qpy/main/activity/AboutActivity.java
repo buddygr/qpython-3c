@@ -22,6 +22,8 @@ import org.qpython.qpy.databinding.ActivityAboutBinding;
 import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.texteditor.androidlib.common.MiscUtils;
 
+import java.io.File;
+
 
 /**
  * About page
@@ -68,6 +70,16 @@ public class AboutActivity extends BaseActivity {
         startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(getString(resId))));
     }
 
+    private void viewWebSite2(int resId) {
+        Uri uri = Uri.parse(getString(resId));
+        Intent intent = new Intent();
+        intent.putExtra("src",uri);
+        intent.setClass(this,QWebViewActivity.class);
+        intent.setDataAndType(uri, "text/html");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+        startActivity(intent);
+    }
+
     private void initListener() {
 
         binding.tvPrivacy.setOnClickListener(v -> {
@@ -87,7 +99,7 @@ public class AboutActivity extends BaseActivity {
         });
 
         binding.tvBackupDownload.setOnClickListener(v ->
-            viewWebSite(R.string.backup_down_addr)
+            viewWebSite2(R.string.backup_down_addr)
         );
 
         String[] words = new String[]{"github", "gitee"};

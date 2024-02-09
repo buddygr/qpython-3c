@@ -18,7 +18,6 @@ import android.text.Spanned;
 import android.widget.Toast;
 
 import com.quseit.util.FileHelper;
-import com.quseit.util.NUtil;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
@@ -27,12 +26,11 @@ import org.qpython.qpy.R;
 import org.qpython.qpy.console.ScriptExec;
 import org.qpython.qpy.console.TermActivity;
 import org.qpython.qpy.databinding.ActivityMainBinding;
-import org.qpython.qpy.main.app.App;
 import org.qpython.qpy.main.app.CONF;
+import org.qpython.qpy.main.auxActivity.CourseActivity;
 import org.qpython.qpy.main.auxActivity.ProtectActivity;
 import org.qpython.qpy.main.auxActivity.ScreenRecordActivity;
 import org.qpython.qpy.main.fragment.QPyExtFragment;
-import org.qpython.qpy.main.model.QPyScriptModel;
 import org.qpython.qpy.main.utils.Bus;
 import org.qpython.qpy.texteditor.EditorActivity;
 import org.qpython.qpy.texteditor.TedLocalActivity;
@@ -172,6 +170,9 @@ public class HomeMainActivity extends BaseActivity {
         });
         binding.about.setOnClickListener(v -> {
             AboutActivity.start(this);
+        });
+        binding.llCourse.setOnClickListener(v -> {
+            CourseActivity.startActivity(this);
         });
         binding.llSetting.setOnClickListener(v -> {
             SettingActivity.startActivity(this);

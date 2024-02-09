@@ -200,21 +200,6 @@ public class MyProjectFragment extends Fragment {
                     // delete
                     scriptList.get(menuBridge.getAdapterPosition()).setUploading(true);
                     adapter.notifyItemChanged(menuBridge.getAdapterPosition());
-                    // TODO: 2017/12/4 删除上传的脚本文件
-//                    ShareCodeUtil.getInstance().deleteUploadScript(scriptList.get(menuBridge.getAdapterPosition()), new LeancloudStorage.SaveFileCallback() {
-//                        @Override
-//                        public void onSuccess(int code) {
-//                            Toast.makeText(getContext(), R.string.delete_remote_suc, Toast.LENGTH_SHORT).show();
-//                            adapter.notifyItemRemoved(menuBridge.getAdapterPosition());
-//                            ((TedLocalActivity) getActivity()).deleteCloudFile(scriptList.get(menuBridge.getAdapterPosition()).getAbsolutePath());
-//                            scriptList.remove(menuBridge.getAdapterPosition());
-//                        }
-//
-//                        @Override
-//                        public void onFail(String msg) {
-//                            Toast.makeText(getContext(), "删除出错", Toast.LENGTH_SHORT).show();
-//                        }
-//                    });
                     break;
             }
         });
@@ -225,34 +210,6 @@ public class MyProjectFragment extends Fragment {
     private void writeFile(File file, CloudFile cloudFile, int adapterPosition) {
         cloudFile.setUploading(true);
         adapter.notifyDataSetChanged();
-//        ShareCodeUtil.getInstance().downloadFile(cloudFile.getFileObject().getFileId(), new LeancloudStorage.DownloadCallback() {
-//            @Override
-//            public void onSuccess(String content) {
-//                try {
-//                    FileWriter writer = new FileWriter(file, false);
-//                    writer.write(content);
-//                    writer.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                    cloudFile.setUploading(false);
-//                    adapter.notifyDataSetChanged();
-//                    Toast.makeText(getContext(), R.string.override_fail_hint, Toast.LENGTH_SHORT).show();
-//                }
-//                Toast.makeText(getContext(), R.string.file_downloaded, Toast.LENGTH_SHORT).show();
-//                cloudFile.setUploading(false);
-//                adapter.notifyItemChanged(adapterPosition);
-//            }
-//
-//            @Override
-//            public void onFail(String msg) {
-//
-//            }
-//
-//            @Override
-//            public void onProgress(int progress) {
-//
-//            }
-//        });
     }
 
     public void needRefresh(boolean isNewUpload) {

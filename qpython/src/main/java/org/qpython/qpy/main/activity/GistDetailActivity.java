@@ -21,6 +21,7 @@ import org.qpython.qpy.databinding.ActivityNewsDetailBinding;
 import org.qpython.qpy.main.adapter.NewsDetailAdapter;
 import org.qpython.qpy.main.app.App;
 import org.qpython.qpy.main.listener.LoadmoreListener;
+import org.qpython.qpy.main.server.gist.Api;
 import org.qpython.qpy.main.server.gist.GistEvent;
 import org.qpython.qpy.main.server.gist.detailScreen.DetailControler;
 import org.qpython.qpy.main.server.gist.detailScreen.DetailView;
@@ -148,7 +149,7 @@ public class GistDetailActivity extends BaseActivity implements DetailView {
                     break;
                 }
                 case ShareDialog.COPY_LINK: {
-                    OpenWebUtil.open(this, "http://gist.qpython.org/share/"+getIntent().getStringExtra(GIST_ID));
+                    //OpenWebUtil.open(this, Api.BASE_URL+"/share/"+getIntent().getStringExtra(GIST_ID));
                     break;
                 }
             }

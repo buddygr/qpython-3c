@@ -149,7 +149,7 @@ public class AppListActivity extends BaseActivity implements LoaderManager.Loade
 
     private void getScriptList(String path) {
         try {
-            File[] files = FileHelper.getPyFiles(new File(path + "/" + QPyConstants.DFROM_QPY3));
+            File[] files = FileHelper.getPyFiles(new File(path + "/" + QPyConstants.DFROM_SCR3));
             if (files!=null && files.length > 0) {
                 Arrays.sort(files, FolderUtils.sortByName);
                 for (File file : files) {

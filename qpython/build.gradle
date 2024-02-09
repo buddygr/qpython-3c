@@ -13,8 +13,8 @@ android {
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 378
-        versionName "3.7.8"
+        versionCode 379
+        versionName "3.7.9"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
 
@@ -180,4 +180,4 @@ dependencies {
     implementation  'com.umeng.umsdk:asms:1.8.0'// 必选
 }
 
-apply plugin: 'com.google.gms.google-services'
+//apply plugin: 'com.google.gms.google-services'

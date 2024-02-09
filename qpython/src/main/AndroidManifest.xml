@@ -14,7 +14,6 @@
     <uses-permission android:name="android.permission.FLASHLIGHT"/>
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT" />
-    <uses-permission android:name="com.android.vending.BILLING"/>
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
     <uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT" />
     <uses-permission android:name="android.permission.INSTALL_SHORTCUT" />
@@ -26,6 +25,9 @@
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS"/>
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permision.MEDIA_PROJECTION"/>
@@ -143,6 +145,7 @@
 
         <activity
             android:name="org.qpython.qpy.main.activity.HomeMainActivity"
+            android:exported="true"
             android:launchMode="singleTask">
             <meta-data
                 android:name="android.app.shortcuts"
@@ -186,6 +189,10 @@
         <activity android:name=".main.activity.CodeShareActivity"/>
         <activity
             android:name="org.qpython.qpy.main.activity.SettingActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/AppTheme"/>
+        <activity
+            android:name="org.qpython.qpy.main.auxActivity.CourseActivity"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme"/>
         <activity
