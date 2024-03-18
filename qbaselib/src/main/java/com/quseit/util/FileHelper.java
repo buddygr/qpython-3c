@@ -4,27 +4,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
-import android.util.*;
-import android.util.Log;
 import android.webkit.MimeTypeMap;
-import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -144,27 +136,6 @@ public class FileHelper {
             iox.printStackTrace();
         }
 
-    }
-
-    public static String getFileContentsFromAssets(Context context, String filename) {
-        String content = ""; //结果字符串
-        try {
-            java.io.InputStream is = context.getResources().getAssets().open(filename); //打开文件
-            int ch = 0;
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(); //实现了一个输出流
-            while ((ch = is.read()) != -1) {
-                baos.write(ch); //将指定的字节写入此 byte 数组输出流
-            }
-            byte[] buff = baos.toByteArray();//以byte 数组的形式返回此输出流的当前内容
-            baos.close(); //关闭流
-            is.close(); //关闭流
-            content = new String(buff, "UTF-8"); //设置字符串编码
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            //Log.d(TAG, "getFileContentsFromAssets:"+e.getMessage());
-        }
-        return content;
     }
 
     public static String getFileContents(String filename, int pos) {
@@ -319,38 +290,6 @@ public class FileHelper {
         }
     }
 
-    /*public static File getBasePath(String subdir) throws IOException {
-        File basePath = new File(Environment.getExternalStorageDirectory(),
-                BASE_CONF.BASE_PATH);
-
-        if (!basePath.exists()) {
-            if (!basePath.mkdirs()) {
-                throw new IOException(String.format("%s cannot be created!",
-                        basePath.toString()));
-            }
-        }
-        File subPath = null;
-        if (!subdir.equals("")) {
-            subPath = new File(Environment.getExternalStorageDirectory(),
-                    BASE_CONF.BASE_PATH+"/"+subdir);
-            if (!subPath.exists()) {
-                if (!subPath.mkdirs()) {
-                    throw new IOException(String.format("%s cannot be created!",
-                            subPath.toString()));
-                }
-            }
-        }
-
-        if (!basePath.isDirectory()) {
-            throw new IOException(String.format("%s is not a directory!",
-                    basePath.toString()));
-        }
-        if (subdir.equals(""))
-            return basePath;
-        else
-            return subPath;
-    }
-    */
     public static File getABSPath(String subdir) throws IOException {
         File basePath = new File(subdir);
 
@@ -434,64 +373,6 @@ public class FileHelper {
 
     }
 
-
-    public static boolean getUrlAsFile(String link, String fileName) {
-        try {
-            // get URL content
-            URL url = new URL(link);
-            URLConnection conn = url.openConnection();
-
-            // open the stream and put it into BufferedReader
-            BufferedReader br = new BufferedReader(
-                    new InputStreamReader(conn.getInputStream()));
-
-            String inputLine;
-
-            //save to this filename
-            File file = new File(fileName);
-
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-
-            //use FileWriter to write file
-            FileWriter fw = new FileWriter(file.getAbsoluteFile());
-            BufferedWriter bw = new BufferedWriter(fw);
-
-            while ((inputLine = br.readLine()) != null) {
-                bw.write(inputLine + "\n");
-            }
-
-            bw.close();
-            br.close();
-
-            //System.out.println("Done");
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
-
-    }
-
-    /**
-     * @param dir
-     * @return The first file to be found in dir
-     */
-    public static File getFileByType(File dir) {
-        File[] files = dir.listFiles();
-        for (File file : files) {
-            if (file.isDirectory() && !file.getAbsolutePath().contains("/.")) {
-                getFileByType(file);
-            } else if (file.getName().equals("main.py")) {
-                return file;
-            } else if (file.getName().contains(".py")) {
-                return file;
-            }
-        }
-        return null;
-    }
-
     /**
      * @param dir
      * @return The main file to be found in dir
@@ -531,115 +412,5 @@ public class FileHelper {
         }
     }
 
-    public static void copyFile(File file, String outputPath) {
-        int BUFFER_SIZE = 4069;
-        try {
-            InputStream inputStream = new FileInputStream(file);
-            OutputStream outputStream = new FileOutputStream(outputPath);
 
-            byte[] buffer = new byte[BUFFER_SIZE];
-            int bytesRead;
-
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    public static void moveFile(File file, String outputPath) {
-        if (file.isDirectory()) {
-            for (File file1 : file.listFiles()) {
-                moveFile(file1, outputPath);
-            }
-            file.delete();
-        } else {
-            copyFile(file, outputPath + "/" + file.getName());
-            file.delete();
-        }
-    }
-
-    /**
-     * @param file root file
-     * @return all sub-file except dir file and hided file(start with '.')
-     */
-    public static List<File> filterDir(File file) {
-        List<File> files = new ArrayList<>();
-        File[] subFile = file.listFiles();
-        if (subFile != null) {
-            for (File file1 : subFile) {
-                if (!file1.isDirectory()) {
-                    files.add(file1);
-                } else if (!file1.getName().startsWith(".")) {
-                    files.addAll(filterDir(file1));
-                }
-            }
-        }
-        return files;
-    }
-
-
-
-    public static List<File> filterExt(File dir, String[] exts, int size) {
-        List<File> filtered = new ArrayList<>();
-        List<File> files = filterDir(dir);
-        for (File file : files) {
-            if (file.getName().startsWith(".")) {
-                continue;
-            }
-            String ext = "";
-            if (file.getName().lastIndexOf(".") > 0) {
-                ext = file.getName().substring(file.getName().lastIndexOf(".") + 1);
-            }
-            for (String s : exts) {
-                if (s.equals(ext)) {
-                    filtered.add(file);
-                    size += 1;
-                }
-            }
-        }
-        return filtered;
-    }
-
-    public static List<File> filterExt(File dir, String[] exts) {
-        List<File> filtered = new ArrayList<>();
-        List<File> files = filterDir(dir);
-        for (File file : files) {
-            if (file.getName().startsWith(".")) {
-                continue;
-            }
-            String ext = "";
-            if (file.getName().lastIndexOf(".") > 0) {
-                ext = file.getName().substring(file.getName().lastIndexOf(".") + 1);
-            }
-            for (String s : exts) {
-                if (s.equals(ext)) {
-                    filtered.add(file);
-                }
-            }
-        }
-        return filtered;
-    }
-
-    public static File findFile(File dir, String findName) {
-        File result = null;
-        if (dir.isDirectory()) {
-            for (File file : dir.listFiles()) {
-                if (file.isDirectory()) {
-                    File ret = findFile(file, findName);
-                    if (ret != null) {
-                        result = ret;
-                    }
-                } else {
-                    if (file.getName().equals(findName)) {
-                        result = file;
-                    }
-                }
-            }
-            return result;
-        } else {
-            return dir;
-        }
-    }
 }

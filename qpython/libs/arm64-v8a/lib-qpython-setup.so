@@ -50,9 +50,9 @@ i=$HOME/public.7z
 $j x $i -aoa -o$ANDROID_PUBLIC
 rm $i
 
-for i in $(ls $BIN)
+for i in $BIN $ANDROID_PUBLIC
 do
-chmod 777 $BIN/$i
+chmod -R 777 $i
 done
 
 python $HOME/setup.py

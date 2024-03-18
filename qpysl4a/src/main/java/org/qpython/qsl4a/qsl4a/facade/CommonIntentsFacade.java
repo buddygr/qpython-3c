@@ -54,6 +54,7 @@ public class CommonIntentsFacade extends RpcReceiver {
   private final AndroidFacade mAndroidFacade;
   private final Context context;
   private final String qpyProvider;
+  private final String qpyPrivate;
   private final Service mService;
 
 
@@ -62,6 +63,7 @@ public class CommonIntentsFacade extends RpcReceiver {
     mAndroidFacade = manager.getReceiver(AndroidFacade.class);
     context = mAndroidFacade.context;
     qpyProvider = mAndroidFacade.qpyProvider;
+    qpyPrivate = "/"+context.getPackageName()+"/";
     mService = mAndroidFacade.mService;
   }
 
@@ -208,8 +210,12 @@ public class CommonIntentsFacade extends RpcReceiver {
         if (extras == null)
             extras = new JSONObject();
         Intent intent;
-        if(path instanceof String)
-            intent = sendFile1((String) path,type,extras);
+        if(path instanceof String) {
+            String p = (String) path;
+            if(p.contains(qpyPrivate))
+                intent = sendFile1i(p, type, extras);
+            else intent = sendFile1(p, type, extras);
+        }
         else if(path instanceof JSONArray){
             JSONArray paths = (JSONArray) path;
              if (paths.length() > 0)
@@ -227,6 +233,17 @@ public class CommonIntentsFacade extends RpcReceiver {
         AndroidFacade.putExtrasFromJsonObject(extras,intent);
         if (!intent.hasExtra(Intent.EXTRA_STREAM)) {
             intent.putExtra(Intent.EXTRA_STREAM, getMediaUri(path,type));
+        }
+        return intent;
+    }
+
+    private Intent sendFile1i(String path, String type, JSONObject extras) throws Exception {
+        // One File
+        Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+        intent.setType(getPathType(path,type));
+        AndroidFacade.putExtrasFromJsonObject(extras,intent);
+        if (!intent.hasExtra(Intent.EXTRA_STREAM)) {
+            intent.putExtra(Intent.EXTRA_STREAM, getPathUri(path));
         }
         return intent;
     }

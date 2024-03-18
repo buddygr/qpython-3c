@@ -15,7 +15,6 @@ import android.support.v4.util.ArrayMap;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.quseit.util.NAction;
 import com.quseit.util.StringUtils;
@@ -58,11 +57,35 @@ public class ScriptExec {
     private InputStream  mIn;
     private OutputStream mOut;
     private String logFile = CONF.ABSOLUTE_LOG;
+    private static ScriptExec INSTANCE;
 
-    private ScriptExec() {  }
+    private ScriptExec() {
+    }
 
     public static ScriptExec getInstance() {
-        return ScriptExecHolder.INSTANCE;
+        return INSTANCE;
+    }
+
+    public static void setInstance(Context context){
+        if(INSTANCE==null){
+            CONF.PREF = PreferenceManager.getDefaultSharedPreferences(context);
+            INSTANCE = new ScriptExec();
+    }}
+
+    public static void play(Context context, String script, String arg){
+        INSTANCE.playScript(context,script,arg);
+    }
+
+    public static void play(Context context, String script){
+        INSTANCE.playScript(context,script,null);
+    }
+
+    public static void playPro(Context context, String project,String args){
+        INSTANCE.playProject(context,project,args);
+    }
+
+    public static void playPro(Context context, String project){
+        INSTANCE.playProject(context,project,null);
     }
 
     public void playScript(Context context, String script, String arg) {
@@ -83,8 +106,7 @@ public class ScriptExec {
 
         } else {
 
-            context.startService(new Intent(context, QPyScriptService.class));
-            Toast.makeText(context, R.string.sl4a_start, Toast.LENGTH_SHORT).show();
+            QPyScriptService.startToast(context);
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
@@ -94,17 +116,6 @@ public class ScriptExec {
 
         }
     }
-
-    /*
-        Play project Without args
-     */
-    public void playProject(Context context, String project) {
-        playProject(context, project, null);
-    }
-
-    /*
-        Play project with args
-     */
 
     public void playProject(Context context, String project, String args) {
         Log.d(TAG, "playProject:" + project);
@@ -131,7 +142,7 @@ public class ScriptExec {
 
     public String[] getPyEnv(Context context, String path, String term, String pyPath) {
         String pyVer = CONF.pyVer;
-        File filesDir = context.getFilesDir();
+        String filesDir = CONF.filesDir;
         File externalStorage = new File(CONF.SCOPE_STORAGE_PATH);
         File externalLegacyStorage = new File(QPyConstants.LEGACY_PATH);
         boolean needCustom = !CONF.CUSTOM_PATH.equals(CONF.LEGACY_PATH);
@@ -140,7 +151,7 @@ public class ScriptExec {
         String[] env = new String[24 + (needCustom?1:0)];
 
         env[0] = "TERM=" + term;
-        env[1] = "PATH=" + CONF.filesDir+"/bin"+":"+path;
+        env[1] = "PATH=" + filesDir+"/bin"+":"+path;
 
         env[2] = "LD_LIBRARY_PATH=.:" + filesDir + "/lib/" + ":" + filesDir + "/";
 
@@ -149,7 +160,7 @@ public class ScriptExec {
 
         if (!externalStorage.exists()) externalStorage.mkdir();
 
-            env[5] = "PYTHONPATH="
+        env[5] = "PYTHONPATH="
                     +commDir+":"
                     +commDir+"lib-dynload/:"
                     +commDir+"site-packages/:"
@@ -473,10 +484,6 @@ public class ScriptExec {
         void onGrant();
 
         void onDeny();
-    }
-
-    private static class ScriptExecHolder {
-        private static final ScriptExec INSTANCE = new ScriptExec();
     }
 
     public static class LogDialog {

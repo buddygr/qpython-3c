@@ -111,7 +111,7 @@ public class LibActivity extends AppCompatActivity {
     }
 
     private void initTabs() {
-        binding.tabs.addTab(binding.tabs.newTab().setText(R.string.selected));
+        binding.tabs.addTab(binding.tabs.newTab().setText(R.string.tools));
         binding.tabs.addTab(binding.tabs.newTab().setText(R.string.qpypi));
         binding.tabs.addTab(binding.tabs.newTab().setText(R.string.aipy));
         binding.tabs.setTabGravity(TabLayout.GRAVITY_FILL);

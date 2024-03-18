@@ -160,7 +160,7 @@ public class FloatViewActivity extends Activity
                             if(script!=null){
                                 //脚本参数
                                 //final String arg = getArg(args,"arg");
-                                ScriptExec.getInstance().playScript(FloatViewActivity.this,
+                                ScriptExec.play(FloatViewActivity.this,
                                         script, getArg(args,"arg"));
                             }
                             if (clickRemove)

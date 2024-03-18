@@ -29,6 +29,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.quseit.util.StringUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.qpython.qsl4a.QSL4APP;
@@ -799,7 +801,7 @@ public class UiFacade extends RpcReceiver {
       if (!_path.exists()) {
         _path.mkdirs();
       }
-      path += new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date()) + ".jpg";//图片命名
+      path += StringUtils.getDateStr() + ".jpg";//图片命名
     }
     Bitmap bmp = mFullScreenTask.getScreenShot();
     bmp.compress(Bitmap.CompressFormat.JPEG,100,new FileOutputStream(path));

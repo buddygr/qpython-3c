@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import org.qpython.qpy.R;
+import org.qpython.qpy.console.ScriptExec;
 import org.qpython.qsl4a.QPyScriptService;
 
 import java.util.Timer;
@@ -30,7 +31,8 @@ public class SplashActivity extends AppCompatActivity {
             }
         },delay);
         setTaskDescription(new ActivityManager.TaskDescription(getString(R.string.main_window)));
-        startService( new Intent(this, QPyScriptService.class) );
+        QPyScriptService.start(this);
+        //ScriptExec.setInstance(this);
         delay = 100;
     }
 

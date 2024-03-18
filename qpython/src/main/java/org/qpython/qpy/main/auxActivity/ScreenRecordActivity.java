@@ -25,6 +25,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.quseit.util.StringUtils;
+
 import org.qpython.qpy.R;
 import org.qpython.qsl4a.qsl4a.facade.MediaRecorderFacade;
 import org.qpython.qsl4a.qsl4a.util.PermissionUtil;
@@ -172,6 +174,10 @@ public class ScreenRecordActivity extends Activity {
 
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent PermissionIntent) {
+    if(PermissionIntent == null) {
+      finish();
+      return;
+    }
     permissionResultCode = resultCode;
     permissionIntent = PermissionIntent;
     permissionIntent.putExtra("RESULT_CODE",resultCode);
@@ -196,7 +202,7 @@ public class ScreenRecordActivity extends Activity {
     if (!_path.exists()) {
       _path.mkdirs();
     }
-    path += new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date()) + ".mp4";//视频命名
+    path += StringUtils.getDateStr() + ".mp4";//视频命名
     int screenWidth, screenHeight;
     if (rotation) {
       screenHeight = dm.widthPixels;

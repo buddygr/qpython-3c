@@ -93,12 +93,12 @@ public class AppListActivity extends BaseActivity implements LoaderManager.Loade
         adapter.setCallback(new AppListAdapter.Callback() {
             @Override
             public void runScript(QPyScriptModel item) {
-                ScriptExec.getInstance().playScript(AppListActivity.this, item.getPath(), null);
+                ScriptExec.play(AppListActivity.this, item.getPath());
             }
 
             @Override
             public void runProject(QPyScriptModel item) {
-                ScriptExec.getInstance().playProject(AppListActivity.this, item.getPath());
+                ScriptExec.playPro(AppListActivity.this, item.getPath());
             }
 
             @Override
@@ -289,15 +289,14 @@ public class AppListActivity extends BaseActivity implements LoaderManager.Loade
 
     public static void openNotebook(Context context,File file){
         if(JsonRpcServer.isServiceRunning()) {
-        File qcnb = new File(CONF.filesDir,"bin/quick_notebook.py");
+        File qcnb = new File(CONF.binDir,"NoteBook.py");
         boolean notebookInstall = qcnb.exists();
         if(notebookInstall)
-            ScriptExec.getInstance().playQScript(context,qcnb.getAbsolutePath(),file.getAbsolutePath());
+            ScriptExec.getInstance().playQScript(context,qcnb.getAbsolutePath(),"'"+file.getAbsolutePath()+"'");
         else
             EditorActivity.start(context, Uri.fromFile(file));
     } else {
-            context.startService(new Intent(context, QPyScriptService.class));
-            Toast.makeText(context, R.string.sl4a_start, Toast.LENGTH_SHORT).show();
+            QPyScriptService.startToast(context);
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {

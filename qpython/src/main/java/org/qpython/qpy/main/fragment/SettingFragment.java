@@ -3,7 +3,6 @@ package org.qpython.qpy.main.fragment;
 import static org.qpython.qpy.main.app.CONF.pyVer;
 
 import android.annotation.SuppressLint;
-import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -33,16 +32,15 @@ import com.quseit.util.NStorage;
 
 import org.qpython.qpy.R;
 import org.qpython.qpy.main.activity.HomeMainActivity;
-import org.qpython.qpy.main.app.App;
 import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.main.auxActivity.ProtectActivity;
 import org.qpython.qpy.main.auxActivity.ScreenRecordActivity;
 import org.qpython.qpy.main.service.FTPServerService;
 import org.qpython.qpy.texteditor.ui.view.EnterDialog;
-import org.qpython.qpysdk.QPySDK;
 import org.qpython.qpysdk.utils.Utils;
 import org.qpython.qsl4a.QPyScriptService;
 import org.qpython.qsl4a.qsl4a.jsonrpc.JsonRpcServer;
+import org.qpython.qsl4a.qsl4a.util.PermissionUtil;
 import org.swiftp.Globals;
 
 import java.io.File;
@@ -54,7 +52,7 @@ public class SettingFragment extends PreferenceFragment {
 
     private SharedPreferences settings;
     private Resources         resources;
-    private Preference        mPassWordPref, username_pref, portnum_pref, chroot_pref, lastlog, ipaddress, qpyCustom;//, pyOptimize;
+    private Preference        mPassWordPref, username_pref, portnum_pref, chroot_pref, lastlog, ipaddress, qpyCustom, autoBackup;
     private CheckBoxPreference sl4a, running_state, root, display_pwd, qpy_protect, screen_on;//, notebook_run;
     private PowerManager.WakeLock wakeLock;
 
@@ -195,13 +193,14 @@ public class SettingFragment extends PreferenceFragment {
         mPassWordPref = findPreference(resources.getString(R.string.key_ftp_pwd));
         portnum_pref = findPreference(resources.getString(R.string.key_port_num));
         chroot_pref = findPreference(resources.getString(R.string.key_root_dir));
+        autoBackup = findPreference(resources.getString(R.string.key_auto_backup));
 
         boolean isRoot, isRunning;
         isRoot = settings.getBoolean(getString(R.string.key_root), false);
         root.setChecked(isRoot);
         root.setSummary(isRoot ? R.string.enable_root : R.string.disable_root);
 
-        isRunning = JsonRpcServer.isServiceRunning();//isMyServiceRunning(QPyScriptService.class);
+        isRunning = JsonRpcServer.isServiceRunning();
         sl4a.setChecked(isRunning);
         sl4a.setSummary(isRunning ? R.string.sl4a_running : R.string.sl4a_un_running);
 
@@ -225,10 +224,8 @@ public class SettingFragment extends PreferenceFragment {
         chroot_pref.setSummary(settings.getString(resources.getString(R.string.key_root_dir),
                 Environment.getExternalStorageDirectory().getAbsolutePath()));
         qpyCustom.setSummary(CONF.CUSTOM_PATH);
-        //pyOptimize.setSummary(PY_OPTIMIZE()[settings.getInt(getString(R.string.key_python_optimize),0)]);
-
-        //py_inter.setSummary(NAction.isQPy3(getActivity()) ? R.string.py3_now : R.string.py2_now);
-        //setNotebookCheckbox();
+        autoBackup.setSummary(settings.getString(resources.getString(R.string.key_auto_backup),"0"));
+        autoBackup.setTitle(resources.getString(R.string.auto_backup)+" ("+resources.getString(R.string.day)+")");
 
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean(getString(R.string.key_root), root.isChecked());
@@ -237,8 +234,8 @@ public class SettingFragment extends PreferenceFragment {
         editor.putString(getString(R.string.key_ftp_pwd), settings.getString(mPassWordPref.getKey(), "ftp"));
         editor.putString(getString(R.string.key_port_num), portnum_pref.getSummary().toString());
         editor.putString(getString(R.string.key_root_dir), chroot_pref.getSummary().toString());
+        editor.putString(getString(R.string.key_auto_backup),autoBackup.getSummary().toString());
         editor.putBoolean(getString(R.string.key_hide_noti), log.isChecked());
-        //editor.putBoolean(getString(R.string.key_py3), py3.isChecked());
         editor.apply();
     }
 
@@ -350,9 +347,9 @@ public class SettingFragment extends PreferenceFragment {
             boolean isCheck = (boolean) newValue;
             Context context = getActivity();
             if (isCheck) {
-                context.startService(new Intent(context, QPyScriptService.class));
+                QPyScriptService.start(context);
             } else {
-                context.stopService(new Intent(context, QPyScriptService.class));
+                QPyScriptService.stop(context);
             }
             return true;
         });
@@ -504,6 +501,26 @@ public class SettingFragment extends PreferenceFragment {
             return true;
         });
 
+        autoBackup.setOnPreferenceClickListener(preference ->
+
+        {
+            new EnterDialog(getActivity())
+                    .setTitle(getString(R.string.auto_backup))
+                    .setText(preference.getSummary().toString())
+                    .setMessage(getString(R.string.auto_backup_days)+
+                            Environment.getExternalStorageDirectory()+
+                            "/Download/QPythonBackup")
+                    .setEnterType(InputType.TYPE_CLASS_TEXT)
+                    .setConfirmListener(name -> {
+                        preference.setSummary(name);
+                        updatePreference(preference);
+                        PermissionUtil.requestAllFilesPermission();
+                        return true;
+                    })
+                    .show();
+            return true;
+        });
+
         chroot_pref.setOnPreferenceClickListener(preference ->
 
         {
@@ -539,6 +556,7 @@ public class SettingFragment extends PreferenceFragment {
             String path = preference.getSummary().toString();
             String msg = "\n"+getString(R.string.project)+": "+path+"/projects3\n"+
                     getString(R.string.script)+": "+path+"/scripts3\n"+
+                    "Notebook: "+path+"/notebooks\n"+
                     getString(R.string.library)+": "+path+"/lib/"+pyVer+"/site-packages/\n\n"+
                     getString(R.string.edit_to_new_path);
             new EnterDialog(getActivity())

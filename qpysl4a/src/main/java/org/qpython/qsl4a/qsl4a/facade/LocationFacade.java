@@ -281,6 +281,7 @@ public class LocationFacade extends RpcReceiver {
     result.put("locality", address.getLocality());
     result.put("postal_code", address.getPostalCode());
     result.put("sub_admin_area", address.getSubAdminArea());
+    result.put("sub_locality", address.getSubLocality());
     result.put("thoroughfare", address.getThoroughfare());
     result.put("url", address.getUrl());
     return result;

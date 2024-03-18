@@ -7,12 +7,13 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import com.quseit.util.FileHelper;
 import com.quseit.util.NUtil;
 
 import org.qpython.qpy.console.ScriptExec;
 import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpysdk.QPyConstants;
+
+import util.FileUtil;
 
 public class MPyService extends Service {
     protected static final String TAG = "mpyapi";
@@ -52,10 +53,10 @@ public class MPyService extends Service {
                 String type = intent.getStringExtra(QPyConstants.EXTRA_CONTENT_URL1);
                 String path = intent.getStringExtra(QPyConstants.EXTRA_CONTENT_URL2);
                 if (type.equals("script")) {
-                    ScriptExec.getInstance().playScript(MPyService.this, path, null);
+                    ScriptExec.play(MPyService.this, path);
 
                 } else if (type.equals("project")) {
-                    ScriptExec.getInstance().playProject(MPyService.this, path);
+                    ScriptExec.playPro(MPyService.this, path);
                 }
 
             } else if (bundle != null) {
@@ -69,7 +70,7 @@ public class MPyService extends Service {
                         if (param != null && param.equals("fileapi")) {
                             runMode = 2;
 
-                            ScriptExec.getInstance().playScript(MPyService.this, pyfile, null);
+                            ScriptExec.play(MPyService.this, pyfile);
 
                         } else {
                             // Compatibility Mode
@@ -79,8 +80,8 @@ public class MPyService extends Service {
                             //  runMode = 1;
                             //}
                             String script = CONF.SCOPE_STORAGE_PATH + "/cache/last.py";
-                            FileHelper.putFileContents(script, pycode);
-                            ScriptExec.getInstance().playScript(MPyService.this, script, null);
+                            FileUtil.writeToFile(script, pycode);
+                            ScriptExec.play(MPyService.this, script);
                         }
                     }
                 }
@@ -93,7 +94,7 @@ public class MPyService extends Service {
         if (myURI != null) {
             String script = getApplicationContext().getFilesDir() + "/bin/share.py";
             String param = myURI.toString();
-            ScriptExec.getInstance().playScript(MPyService.this, script, param);
+            ScriptExec.play(MPyService.this, script, param);
         }
     }
 
@@ -101,7 +102,7 @@ public class MPyService extends Service {
         String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
         if (sharedText != null) {
             String script = getApplicationContext().getFilesDir() + "/bin/share.py";
-            ScriptExec.getInstance().playScript(MPyService.this, script, sharedText);
+            ScriptExec.play(MPyService.this, script, sharedText);
         }
     }
 

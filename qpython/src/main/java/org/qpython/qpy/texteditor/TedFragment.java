@@ -265,9 +265,9 @@ public class TedFragment extends Fragment implements Constants, TextWatcher, Ind
                 }
             } else {
                 if (activity.mCurrentFilePath.contains("/projects")) {
-                    ScriptExec.getInstance().playProject(getActivity(), activity.mCurrentFilePath.replace("/main.py", ""));
+                    ScriptExec.playPro(getActivity(), activity.mCurrentFilePath.replace("/main.py", ""));
                 } else {
-                    ScriptExec.getInstance().playScript(getActivity(), activity.mCurrentFilePath, null);
+                    ScriptExec.play(getActivity(), activity.mCurrentFilePath);
                 }
             }
         } else {

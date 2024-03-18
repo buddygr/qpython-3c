@@ -93,9 +93,8 @@ public class AboutActivity extends BaseActivity {
         binding.tvWholeDown.setOnClickListener(v -> {
             //  checkUpdate(false);
             //progressDialog.show();
-            ScriptExec.getInstance().playScript(this,
-                    getFilesDir().getAbsolutePath()+"/bin/updateQPython.py",
-                    null);
+            ScriptExec.play(this,
+                    CONF.binDir+"updateQPython.py");
         });
 
         binding.tvBackupDownload.setOnClickListener(v ->

@@ -2,11 +2,13 @@ package org.qpython.qsl4a;
 
 import android.annotation.SuppressLint;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.qpython.qsl4a.qsl4a.AndroidProxy;
 import org.qpython.qsl4a.qsl4a.util.SPFUtils;
@@ -157,4 +159,18 @@ public class QPyScriptService extends Service {
             Log.d(TAG, "startMyAsyncTask:onPostExecute");
         }
     }
+
+    public static void startToast(Context context){
+        start(context);
+        Toast.makeText(context, R.string.sl4a_start, Toast.LENGTH_SHORT).show();
+    }
+
+    public static void start(Context context){
+        context.startService(new Intent(context,QPyScriptService.class));
+    }
+
+    public static void stop(Context context){
+        context.stopService(new Intent(context,QPyScriptService.class));
+    }
+
 }

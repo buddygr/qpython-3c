@@ -92,7 +92,7 @@ public class QrCodeActivity extends AppCompatActivity implements ZXingScannerVie
                 if (ps.get("token") != null) {
                     token = ps.get("token").get(0);
                 }
-                ScriptExec.getInstance().playScript(this,getApplicationContext().getFilesDir() + "/bin/qedit4web.py", token);
+                ScriptExec.play(this,getApplicationContext().getFilesDir() + "/bin/qedit4web.py", token);
                 QBaseApp.getInstance().getAsyncHttpClient().get(this, qweLink, null, new AsyncHttpResponseHandler() {
 
                     @Override

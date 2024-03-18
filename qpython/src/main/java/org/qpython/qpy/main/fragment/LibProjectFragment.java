@@ -129,7 +129,7 @@ public class LibProjectFragment extends RefreshFragment {
                 binding.progressBar.setVisibility(View.GONE);
                 binding.netError.setVisibility(View.VISIBLE);
 
-                if (NetStateUtil.isConnected(getContext())) {
+                //if (NetStateUtil.isConnected(getContext())) {
                     Button np = binding.netErrPypi;
                     np.setText(
                             getString(R.string.click_force_open)+" "+
@@ -139,7 +139,7 @@ public class LibProjectFragment extends RefreshFragment {
                         openPip();
                     });
                     np.setVisibility(View.VISIBLE);
-                }
+                //}
             }
 
 
@@ -304,7 +304,7 @@ public class LibProjectFragment extends RefreshFragment {
                         switch (item.getLinkExt()) {
                             case "py":
                                 path = SCRIPT_DIR + path;
-                                ScriptExec.getInstance().playScript(getContext(), path, "");
+                                ScriptExec.play(getContext(), path);
                                 break;
                             case "ipynb":
                                 path = NOTEBOOK_DIR + path;
@@ -312,7 +312,7 @@ public class LibProjectFragment extends RefreshFragment {
                                 break;
                             case "zip":
                                 path = PROJECT_DIR + path;
-                                ScriptExec.getInstance().playProject(getContext(), path,"");
+                                ScriptExec.playPro(getContext(), path);
                                 break;
                         }
                         break;

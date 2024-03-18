@@ -17,4 +17,5 @@
     <string name="normal">一般</string>
     <string name="click_daemon">点击多任务列表的“守护+数字”解锁进程</string>
     <string name="screen_capture_service">QPython屏幕捕获服务</string>
+    <string name="sl4a_start">启动SL4A服务……</string>
 </resources>

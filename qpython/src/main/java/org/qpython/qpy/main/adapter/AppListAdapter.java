@@ -26,6 +26,7 @@ import org.qpython.qpy.console.ScriptExec;
 import org.qpython.qpy.databinding.ItemAppListBinding;
 import org.qpython.qpy.main.activity.AppListActivity;
 import org.qpython.qpy.main.activity.HomeMainActivity;
+import org.qpython.qpy.main.app.CONF;
 import org.qpython.qpy.main.model.AppModel;
 import org.qpython.qpy.main.model.LocalAppModel;
 import org.qpython.qpy.main.model.QPyScriptModel;
@@ -106,7 +107,12 @@ public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppLis
 
         binding.getRoot().setOnLongClickListener(v -> {
             if (position != dataList.size()) {
-                CharSequence[] chars = new CharSequence[]{context.getString(R.string.create_shortcut), context.getString(R.string.run_with_params), context.getString(R.string.open_with_editor)};
+                CharSequence[] chars = new CharSequence[]{
+                        context.getString(R.string.create_shortcut),
+                        context.getString(R.string.run_with_params),
+                        context.getString(R.string.open_with_editor),
+                        context.getString(R.string.share)
+                };
 
                 final boolean[] isConsumed = new boolean[]{true};
                 new AlertDialog.Builder(context, R.style.MyDialog)
@@ -124,6 +130,10 @@ public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppLis
                                 case 2:
                                     openToEdit(position);
                                     dialog.dismiss();
+                                    break;
+                                case 3:
+                                    shareCode(position);
+                                    dialog.dismiss();
 
                             }
                         }).setNegativeButton(context.getString(R.string.close), new DialogInterface.OnClickListener() {
@@ -140,6 +150,11 @@ public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppLis
             }
         });
 
+    }
+
+    private void shareCode(int position) {
+        String path = ((QPyScriptModel) dataList.get(position)).getPath();
+        ScriptExec.play(context,CONF.binDir+"shareCode.py","'"+path+"'");
     }
 
     @Override
@@ -241,9 +256,9 @@ public class AppListAdapter extends RecyclerView.Adapter<MyViewHolder<ItemAppLis
                     }
                     QPyScriptModel model = (QPyScriptModel) dataList.get(position);
                     if (model.isProj()) {
-                        ScriptExec.getInstance().playProject(context, model.getPath(), args);
+                        ScriptExec.playPro(context, model.getPath(), args);
                     } else {
-                        ScriptExec.getInstance().playScript(context, model.getPath(),
+                        ScriptExec.play(context, model.getPath(),
                                 args);
                     }
                     return true;

@@ -22,6 +22,7 @@ import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
@@ -243,6 +244,14 @@ public class EmulatorView extends View implements GestureDetector.OnGestureListe
      * A hash table of underlying URLs to implement clickable links.
      */
     private Hashtable<Integer, URLSpan[]> mLinkLayer = new Hashtable<Integer, URLSpan[]>();
+
+    public void sendEscKey() {
+        //mIsTabKeySent = true;
+        mTermSession.write(new byte[]{0x1b}, 0, 1);
+        //effectiveMetaState &= ~KeyEvent.META_META_MASK;
+        ((Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE)).vibrate(200);
+        invalidate();
+    }
 
     /**
      * Accept links that start with http[s]:
@@ -1707,7 +1716,6 @@ public class EmulatorView extends View implements GestureDetector.OnGestureListe
         mIsTabKeySent = true;
         mKeyListener.handleTabKey(true);
         invalidate();
-
     }
     /**
      * Set the key code to be sent when the Back key is pressed.

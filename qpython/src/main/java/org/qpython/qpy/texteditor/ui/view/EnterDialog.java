@@ -19,6 +19,7 @@ import org.qpython.qpy.databinding.DialogEnterBinding;
 /**
  * A Dialog Contain EditText
  * Created by Hmei on 2017-05-18.
+ * Edit by 乘着船
  */
 
 public class EnterDialog {

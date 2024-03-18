@@ -423,7 +423,7 @@ public class EditorActivity extends BaseActivity implements ViewTreeObserver.OnG
     }
 
     private void updateSetting() {
-        Settings.updateFromPreferences(PreferenceManager.getDefaultSharedPreferences(this));
+        Settings.updateFromPreferences(CONF.PREF);
     }
 
     //private void initFiles() {

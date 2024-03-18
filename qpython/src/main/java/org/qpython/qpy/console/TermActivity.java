@@ -77,7 +77,7 @@ import org.qpython.qpy.texteditor.ui.adapter.bean.PopupItemBean;
 import org.qpython.qpy.texteditor.ui.view.EditorPopUp;
 import org.qpython.qpysdk.utils.AndroidCompat;
 import org.qpython.qsl4a.QPyScriptService;
-import org.qpython.qsl4a.qsl4a.StringUtils;
+import com.quseit.util.StringUtils;
 import org.qpython.qsl4a.qsl4a.jsonrpc.JsonRpcServer;
 
 import java.io.File;
@@ -120,6 +120,7 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
     private final static int    PASTE_ID                          = 2;
     private final static int    SEND_CONTROL_KEY_ID               = 3;
     private final static int    SEND_FN_KEY_ID                    = 4;
+    private final static int    SEND_ESC_KEY_ID                   = 5;
     // Available on API 12 and later
     private static final int    WIFI_MODE_FULL_HIGH_PERF          = 3;
     private static final String ACTION_PATH_BROADCAST             = "jackpal.androidterm.broadcast.APPEND_TO_PATH";
@@ -271,8 +272,7 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
         if(JsonRpcServer.isServiceRunning()) {
             context.startActivity(intent);
         } else {
-            context.startService(new Intent(context, QPyScriptService.class));
-            Toast.makeText(context, R.string.sl4a_start, Toast.LENGTH_SHORT).show();
+            QPyScriptService.startToast(context);
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
@@ -378,14 +378,6 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
         TermShortcutLayout shortcutLayout = (TermShortcutLayout) findViewById(R.id.term_shortcut);
         shortcutLayout.setCallback(this::setTextToEmulator);
 
-        /*findViewById(R.id.notebook).setOnClickListener(v -> {
-            ScriptExec.getInstance().playScript(this,
-                    getFilesDir().getAbsolutePath()+"/bin/browserConsole.py",
-                    null, false);
-        });*/
-
-        //findViewById(R.id.history).setOnClickListener(v -> showHistory());
-        //findViewById(R.id.switch_notebook_img).setOnClickListener(v -> openNotebook());
     }
 
     /*private void openNotebook() {
@@ -827,6 +819,7 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
         menu.add(0, PASTE_ID, 0, R.string.paste);
         menu.add(0, SEND_CONTROL_KEY_ID, 0, R.string.send_control_key);
         menu.add(0, SEND_FN_KEY_ID, 0, R.string.send_fn_key);
+        menu.add(0, SEND_ESC_KEY_ID, 0, R.string.send_esc_key);
         if (!canPaste()) {
             menu.getItem(PASTE_ID).setEnabled(false);
         }
@@ -851,9 +844,16 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
             case SEND_FN_KEY_ID:
                 doSendFnKey();
                 return true;
+            case SEND_ESC_KEY_ID:
+                doSendEscKey();
+                return true;
             default:
                 return super.onContextItemSelected(item);
         }
+    }
+
+    private void doSendEscKey() {
+        getCurrentEmulatorView().sendEscKey();
     }
 
     @Override
@@ -1163,11 +1163,11 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
     private TermSession setup(TermSettings settings) throws IOException {
         SharedPreferences.Editor pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
         pref.putString("shell",getString(R.string.pref_shell_default)).apply();
-        String filesDir = CONF.filesDir;
+        //String filesDir = CONF.filesDir;
         TermSession session = createTermSession(this, settings,
                 this.getApplicationInfo().nativeLibraryDir + "/lib-qpython-setup.so setup && exit",
-                filesDir);
-        pref.putString("shell",filesDir+"/bin/sh").apply();
+                CONF.filesDir);
+        pref.putString("shell",CONF.binDir+"sh").apply();
         return session;
     }
 
@@ -1191,6 +1191,9 @@ public class TermActivity extends AppCompatActivity implements UpdateCallback, S
             session = createTermSession(this, settings, "cd && bin/shell.sh", CONF.filesDir);
         else if (shell_type.equals("setup")) {
             session = setup(settings);
+        } else if (shell_type.equals("backup")) {
+            session = createTermSession(this, settings, "cd && python bin/autoBackup.py && exit", CONF.filesDir);
+            this.finish();
         } else
             session = createTermSession(this, settings, CONF.binDir + shell_type + " && exit", CONF.filesDir);
         if (mArgs != null) {

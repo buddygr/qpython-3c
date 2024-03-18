@@ -25,6 +25,7 @@ import util.FileUtil;
 import com.quseit.util.NAction;
 
 import org.qpython.qpy.R;
+import org.qpython.qpy.console.ScriptExec;
 import org.qpython.qpy.console.TermActivity;
 import org.qpython.qpy.main.activity.BaseActivity;
 import org.qpython.qpy.main.activity.HomeMainActivity;
@@ -96,30 +97,16 @@ public class QPyExtFragment extends Fragment {
             activity.startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + activity.getPackageName())),100);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     private static void initQPy(){
         long t1 = SystemClock.elapsedRealtimeNanos();
+        checkOtherPermission();
         Toast.makeText(activity,R.string.initial_qpython,Toast.LENGTH_SHORT).show();
         File filesDir = activity.getFilesDir();
         if (!CONF.pyVer.equals("-1"))
             qpysdk.extractRes("resource", filesDir,true);
-        /*new AlertDialog.Builder(activity, R.style.MyDialog)
-                .setTitle(R.string.notice)
-                .setMessage(
-                        activity.getString(R.string.welcome)+"\n\n"+
-                                activity.getString(R.string.shortcut_permission))
-                .setPositiveButton(R.string.setting, (dialog1, which) -> {
-                    NAction.startInstalledAppDetailsActivity(activity);
-                    getPyVer(false);
-                })
-                .setNegativeButton(R.string.ignore, (dialog1, which) -> getPyVer(false))
-                .setOnCancelListener(cancel -> getPyVer(false))
-                .create()
-                .show();*/
         TermActivity.startShell(activity,"setup");
         long t2 = SystemClock.elapsedRealtimeNanos();
-        checkOtherPermission();
-        int t = (int) Math.round((t2-t1)*0.001);
+        int t = (int) Math.round((t2-t1)*0.05);
         File f = new File(filesDir+"/resource.version");
         final boolean[] exist = {false};
         (new CountDownTimer(t,500){
@@ -143,7 +130,6 @@ public class QPyExtFragment extends Fragment {
         }).start();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     private static void getPyVer(boolean once) {
         if (CONF.pyVer.startsWith("py")) return;
         if (qpysdk==null)
@@ -160,7 +146,7 @@ public class QPyExtFragment extends Fragment {
             CONF.pyVerComplete = pyVer[1];
             CONF.pyVer = pyVer[0];
             //可以消除终端中文输入的某些bug，虽然不知道为什么
-            if (once) activity.startShell("init.sh");
+            if (once) activity.startShell("backup");
             else activity.runShortcut(activity.getIntent());
         }
         catch (Exception e){
@@ -171,7 +157,8 @@ public class QPyExtFragment extends Fragment {
 
     public static void openQpySDK(HomeMainActivity context) {
         activity = context;
-        CONF.PREF = PreferenceManager.getDefaultSharedPreferences(activity);
+        //CONF.PREF = PreferenceManager.getDefaultSharedPreferences(activity);
+        ScriptExec.setInstance(context);
         if (qpysdk==null)
             qpysdk = new QPySDK(activity, activity);
         try {

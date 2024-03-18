@@ -68,7 +68,6 @@ public class HomeMainActivity extends BaseActivity {
 
     private void startMain() {
         initListener();
-        //JsonRpcServer.startService(this);
         Bus.getDefault().register(this);
         QPyExtFragment.openQpySDK(this);
         setTaskDescription(new ActivityManager.TaskDescription(getString(R.string.aux_window)));
@@ -94,8 +93,8 @@ public class HomeMainActivity extends BaseActivity {
     }
 
     private void playPy(String name){
-        ScriptExec.getInstance().playScript(HomeMainActivity.this,
-                CONF.binDir+name+".py", null);
+        ScriptExec.play(HomeMainActivity.this,
+                CONF.binDir+name+".py");
     }
 
     private void initListener() {
@@ -115,7 +114,7 @@ public class HomeMainActivity extends BaseActivity {
             for(byte i = 0;i < consoleItem.length;i++)
                 list.add(consoleItem[consoleMenu.get(i)]);
             Spanned[] chars = list.toArray(new Spanned[consoleItem.length]);
-            boolean k = new File(CONF.filesDir,"bin/quick_notebook.py").exists();
+            boolean k = new File(CONF.binDir,"NoteBook.py").exists();
             new AlertDialog.Builder(this, R.style.MyDialog)
                     .setTitle(R.string.choose_action)
                     .setItems(chars, (dialog, which) -> {
@@ -142,7 +141,7 @@ public class HomeMainActivity extends BaseActivity {
                                 startShell("shell");
                                 break;
                             case 6:
-                                if (k) playPy("quick_notebook");
+                                if (k) playPy("NoteBook");
                                 else liteVersionNotSupport();
                                 break;
                         }
@@ -287,24 +286,19 @@ public class HomeMainActivity extends BaseActivity {
         String arg = intent.getStringExtra("arg");
         boolean isProj = intent.getBooleanExtra("isProj", false);
         if (isProj)
-            ScriptExec.getInstance().playProject(this, path, arg);
+            ScriptExec.playPro(this, path, arg);
         else {
             if(path.endsWith(".ipynb"))
                 AppListActivity.openNotebook(this,path);
             else
-                ScriptExec.getInstance().playScript(this, path, arg);
+                ScriptExec.play(this, path, arg);
     }}}
 
     private void runShortcut(){
         if(SplashActivity.delay > 100){
             if(CONF.pyVer.isEmpty())
                 return;
-            //new Timer().schedule(new TimerTask() {
-            //    @Override
-            //    public void run() {
             runShortcut(getIntent());
-            //    }
-            //},500);
             SplashActivity.delay = 100;
         } else runShortcut(getIntent());
     }
@@ -324,7 +318,7 @@ public class HomeMainActivity extends BaseActivity {
             public void handleMessage(Message msg){
                 super.handleMessage(msg);
                 String[] string = (String[]) msg.obj;
-                ScriptExec.getInstance().playScript(
+                ScriptExec.play(
                         HomeMainActivity.this,
                         string[0],string[1]
                 );

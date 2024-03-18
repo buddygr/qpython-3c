@@ -18,12 +18,8 @@ package org.qpython.qsl4a.qsl4a.jsonrpc;
 
 //import org.qpython.qsl4a.qsl4a.LogUtil;
 
-import android.content.Context;
-import android.content.Intent;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.qpython.qsl4a.QPyScriptService;
 import org.qpython.qsl4a.qsl4a.SimpleServer;
 import org.qpython.qsl4a.qsl4a.rpc.MethodDescriptor;
 import org.qpython.qsl4a.qsl4a.rpc.RpcError;
@@ -118,10 +114,5 @@ public class JsonRpcServer extends SimpleServer {
   public static boolean isServiceRunning(){
     return mHandshake!=null;
   }
-
-  /*public static void startService(Context context){
-    if(mHandshake==null)
-      context.startService(new Intent(context,QPyScriptService.class));
-  }*/
 
 }

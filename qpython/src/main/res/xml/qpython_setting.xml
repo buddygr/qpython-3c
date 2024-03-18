@@ -6,30 +6,16 @@
     <PreferenceCategory
         android:key="other"
         android:title="@string/more"/>
-    <!--<Preference-->
-        <!--android:key="install_py3"-->
-        <!--android:title="@string/install_py3"/>-->
 
     <Preference
         android:key="community"
         android:title="@string/get_help"
         android:summary="@string/get_support_from_community"/>
 
-    <!--Preference
-        android:key="@string/key_about"
-        android:title="@string/about"
-        android:summary="@string/abou_feed_cont"/-->
-
-
     <Preference
         android:key="ipaddress"
         android:title="@string/ip_address"
         android:summary=""/>
-
-    <!-- PreferenceCategory
-        android:key="config"
-        android:title="@string/more"/ -->
-
 
     <Preference
         android:defaultValue=""
@@ -40,12 +26,6 @@
         android:key="lastlog"
         android:title="@string/log_title"
         android:summary="@string/get_last_log"/>
-
-    <CheckBoxPreference
-        android:key="@string/key_root"
-        android:summaryOn="@string/enable_root"
-        android:summaryOff="@string/disable_root"
-        android:title="@string/root_mode"/>
 
     <CheckBoxPreference
         android:key="@string/key_sl4a"
@@ -121,14 +101,20 @@
         android:key="@string/key_screen_on"
         android:title="@string/screen_on_label"/>
 
-    <!-- Preference
-        android:key="@string/key_python_optimize"
-        android:title="@string/optimize_grade"
-        android:summary=""/ -->
+    <Preference
+        android:defaultValue="0"
+        android:key="@string/key_auto_backup"
+        android:title="@string/auto_backup"/>
 
     <Preference
         android:key="screen_record"
         android:title="@string/screen_record"/>
+
+    <CheckBoxPreference
+        android:key="@string/key_root"
+        android:summaryOn="@string/enable_root"
+        android:summaryOff="@string/disable_root"
+        android:title="@string/root_mode"/>
 
     <PreferenceCategory
         android:key="notify"

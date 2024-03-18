@@ -93,6 +93,9 @@ public class ApplicationManagerFacade extends RpcReceiver {
     result.put("publicSourceDir",appInfo.publicSourceDir);
     result.put("deviceProtectedDataDir",appInfo.deviceProtectedDataDir);
     result.put("label",appInfo.loadLabel(mPackageManager));
+    PackageInfo pkgInfo = mPackageManager.getPackageInfo(packageName,0);
+    result.put("versionCode",pkgInfo.versionCode);
+    result.put("versionName",pkgInfo.versionName);
     return result;
   }
 

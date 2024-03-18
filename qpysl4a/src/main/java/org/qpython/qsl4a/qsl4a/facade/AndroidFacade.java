@@ -30,6 +30,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -107,6 +108,7 @@ public class AndroidFacade extends RpcReceiver {
   public final String qpyProvider;
   public static Handler handler;
   public final String SCOPE_STORAGE_PATH;
+  public final String basepath;
 
   public final int intentFlags = Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION  | Intent.FLAG_GRANT_WRITE_URI_PERMISSION ;
 
@@ -134,6 +136,10 @@ public class AndroidFacade extends RpcReceiver {
     context = mService.getApplicationContext();
     qpyProvider = context.getPackageName() + ".provider";
     SCOPE_STORAGE_PATH = context.getExternalFilesDir("").getParent();
+    if( Environment.getExternalStorageDirectory().canWrite())
+      basepath = Environment.getExternalStorageDirectory().getAbsolutePath();
+    else
+      basepath = SCOPE_STORAGE_PATH;
   }
 
   ClipboardManager getClipboardManager() {

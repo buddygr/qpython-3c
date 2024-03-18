@@ -26,11 +26,14 @@ import android.hardware.Camera.PictureCallback;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+
+import com.quseit.util.StringUtils;
 
 import util.DocumentUtil;
 
@@ -63,7 +66,7 @@ public class CameraFacade extends RpcReceiver {
 
   private final Service mService;
 
-  private final String sdcard;
+  private static String basepath;
   private final AndroidFacade mAndroidFacade;
   private final Context context;
   private final String qpyProvider;
@@ -75,33 +78,29 @@ public class CameraFacade extends RpcReceiver {
   public CameraFacade(FacadeManager manager) {
     super(manager);
     mService = manager.getService();
-
     mAndroidFacade = manager.getReceiver(AndroidFacade.class);
-    sdcard = DocumentUtil.SDCARD;
     context = mAndroidFacade.context;
+    basepath = mAndroidFacade.basepath;
     qpyProvider = mAndroidFacade.qpyProvider;
   }
 
   @Rpc(description = "Take a picture and save it to the specified path.", returns = "A map of Booleans autoFocus and takePicture where True indicates success.")
-  public String cameraCapturePicture(@RpcParameter(name = "targetPath") final String targetPath,
+  public String cameraCapturePicture(@RpcParameter(name = "targetPath") @RpcOptional String targetPath,
                                      //cameraId: back==0, front==1
                                      @RpcParameter(name = "cameraId") @RpcDefault("0") Integer cameraId,
                                      @RpcParameter(name = "useAutoFocus") @RpcDefault("true") Boolean useAutoFocus)
           throws Exception {
+    if(targetPath == null)
+        targetPath = basepath + "/DCIM/" + StringUtils.getDateStr() + ".jpg";//照片命名
     final BooleanResult autoFocusResult = new BooleanResult();
     final BooleanResult takePictureResult = new BooleanResult();
 
     Camera camera = Camera.open(cameraId);
-    /*try{
-      mParameters = camera.getParameters();
-      camera.setParameters(mParameters);
-    } catch (Exception e){
-      //throw new Exception(Arrays.toString(e.getStackTrace()));
-    }*/
 
     try {
-      Method method = camera.getClass().getMethod("setDisplayOrientation", int.class);
-      method.invoke(camera, 90);
+      //Method method = camera.getClass().getMethod("setDisplayOrientation", int.class);
+      //method.invoke(camera, 90);
+      camera.setDisplayOrientation(90);
     } catch (Exception e) {
       LogUtil.e(e);
     }
@@ -205,22 +204,6 @@ public class CameraFacade extends RpcReceiver {
     }
   }
 
-  /*@Rpc(description = "Starts the image capture application to take a picture and saves it to the specified path.")
-  public void cameraInteractiveCapturePicture(
-      @RpcParameter(name = "targetPath") final String targetPath) {
-    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-    File file = new File(targetPath);
-    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
-
-    AndroidFacade facade = mManager.getReceiver(AndroidFacade.class);
-    if (intent.resolveActivity(mService.getPackageManager())!=null) {
-      facade.startActivityForResult(intent);
-    } else {
-      LogUtil.e("No camera found");
-    }
-  }*/
-
-
   @Override
   public void shutdown() {
     // Nothing to clean up.
@@ -235,8 +218,8 @@ public class CameraFacade extends RpcReceiver {
     String fn;
     File out;
     if (path == null) {
-      String imgPath = sdcard + "/DCIM/";//存放照片的文件夹
-      fn = new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date()) + ".jpg";//照片命名
+      String imgPath = basepath + "/DCIM/";//存放照片的文件夹
+      fn = StringUtils.getDateStr() + ".jpg";//照片命名
       out = new File(imgPath);
       if (!out.exists()) {
         out.mkdirs();
@@ -274,8 +257,8 @@ public class CameraFacade extends RpcReceiver {
     String fn;
     File out;
     if (path == null) {
-      String vidPath = sdcard + "/DCIM/";//存放照片的文件夹
-      fn = new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date()) + ".mp4";//视频命名
+      String vidPath = basepath + "/DCIM/";//存放照片的文件夹
+      fn = StringUtils.getDateStr() + ".mp4";//视频命名
       out = new File(vidPath);
       if (!out.exists()) {
         out.mkdirs();

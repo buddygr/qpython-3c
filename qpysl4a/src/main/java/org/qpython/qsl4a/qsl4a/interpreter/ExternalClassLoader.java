@@ -1,6 +1,6 @@
 package org.qpython.qsl4a.qsl4a.interpreter;
 
-import org.qpython.qsl4a.qsl4a.StringUtils;
+import com.quseit.util.StringUtils;
 
 import dalvik.system.DexClassLoader;
 

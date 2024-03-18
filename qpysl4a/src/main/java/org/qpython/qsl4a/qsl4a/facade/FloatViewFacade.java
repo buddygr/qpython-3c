@@ -161,7 +161,7 @@ public class FloatViewFacade extends RpcReceiver {
     for(int i=0;i<buttons.size();i++)
       if(buttons.get(i)!=null)
         cnt+=1;
-      return cnt;
+    return cnt;
   }
 
   @Rpc(description = "QPython Background Protect .")

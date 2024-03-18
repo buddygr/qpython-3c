@@ -384,4 +384,18 @@ public class FileUtil {
             iox.printStackTrace();
         }
     }
+
+    public static File fileAutoMkParent(File file) throws Exception {
+        File parent = file.getParentFile();
+        if(parent == null)
+            throw new Exception("Cannot create directory : "+parent);
+        if (!parent.exists()) {
+            parent.mkdirs();
+        }
+        return file;
+    }
+
+    public static String fileAutoMkParent(String file) throws Exception {
+        return fileAutoMkParent(new File(file)).getAbsolutePath();
+    }
 }

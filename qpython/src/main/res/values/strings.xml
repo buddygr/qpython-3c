@@ -45,7 +45,7 @@
     <string name="gist">Gist</string>
 
     <string name="more">More</string>
-    <string name="qpypi">Package</string>
+    <string name="qpypi" translatable="false">QPy</string>
     <string name="sl4a_server">SL4A Server</string>
     <string name="internal_space"><![CDATA[Permissions & Storage]]></string>
     <string name="ftp_server">FTP Server</string>
@@ -73,6 +73,7 @@
     <string name="copy_all">Copy all</string>
     <string name="send_control_key">Send control key</string>
     <string name="send_fn_key">Send Fn key</string>
+    <string name="send_esc_key">Send Esc key</string>
 
     <string name="window_title">Terminal %1$d</string>
 
@@ -343,7 +344,7 @@
     <string name="enter_name_hint">Enter script name</string>
 
     <string name="paste">Paste</string>
-    <string name="install_with_python_s_pypi">QPYPI CLIENT</string>
+    <string name="install_with_python_s_pypi">PIP CLIENT</string>
     <string name="py_pi"><![CDATA[You can manager and install Python packages from QPYPI and Python\'s PYPI, support tsinghua and BFSU source .]]></string>
     <string name="download_fail">Download fail</string>
     <string name="key_reset">reset_storage</string>
@@ -515,23 +516,11 @@
     <string name="insert_frm">from</string>
 
     <string name="file_new">File</string>
-    <string name="install_py3">Install Python 3</string>
-    <string name="py2_or_3">Do you want to use Python 3 or 2 by default ?</string>
-    <string name="use_py3">Use Python 3</string>
-    <string name="py3_now">Using Python 3 now</string>
-    <string name="install_py3_first">To switch to Python 3, please download it\'s resource</string>
 
     <string name="py_resources">Download Python Resource</string>
 
     <string name="aipy_install">Check to Install AIPY</string>
     <string name="aipy_installed">AIPy is installed</string>
-    <string name="switch_py3">Switch to Python 3</string>
-    <string name="update_py3"><![CDATA[Download Py3 Resource]]></string>
-
-    <string name="switch_py2">Reset to Python 2 Standard</string>
-    <string name="switch_py2_libs">It will remove all Python 2 libraries you have installed</string>
-
-    <string name="switch_py2compatible">Reset to Python 2 Compatible</string>
 
     <string name="install_aipy">Enable AIPY</string>
 
@@ -653,10 +642,9 @@
     <string name="python_interpreter">Python Interpreter</string>
 
     <string name="shell_terminal">Shell Terminal</string>
-    <string name="ip_address">My IP Adress</string>
+    <string name="ip_address">My IP Address</string>
     <string name="ip_address_need_wifi_or_ap">Please connect your WiFi or turn on WiFi hotspot</string>
     <string name="editor_override">Do you want to override?</string>
-    <string name="welcome">Welcome to use QPython Plus , enjoy your mobile phone programming journey now .</string>
     <string name="notice">Notice</string>
     <string name="package_name_title">Package Name</string>
     <string name="qpython_android">qpython-android</string>
@@ -736,23 +724,22 @@
     <string name="key_default">Default</string>
     <string name="click_light">Tap the center of the screen to turn on/off the flash light .</string>
     <string name="screen_on_label">Keep Screen On</string>
-    <!-- string name="optimize_grade">Python Optimize Grade</string>
-    <string name="none">None</string>
-    <string name="optimize_1">remove assert and __debug__-dependent statements</string>
-    <string name="optimize_2">do grade-1 changes and also discard docstrings</string>
-    <string name="key_python_optimize" translatable="false">PYTHONOPTIMIZE</string -->
     <string name="key_screen_on" translatable="false">screen_on</string>
     <string name="key_qpython_protect" translatable="false">qpython_protect</string>
     <string name="edit_to_new_path">You can edit it to new path .</string>
     <string name="qpy_custom_dir_key">QPython Custom Directory</string>
-    <string name="sl4a_start">Start SL4A Server …</string>
     <string name="initial_qpython">Initial QPython, DO NOT operate !</string>
     <string name="umeng">Allow QPython to send user statistics for UMeng ?</string>
-    <string name="selected">Selected</string>
+    <string name="tools">Tools</string>
     <string name="qpython_year" translatable="false">2024</string>
     <string name="url_course">https://edu.qpython.org/courses.html</string>
     <string name="url_course_simple" translatable="false">edu.qpython.org</string>
     <string name="news">News</string>
     <string name="news_page">https://twitter.com/qpython</string>
     <string name="news_page_simple">twitter.com</string>
+    <string name="need_save_as">This file Read Only, please save to another location before edit it.</string>
+    <string name="key_auto_backup" translatable="false">AutoBackup</string>
+    <string name="auto_backup">Auto Backup</string>
+    <string name="auto_backup_days">How many days does it automatically backup QPython code ?\nOnly backup when QPython is started .\nYou can input integers or decimals , where 0 indicates no backup .\nExternal Storage permissions are required , Backup Path :\n</string>
+    <string name="day">Day</string>
 </resources>

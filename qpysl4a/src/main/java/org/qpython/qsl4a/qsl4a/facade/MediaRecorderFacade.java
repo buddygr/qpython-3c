@@ -53,9 +53,12 @@ import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
+import com.quseit.util.StringUtils;
+
 import org.qpython.qsl4a.QSL4APP;
-import org.qpython.qsl4a.qsl4a.future.FutureActivityTaskExecutor;
+import org.qpython.qsl4a.qsl4a.LogUtil;
 import org.qpython.qsl4a.qsl4a.future.FutureActivityTask;
+import org.qpython.qsl4a.qsl4a.future.FutureActivityTaskExecutor;
 import org.qpython.qsl4a.qsl4a.jsonrpc.RpcReceiver;
 import org.qpython.qsl4a.qsl4a.rpc.Rpc;
 import org.qpython.qsl4a.qsl4a.rpc.RpcDefault;
@@ -67,10 +70,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
+import util.FileUtil;
 
 /**
  * A facade for recording media.
@@ -90,7 +93,7 @@ public class MediaRecorderFacade extends RpcReceiver {
 
   private final AndroidFacade mAndroidFacade;
   private final Context context;
-  private final String basepath;
+  private static String basepath;
   private final Handler mHandler;
   private final Service mService;
   static Intent intentMP;
@@ -113,10 +116,7 @@ public class MediaRecorderFacade extends RpcReceiver {
     super(manager);
     mAndroidFacade = manager.getReceiver(AndroidFacade.class);
     context = mAndroidFacade.context;
-    if( Environment.getExternalStorageDirectory().canWrite())
-       basepath = Environment.getExternalStorageDirectory().getAbsolutePath();
-    else
-       basepath = context.getExternalFilesDir("").getAbsolutePath();
+    basepath = mAndroidFacade.basepath;
     mHandler = mAndroidFacade.mHandler;
     mService = mAndroidFacade.mService;
     mLock = new Object();
@@ -127,13 +127,9 @@ public class MediaRecorderFacade extends RpcReceiver {
           @RpcParameter(name = "targetPath") @RpcOptional String path)
           throws Exception {
     if (path == null) {
-      path = basepath + "/Sounds/Recorder/"; /*存放录音的文件夹*/
-      File _path = new File(path);
-      if (!_path.exists()) {
-        _path.mkdirs();
-      }
-      path += new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date()) + ".amr";//音频命名
+      path = basepath + "/Sounds/Recorder/" /*存放录音的文件夹*/ + StringUtils.getDateStr() + ".amr";//音频命名
     }
+    FileUtil.fileAutoMkParent(path);
     startAudioRecording(path);
     return path;
   }
@@ -384,13 +380,9 @@ public class MediaRecorderFacade extends RpcReceiver {
     createMediaProjection();
     DisplayMetrics dm = context.getResources().getDisplayMetrics();
     if (path == null) {
-      path = basepath + "/Pictures/Screenshots/"; /*存放截屏的文件夹*/
-      File _path = new File(path);
-      if (!_path.exists()) {
-        _path.mkdirs();
-      }
-      path += new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date()) + ".mp4";//视频命名
+      path = basepath + "/Pictures/Screenshots/" /*存放截屏的文件夹*/ + StringUtils.getDateStr() + ".mp4";//视频命名
     }
+    FileUtil.fileAutoMkParent(path);
     int screenWidth, screenHeight;
     if (rotation) {
       screenHeight = dm.widthPixels;
@@ -419,13 +411,9 @@ public class MediaRecorderFacade extends RpcReceiver {
   createMediaProjection();
   DisplayMetrics dm = context.getResources().getDisplayMetrics();
   if (path == null) {
-    path = basepath + "/Pictures/Screenshots/"; /*存放截屏的文件夹*/
-    File _path = new File(path);
-    if (!_path.exists()) {
-      _path.mkdirs();
-    }
-    path += new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date()) + ".jpg";//图片命名
+    path = basepath + "/Pictures/Screenshots/" /*存放截屏的文件夹*/ + StringUtils.getDateStr() + ".jpg";//图片命名
   }
+  FileUtil.fileAutoMkParent(path);
   int screenWidth = dm.widthPixels;
   int screenHeight = dm.heightPixels;
   ImageReader mImageReader = ImageReader.newInstance(screenWidth, screenHeight, PixelFormat.RGBA_8888, 2);
@@ -483,7 +471,7 @@ public class MediaRecorderFacade extends RpcReceiver {
 
   @Rpc(description = "Records video from the camera and saves it to the given location.")
   public String recorderCaptureVideo(
-          @RpcParameter(name = "targetPath") String targetPath,
+          @RpcParameter(name = "targetPath") @RpcOptional String targetPath,
           //default duration 10 seconds
           @RpcParameter(name = "duration") @RpcDefault("10") Integer duration,
           //cameraId: back==0, front==1
@@ -491,6 +479,9 @@ public class MediaRecorderFacade extends RpcReceiver {
           //CamcorderProfile.QUALITY_2160P == 8
           @RpcParameter(name = "quality") @RpcDefault("8") Integer quality
   ) throws Exception {
+    if(targetPath == null)
+      targetPath = basepath + "/DCIM/" + StringUtils.getDateStr() + ".mp4";//视频命名
+    FileUtil.fileAutoMkParent(targetPath);
     int ms = convertSecondsToMilliseconds(duration);
       startVideoRecording(new File(targetPath), ms, cameraId, quality);
     return targetPath;
@@ -498,6 +489,15 @@ public class MediaRecorderFacade extends RpcReceiver {
 
   private void startVideoRecording(File file, int milliseconds, int cameraId, int quality) throws Exception {
     camera = Camera.open(cameraId);
+
+    try {
+      //Method method = camera.getClass().getMethod("setDisplayOrientation", int.class);
+      //method.invoke(camera, 90);
+      camera.setDisplayOrientation(90);
+    } catch (Exception e) {
+      LogUtil.e(e);
+    }
+
     mMediaRecorder = new MediaRecorder();
     camera.unlock();
       mMediaRecorder.setCamera(camera);
