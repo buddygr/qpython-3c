@@ -13,7 +13,7 @@ QPython already has millions of users worldwide and it is also an open source pr
 For different usage scenarios, QPython has two branches, namely [QPython (Standard)](https://github.com/qpython-android/qpython) and [QPython Plus](https://gitee.com/buddygr/qpython-3c) .
 
 QPython (Standard) is mainly aimed at programming learners, and it provides more basic features for users ;
-QPython Plus is forked from QPython (Standard) . QPython Plus is mainly aimed at Android 7 to 14 with 64bit, and it provides a lot of advanced technical features .
+QPython Plus is forked from QPython (Standard) . QPython Plus is mainly aimed at Android 9 to 16 with 64bit, and it provides a lot of advanced technical features .
 
 ## Quick start
 
